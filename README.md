@@ -1,4 +1,4 @@
-# 유기동물 센터 TeamProject
+# Ott Movie Review TeamProject
 
 
 ## 프로젝트 소개
