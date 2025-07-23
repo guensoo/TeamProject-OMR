@@ -10,8 +10,8 @@ import {
     StatusBar
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { getBoxOfficeWithPosters } from '../공통/api/kofic';
-import MovieCard from './components/MovieCard';
+import { getBoxOfficeWithPosters } from '../All/api/kofic';
+import MovieCard from './components/card/MovieCard';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - 60) / 2;

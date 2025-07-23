@@ -5,18 +5,19 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 //공통
 
 //메인
-import Home from './허민석/components/Home';
+import Home from './Heo/components/Home';
 
 //
-import ReviewList from './김이삭/ReviewList';
+import ReviewList from './Kim/ReviewList';
 
 //
-import AIRecommend from './박세현/AIRecommend';
+import AIRecommend from './Park/AIRecommend';
 
 //
-import MovieScreen from './최근수/MovieScreen';
-import OTTScreen from './최근수/OTTScreen';
-import FindTheater from './최근수/components/FindTheater';
+import MovieScreen from './Choi/MovieScreen';
+import OTTScreen from './Choi/OTTScreen';
+import OTTListScreen from './Choi/OTTListScreen';
+import FindTheater from './Choi/components/FindTheater';
 
 
 const Stack = createNativeStackNavigator();
@@ -29,6 +30,7 @@ export default function App() {
                     <Stack.Screen name="Home" component={Home} options={{headerShown: false}}/>
                     <Stack.Screen name="ReviewList" component={ReviewList} options={{title: "리뷰 목록", headerTitleStyle:{fontWeight: 'bold'}}}/>
                     <Stack.Screen name="OTTScreen" component={OTTScreen} options={{title: "OTT", headerTitleStyle:{fontWeight: 'bold'}}}/>
+                    <Stack.Screen name="OTTListScreen" component={OTTListScreen}/>
                     <Stack.Screen name="MovieScreen" component={MovieScreen} options={{title: "영화", headerTitleStyle:{fontWeight: 'bold'}}}/>
                     <Stack.Screen name="FindTheater" component={FindTheater} options={{title: "영화관 찾기", headerTitleStyle:{fontWeight: 'bold'}}}/>
                     <Stack.Screen name="AIRecommend" component={AIRecommend} options={{title: "AI추천", headerTitleStyle:{fontWeight: 'bold'}}}/>
