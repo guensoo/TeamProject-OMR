@@ -77,8 +77,6 @@ export default function FindTheater({ navigation }) {
                                 key={district}
                                 style={styles.districtBtn}
                                 onPress={() => {
-                                    console.log('선택한 지역, 시군구:', region, district);
-                                    console.log('넘기는 좌표:', latitude, longitude);
                                     navigation.navigate('MapScreen', {
                                         region,
                                         district,
