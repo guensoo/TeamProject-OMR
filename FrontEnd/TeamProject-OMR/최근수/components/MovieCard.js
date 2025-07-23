@@ -1,13 +1,11 @@
 import { useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 
-export default function MovieCard({ rank, image, title, onReviewPress, onDetailPress }) {
-    const [showButtons, setShowButtons] = useState(false); // ✅ 클릭 시 토글 상태
-
+export default function MovieCard({ rank, image, title, onReviewPress, onDetailPress, isActive, onToggle }) {
     return (
         <TouchableOpacity
             style={styles.card}
-            onPress={() => setShowButtons(!showButtons)}
+            onPress={onToggle}
             activeOpacity={0.9}
         >
             {/* ✅ 이미지 URL 보정: http가 없으면 TMDB 기본 URL 붙이기 */}
@@ -21,7 +19,7 @@ export default function MovieCard({ rank, image, title, onReviewPress, onDetailP
             />
 
             {/* ✅ 클릭 시 어두운 오버레이 */}
-            {showButtons && <View style={styles.overlay} />}
+            {isActive && <View style={styles.overlay} />}
 
             {/* ✅ 순위 */}
             {/* <Text style={styles.rank}>{`#${rank}`}</Text> */}
@@ -32,7 +30,7 @@ export default function MovieCard({ rank, image, title, onReviewPress, onDetailP
             </Text>
 
             {/* ✅ 버튼 */}
-            {showButtons && (
+            {isActive && (
                 <View style={styles.buttonContainer}>
                     <TouchableOpacity style={styles.reviewButton} onPress={onReviewPress}>
                         <Text style={styles.reviewText}>리뷰보기</Text>
