@@ -3,7 +3,7 @@ import Header from "./Header"
 import Footer from "./Footer"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { useEffect, useState } from "react"
-import { getMoviePopularWithTrailer } from "../../공통/api/tmdb"
+import { getMoviePopularWithTrailer } from "../../All/api/tmdb"
 import YoutubePlayer from "react-native-youtube-iframe"
 
 const Home = () => {

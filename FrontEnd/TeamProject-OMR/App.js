@@ -16,9 +16,11 @@ import AIRecommend from './Park/AIRecommend';
 
 //
 import MovieScreen from './Choi/MovieScreen';
+import MovieListScreen from './Choi/MovieListScreen';
 import OTTScreen from './Choi/OTTScreen';
 import OTTListScreen from './Choi/OTTListScreen';
 import FindTheater from './Choi/components/FindTheater';
+import MapScreen from './Choi/MapScreen';
 
 
 const Stack = createNativeStackNavigator();
@@ -33,7 +35,9 @@ export default function App() {
                     <Stack.Screen name="OTTScreen" component={OTTScreen} options={{title: "OTT", headerTitleStyle:{fontWeight: 'bold'}}}/>
                     <Stack.Screen name="OTTListScreen" component={OTTListScreen}/>
                     <Stack.Screen name="MovieScreen" component={MovieScreen} options={{title: "영화", headerTitleStyle:{fontWeight: 'bold'}}}/>
+                    <Stack.Screen name="MovieListScreen" component={MovieListScreen}/>
                     <Stack.Screen name="FindTheater" component={FindTheater} options={{title: "영화관 찾기", headerTitleStyle:{fontWeight: 'bold'}}}/>
+                    <Stack.Screen name="MapScreen" component={MapScreen}/>
                     <Stack.Screen name="AIRecommend" component={AIRecommend} options={{title: "AI추천", headerTitleStyle:{fontWeight: 'bold'}}}/>
                 </Stack.Navigator>
             </SafeAreaView>

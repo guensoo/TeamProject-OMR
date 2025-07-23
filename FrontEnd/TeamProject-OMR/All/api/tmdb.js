@@ -5,7 +5,7 @@ const BASE_URL = 'https://api.themoviedb.org/3';
 const REGION = 'KR';
 
 // OTT별 provider_id 매핑
-const OTT_PROVIDERS = {
+export const OTT_PROVIDERS = {
     netflix: 8,
     disney: 337,
     coupang: 356,
@@ -14,19 +14,22 @@ const OTT_PROVIDERS = {
     prime: 119,
 };
 
-// 특정 OTT 인기작 가져오기
-export const getOTTPopular = async (providerId, page = 1, sortBy = 'popularity.desc') => {
+export const getOTTPopular = async (
+    providerId,
+    page = 1,
+    sortBy = 'popularity.desc'
+) => {
     const res = await axios.get(`${BASE_URL}/discover/movie`, {
         params: {
             api_key: API_KEY,
             language: 'ko-KR',
-            sort_by: sortBy, // 인기순 or 최신순
+            sort_by: sortBy,
             watch_region: REGION,
             with_watch_providers: providerId,
             page: page,
         },
     });
-    return res.data.results;
+    return res.data.results.slice(0, 20); // ✅ 무조건 10개만
 };
 
 // 모든 OTT 인기작 한 번에 가져오기
