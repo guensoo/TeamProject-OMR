@@ -19,6 +19,12 @@ const CARD_WIDTH = (width - 60) / 2;
 export default function MovieScreen() {
     const [loading, setLoading] = useState(true);
     const [boxOfficeData, setBoxOfficeData] = useState([]);
+    const [activeCard, setActiveCard] = useState(null); // ✅ 현재 활성화된 카드 id
+
+    const handleToggleCard = (id) => {
+        setActiveCard((prev) => (prev === id ? null : id));
+        // ✅ 같은 카드를 다시 누르면 닫힘, 다른 카드 누르면 교체
+    };
     const fadeAnim = useState(new Animated.Value(0))[0];
     const slideAnim = useState(new Animated.Value(50))[0];
     const scaleAnim = useState(new Animated.Value(0.8))[0];
@@ -58,24 +64,24 @@ export default function MovieScreen() {
         fetchData();
     }, []);
     const renderRankBadge = (rank) => {
-    if(rank > 3) return null; // 4~10등은 아무것도 표시 안함
-    // 기본 스타일 + 텍스트
-    let badgeStyle = [styles.rankBadge, styles.rankBadgeDefault];
-    let badgeContent = <Text style={styles.rankBadgeText}>#{rank}</Text>;
+        if (rank > 3) return null; // 4~10등은 아무것도 표시 안함
+        // 기본 스타일 + 텍스트
+        let badgeStyle = [styles.rankBadge, styles.rankBadgeDefault];
+        let badgeContent = <Text style={styles.rankBadgeText}>#{rank}</Text>;
 
-    if (rank === 1) {
-        badgeStyle = [styles.rankBadge, styles.rankBadgeGold];
-        badgeContent = <Text style={styles.badgeEmoji}>👑</Text>;
-    } else if (rank === 2) {
-        badgeStyle = [styles.rankBadge, styles.rankBadgeSilver];
-        badgeContent = <Text style={styles.badgeEmoji}>🥈</Text>;
-    } else if (rank === 3) {
-        badgeStyle = [styles.rankBadge, styles.rankBadgeBronze];
-        badgeContent = <Text style={styles.badgeEmoji}>🥉</Text>;
-    }
+        if (rank === 1) {
+            badgeStyle = [styles.rankBadge, styles.rankBadgeGold];
+            badgeContent = <Text style={styles.badgeEmoji}>👑</Text>;
+        } else if (rank === 2) {
+            badgeStyle = [styles.rankBadge, styles.rankBadgeSilver];
+            badgeContent = <Text style={styles.badgeEmoji}>🥈</Text>;
+        } else if (rank === 3) {
+            badgeStyle = [styles.rankBadge, styles.rankBadgeBronze];
+            badgeContent = <Text style={styles.badgeEmoji}>🥉</Text>;
+        }
 
-    return <View style={badgeStyle}>{badgeContent}</View>;
-};
+        return <View style={badgeStyle}>{badgeContent}</View>;
+    };
 
     if (loading) {
         return (
@@ -122,6 +128,8 @@ export default function MovieScreen() {
                                     rank={index + 1}
                                     image={item.poster_path}
                                     title={item.title}
+                                    isActive={activeCard === item.id} // ✅ 현재 활성 카드 여부 전달
+                                    onToggle={() => handleToggleCard(item.id)} // ✅ 카드 클릭 시 상태 업데이트
                                     onReviewPress={() => console.log('리뷰보기', item.title)}
                                     onDetailPress={() => console.log('상세정보', item.title)}
                                 />
