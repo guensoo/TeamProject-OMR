@@ -1,9 +1,9 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native"
 
-const Review = () => {
+const Home = () => {
     return(
-        <View>
-            <Text>리뷰 페이지</Text>
+        <View style={styles.container}>
+            <Text>홈</Text>
         </View>
     )
 }
@@ -16,4 +16,4 @@ const styles = StyleSheet.create({
     },
 })
 
-export default Review;
+export default Home;
