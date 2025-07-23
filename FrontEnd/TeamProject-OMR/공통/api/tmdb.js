@@ -44,5 +44,54 @@ export const getAllOTTPopular = async () => {
             results[key] = [];
         }
     }
+    console.log("result:",results)
     return results;
 };
+
+//예고편 유튜브 key 가져오기
+export const getMovieTrailer = async (movieId) => {
+    try {
+        const res = await axios.get(`${BASE_URL}/movie/${movieId}/videos`, {
+            params: {
+                api_key: API_KEY,
+            }
+        })
+
+        const trailer = res.data.results.find((video) => video.site === 'YouTube' && video.type === 'Trailer')
+
+        return trailer ? trailer.key : null;
+    } catch (error) {
+        console.error(`예고편 가져오기 실패: ${movieId}`, error.message);
+        return null;
+    }
+}
+
+//getOTTPopular를 이용하여 인기작 + 예고편 key 함께 가져오기
+export const getMoviePopularWithTrailer = async (providerId) => {
+    try {
+        const movies = await getOTTPopular(providerId);
+        const limitOtt = movies.slice(0, 10);
+
+        const results = [];
+
+        for(const movie of limitOtt){
+            const trailerKey = await getMovieTrailer(movie.id)
+
+            if(trailerKey){
+                results.push({
+                    id: movie.id,
+                    title: movie.title,
+                    overview: movie.overview,
+                    poster_path: movie.poster_path,
+                    backdrop_path: movie.backdrop_path,
+                    trailerKey: trailerKey,
+                })
+            }
+        }
+
+        return results;
+    } catch (error) {
+        console.error('getOTTPopularWithTrailer 실패:', error.message);
+        return [];
+    }
+}
