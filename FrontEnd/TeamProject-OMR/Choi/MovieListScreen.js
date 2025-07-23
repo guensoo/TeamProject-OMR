@@ -10,12 +10,28 @@ import {
 import { getBoxOfficeWithPosters } from '../All/api/kofic';
 import MovieListCard from './components/card/MovieListCard'; // MovieCard or 커스텀 컴포넌트
 
+const DEFAULT_SORT_BY = {
+    all: 'rank',
+    korean: 'rank',
+    global: 'rank',
+    commercial: 'rank',
+    indie: 'rank'
+};
+
+const CATEGORY_LABELS = {
+  all: '박스오피스 순위',
+  korean: '한국 영화 인기순',
+  global: '외국 영화 인기순',
+  commercial: '상업 영화 인기순',
+  indie: '독립 영화 인기순',
+};
+
 export default function MovieListScreen({ route }) {
     // (필터) 카테고리값 route로 받아도 되고 내부 상태로 해도 됨
     const { categoryKey } = route?.params || {}; // 예: 'all', 'korean', 'global', 'commercial', 'indie'
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [sortBy, setSortBy] = useState('rank'); // 박스오피스는 보통 랭크순
+    const [sortBy, setSortBy] = useState(DEFAULT_SORT_BY[categoryKey] || 'rank'); // 박스오피스는 보통 랭크순
     const [activeCard, setActiveCard] = useState(null);
 
     // 카테고리별 params 매핑 (카테고리별로 route로 받아도 되고 상단 버튼도 OK)
@@ -29,6 +45,7 @@ export default function MovieListScreen({ route }) {
     const selectedParams = CATEGORY_PARAMS[categoryKey] || {};
 
     useEffect(() => {
+
         const today = new Date();
         today.setDate(today.getDate() - 1);
         const y = today.getFullYear();
@@ -42,9 +59,10 @@ export default function MovieListScreen({ route }) {
             const res = await getBoxOfficeWithPosters(targetDt, selectedParams);
             setData(res.slice(0, 10));
             setLoading(false);
+            setSortBy(DEFAULT_SORT_BY[categoryKey] || 'rank');
         };
         fetchData();
-    }, [categoryKey, sortBy]);
+    }, [categoryKey]);
 
     // 1~3등만 뱃지
     function renderRankBadge(rank) {
@@ -75,7 +93,7 @@ export default function MovieListScreen({ route }) {
             <View style={styles.sortContainer}>
                 <TouchableOpacity onPress={() => setSortBy('rank')}>
                     <Text style={[styles.sortButton, sortBy === 'rank' && styles.active]}>
-                        박스오피스 순위
+                        {CATEGORY_LABELS[categoryKey] || '박스오피스 순위'}
                     </Text>
                 </TouchableOpacity>
                 {/* 필요하면 최신순 등 다른 정렬 버튼도 추가 */}

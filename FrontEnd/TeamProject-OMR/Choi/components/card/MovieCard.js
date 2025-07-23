@@ -21,9 +21,6 @@ export default function MovieCard({ rank, image, title, onReviewPress, onDetailP
             {/* ✅ 클릭 시 어두운 오버레이 */}
             {isActive && <View style={styles.overlay} />}
 
-            {/* ✅ 순위 */}
-            {/* <Text style={styles.rank}>{`#${rank}`}</Text> */}
-
             {/* ✅ 제목 (줄바꿈 방지) */}
             <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
                 {title}

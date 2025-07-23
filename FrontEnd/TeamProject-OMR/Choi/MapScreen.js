@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import cinemaData from '../Parse/cinema_grouped.json';
 
 export default function MapScreen({ route }) {
-    const { region, district } = route.params;
+    const { region, district, brand } = route.params;
 
     const [markers, setMarkers] = useState([]);
     const [mapRegion, setMapRegion] = useState({
@@ -14,41 +14,37 @@ export default function MapScreen({ route }) {
         longitudeDelta: 0.05,
     });
 
-    // ✅ 1. cinemaData에서 markers 세팅
     useEffect(() => {
-        if (!cinemaData) return;
 
-        const filtered = cinemaData
-            .filter(item =>
-                item.region === region &&
-                item.district === district
-            )
-            .map((item, index) => ({
-                id: index.toString(),
-                latitude: parseFloat(item.latitude),
-                longitude: parseFloat(item.longitude),
-                name: item.name,
-                address: item.address,
-            }));
+        const filtered = cinemaData.filter(item =>
+            item.city === region &&
+            item.district === district &&
+            (brand === "전체" || item.brand === brand)
+        );
 
-        setMarkers(filtered);
+        const mapped = filtered.map((item, index) => ({
+            id: index.toString(),
+            latitude: item.latitude,
+            longitude: item.longitude,
+            name: item.name,
+            address: item.address,
+        }));
 
-        // ✅ 2. 첫 번째 마커 중심으로 지도 이동
-        if (filtered.length > 0) {
-            setMapRegion(prev => ({
-                ...prev,
-                latitude: filtered[0].latitude,
-                longitude: filtered[0].longitude,
-            }));
+        setMarkers(mapped);
+
+        if (mapped.length > 0) {
+            setMapRegion({
+                latitude: mapped[0].latitude,
+                longitude: mapped[0].longitude,
+                latitudeDelta: 0.05,
+                longitudeDelta: 0.05,
+            });
         }
-    }, [region, district]);
+    }, [region, district, brand]);
 
     return (
         <View style={styles.container}>
-            <MapView
-                style={styles.map}
-                initialRegion={mapRegion} // ✅ region → initialRegion (무한 루프 방지)
-            >
+            <MapView style={styles.map} initialRegion={mapRegion}>
                 {markers.map(marker => (
                     <Marker
                         key={marker.id}

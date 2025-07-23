@@ -118,7 +118,6 @@ const styles = StyleSheet.create({
     sectionHeader: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 15,
         paddingLeft: 15,
         borderLeftWidth: 4,
         borderRadius: 8,
