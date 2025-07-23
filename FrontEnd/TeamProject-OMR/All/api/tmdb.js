@@ -47,6 +47,24 @@ export const getOTTPopular = async (
 //     return results;
 // };
 
+//예고편 유튜브 key 가져오기
+export const getMovieTrailer = async (movieId) => {
+    try {
+        const res = await axios.get(`${BASE_URL}/movie/${movieId}/videos`, {
+            params: {
+                api_key: API_KEY,
+            }
+        })
+
+        const trailer = res.data.results.find((video) => video.site === 'YouTube' && video.type === 'Trailer')
+
+        return trailer ? trailer.key : null;
+    } catch (error) {
+        console.error(`예고편 가져오기 실패: ${movieId}`, error.message);
+        return null;
+    }
+}
+
 // 10개만 가져오기
 export const getAllOTTPopular = async () => {
     try {
@@ -71,3 +89,39 @@ export const getAllOTTPopular = async () => {
     }
 };
 
+//getOTTPopular를 이용하여 모든 OTT 인기작 + 예고편 key 함께 가져오기
+export const getAllOTTPopularWithTrailer = async () => {
+    const results = {};
+
+    for (const [key, providerId] of Object.entries(OTT_PROVIDERS)) {
+        try {
+            // OTT별 인기작 가져오기
+            const movies = await getOTTPopular(providerId);
+            const limitOtt = movies.slice(0, 8);
+
+            const movieList = [];
+
+            for (const movie of limitOtt) {
+                const trailerKey = await getMovieTrailer(movie.id);
+                if (trailerKey) {
+                    movieList.push({
+                        id: movie.id,
+                        title: movie.title,
+                        overview: movie.overview,
+                        poster_path: movie.poster_path,
+                        backdrop_path: movie.backdrop_path,
+                        trailerKey: trailerKey,
+                        provider: key,
+                    });
+                }
+            }
+
+            results[key] = movieList;
+        } catch (error) {
+            console.error(`getOTTPopularWithTrailer 실패 (${key}):`, error.message);
+            results[key] = [];
+        }
+    }
+
+    return results;
+};
