@@ -77,12 +77,7 @@ export default function FindTheater({ navigation }) {
                                 key={district}
                                 style={styles.districtBtn}
                                 onPress={() => {
-                                    navigation.navigate('MapScreen', {
-                                        region,
-                                        district,
-                                        latitude,
-                                        longitude,
-                                    });
+                                    navigation.navigate('MapScreen', { region, district });
                                 }}
                             >
                                 <Text style={styles.districtText}>{district}</Text>
