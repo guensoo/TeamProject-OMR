@@ -7,20 +7,44 @@ const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 
 const cleanTitle = (title) => title.replace(/\s+/g, ' ').trim(); // 띄어쓰기 정규화
 
-export const getBoxOfficeWithPosters = async (date) => {
+// ✅ "일간/주간" 선택형, 필터 파라미터 수용, TMDB 연동까지!
+export const getBoxOfficeWithPosters = async (
+    date,
+    {
+        type = 'daily', // 'daily', 'weekly'
+        weekGb = '0',   // (주간 only) 0:주간, 1:주말, 2:주중
+        multiMovieYn,   // "Y": 다양성(독립), "N": 상업, undefined: 전체
+        repNationCd,    // "K": 한국, "F": 외국, undefined: 전체
+    } = {}
+) => {
     try {
-        const res = await axios.get(`${KOFIC_BASE_URL}/boxoffice/searchDailyBoxOfficeList.json`, {
-            params: { key: KOFIC_KEY, targetDt: date },
-        });
-        const list = res.data.boxOfficeResult.dailyBoxOfficeList || [];
+        // 1. 요청 API URL/파라미터
+        let url;
+        let params = { key: KOFIC_KEY, targetDt: date };
+        if (type === 'weekly') {
+            url = `${KOFIC_BASE_URL}/boxoffice/searchWeeklyBoxOfficeList.json`;
+            params.weekGb = weekGb;
+        } else {
+            url = `${KOFIC_BASE_URL}/boxoffice/searchDailyBoxOfficeList.json`;
+        }
+        if (multiMovieYn) params.multiMovieYn = multiMovieYn;
+        if (repNationCd) params.repNationCd = repNationCd;
 
+        // 2. 박스오피스 데이터 조회
+        const res = await axios.get(url, { params });
+        const boxOfficeList =
+            (type === 'weekly'
+                ? res.data.boxOfficeResult.weeklyBoxOfficeList
+                : res.data.boxOfficeResult.dailyBoxOfficeList) || [];
+
+        // 3. TMDB 포스터 매칭
         const results = await Promise.all(
-            list.map(async (item) => {
+            boxOfficeList.map(async (item) => {
                 try {
                     const year = item.openDt ? item.openDt.split('-')[0] : '';
                     const query = cleanTitle(item.movieNm);
 
-                    // ✅ 1차: 한국어 제목 검색
+                    // ✅ 1차: 한국어 제목
                     let tmdbRes = await axios.get(`${TMDB_BASE_URL}/search/movie`, {
                         params: {
                             api_key: TMDB_KEY,
@@ -30,7 +54,7 @@ export const getBoxOfficeWithPosters = async (date) => {
                         },
                     });
 
-                    // ✅ 2차: 한국어 실패 시, 다국어 검색으로 fallback
+                    // ✅ 2차: 다국어 fallback
                     if (!tmdbRes.data.results.length) {
                         tmdbRes = await axios.get(`${TMDB_BASE_URL}/search/movie`, {
                             params: {
@@ -63,9 +87,9 @@ export const getBoxOfficeWithPosters = async (date) => {
             })
         );
 
-    return results;
-  } catch (err) {
-    console.error('kofic API Error:', err.message);
-    return [];
-  }
+        return results;
+    } catch (err) {
+        console.error('kofic API Error:', err.message);
+        return [];
+    }
 };

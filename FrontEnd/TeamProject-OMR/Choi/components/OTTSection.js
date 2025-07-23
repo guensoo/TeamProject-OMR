@@ -1,13 +1,19 @@
 import { memo } from 'react';
+import { useNavigation } from '@react-navigation/native';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
-import OTTCard from './OTTCard';
+import OTTCard from './card/OTTCard';
 
-function OTTSection({ title, data, activeCard, onToggle }) {
+function OTTSection({ title, data, activeCard, onToggle, providerKey }) {
+    const navigation = useNavigation();
     return (
         <View style={styles.section}>
             <View style={styles.header}>
                 <Text style={styles.title}>{title}</Text>
-                <TouchableOpacity>
+                <TouchableOpacity
+                    onPress={() =>
+                        navigation.navigate('OTTListScreen', { providerKey })
+                    }
+                >
                     <Text style={styles.seeAll}>전체보기</Text>
                 </TouchableOpacity>
             </View>

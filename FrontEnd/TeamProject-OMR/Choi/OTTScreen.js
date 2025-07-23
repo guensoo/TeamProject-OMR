@@ -69,7 +69,6 @@ export default function OTTScreen() {
         { key: 'coupang', title: '쿠팡플레이 인기 순', color: '#ff7b00', icon: '🎭' },
         { key: 'wavve', title: '웨이브 인기 순', color: '#1f4788', icon: '🌊' },
         { key: 'watcha', title: '왓챠 인기 순', color: '#ff0558', icon: '👁️' },
-        { key: 'appletv', title: 'Apple TV+ 인기 순', color: '#000000', icon: '🍎' },
         { key: 'prime', title: 'Prime Video 인기 순', color: '#00a8e1', icon: '📺' },
     ];
 
@@ -95,6 +94,7 @@ export default function OTTScreen() {
                             data={ottData[service.key] || []}
                             activeCard={activeCard}
                             onToggle={handleToggle}
+							providerKey={service.key}
                         />
                     </Animated.View>
                 ))}
