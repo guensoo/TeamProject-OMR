@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ScrollView, ActivityIndicator, StyleSheet } from 'react-native';
-import OTTSection from '../components/OTTSection';
-import { getAllOTTPopular } from '../api/tmdb';
+import OTTSection from './component/OTTSection';
+import { getAllOTTPopular } from '../공통/api/tmdb';
 
 export default function OTTScreen() {
   const [loading, setLoading] = useState(true);
