@@ -65,7 +65,7 @@ export const getBoxOfficeWithPosters = async (date) => {
 
     return results;
   } catch (err) {
-    console.error('KOFIC API Error:', err.message);
+    console.error('kofic API Error:', err.message);
     return [];
   }
 };

@@ -1,23 +1,37 @@
 import { useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 
-export default function OTTCard({ rank, image, title, onReviewPress, onDetailPress }) {
+export default function MovieCard({ rank, image, title, onReviewPress, onDetailPress }) {
     const [showButtons, setShowButtons] = useState(false); // ✅ 클릭 시 토글 상태
 
     return (
         <TouchableOpacity
             style={styles.card}
-            onPress={() => setShowButtons(!showButtons)} // ✅ 카드 클릭 시 버튼 보이기/숨기기
+            onPress={() => setShowButtons(!showButtons)}
             activeOpacity={0.9}
         >
-            <Image source={{ uri: image }} style={styles.image} />
+            {/* ✅ 이미지 URL 보정: http가 없으면 TMDB 기본 URL 붙이기 */}
+            <Image
+                source={{
+                    uri: image?.startsWith('http')
+                        ? image
+                        : `https://image.tmdb.org/t/p/w500${image}`
+                }}
+                style={styles.image}
+            />
 
             {/* ✅ 클릭 시 어두운 오버레이 */}
             {showButtons && <View style={styles.overlay} />}
 
-            <Text style={styles.rank}>#{rank}</Text>
-            <Text style={styles.title}>{title}</Text>
+            {/* ✅ 순위 */}
+            {/* <Text style={styles.rank}>{`#${rank}`}</Text> */}
 
+            {/* ✅ 제목 (줄바꿈 방지) */}
+            <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
+                {title}
+            </Text>
+
+            {/* ✅ 버튼 */}
             {showButtons && (
                 <View style={styles.buttonContainer}>
                     <TouchableOpacity style={styles.reviewButton} onPress={onReviewPress}>
@@ -33,12 +47,22 @@ export default function OTTCard({ rank, image, title, onReviewPress, onDetailPre
 }
 
 const styles = StyleSheet.create({
-    card: { width: 120, marginRight: 10, position: 'relative' },
-    image: { width: 120, height: 180, borderRadius: 8 },
-    overlay: {
-        ...StyleSheet.absoluteFillObject, // ✅ 이미지 위 덮는 오버레이
-        backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    card: {
+        width: 120,
+        marginRight: 10,
+        position: 'relative',
         borderRadius: 8,
+        overflow: 'hidden', // ✅ 오버레이와 버튼이 카드 경계 안에만 보이도록
+    },
+    image: {
+        width: 120,
+        height: 180,
+        borderRadius: 8,
+    },
+    overlay: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'rgba(0, 0, 0, 0.4)',
+        zIndex: 1, // ✅ 버튼보다 낮게
     },
     rank: {
         position: 'absolute',
@@ -49,16 +73,21 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0.5)',
         paddingHorizontal: 5,
         borderRadius: 3,
+        zIndex: 2,
     },
-    title: { marginTop: 5, textAlign: 'center', fontSize: 12, color: '#fff' },
-
-    // ✅ 버튼 스타일
+    title: {
+        marginTop: 5,
+        textAlign: 'center',
+        fontSize: 12,
+        color: '#fff',
+    },
     buttonContainer: {
         position: 'absolute',
         top: '35%',
         left: 0,
         right: 0,
         alignItems: 'center',
+        zIndex: 2, // ✅ 오버레이 위에 표시
     },
     reviewButton: {
         backgroundColor: '#fff',
