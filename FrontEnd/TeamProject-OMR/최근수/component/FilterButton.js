@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-=======
-import React from 'react';
->>>>>>> 23bc1e739ec2db711514254c070b024c0f0dd21f
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 
 export default function FilterButton({ label, selected, onPress }) {

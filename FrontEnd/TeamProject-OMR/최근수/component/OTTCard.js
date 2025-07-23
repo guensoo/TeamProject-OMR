@@ -1,27 +1,14 @@
-<<<<<<< HEAD
-=======
-import React from 'react';
->>>>>>> 23bc1e739ec2db711514254c070b024c0f0dd21f
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 
 export default function OTTCard({ rank, image, title }) {
     return (
         <View style={styles.card}>
-<<<<<<< HEAD
-        <Image source={{ uri: image }} style={styles.image} />
-        <Text style={styles.rank}>{rank}</Text>
-        <Text style={styles.title}>{title}</Text>
-        <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>상세정보</Text>
-        </TouchableOpacity>
-=======
             <Image source={{ uri: image }} style={styles.image} />
             <Text style={styles.rank}>{rank}</Text>
             <Text style={styles.title}>{title}</Text>
             <TouchableOpacity style={styles.button}>
                 <Text style={styles.buttonText}>상세정보</Text>
             </TouchableOpacity>
->>>>>>> 23bc1e739ec2db711514254c070b024c0f0dd21f
         </View>
     );
 }
