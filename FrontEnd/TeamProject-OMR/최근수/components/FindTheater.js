@@ -1,9 +1,9 @@
 import { View, Text, StyleSheet } from "react-native";
 
-const Review = () => {
+const FindTheater = () => {
     return(
-        <View>
-            <Text>리뷰 페이지</Text>
+        <View style={styles.container}>
+            <Text>영화관찾기</Text>
         </View>
     )
 }
@@ -16,4 +16,4 @@ const styles = StyleSheet.create({
     },
 })
 
-export default Review;
+export default FindTheater;

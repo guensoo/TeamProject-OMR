@@ -3,18 +3,21 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 //공통
-import Header from './공통/Header/Header';
-import Footer from './공통/Footer/Footer';
 
 //메인
-import Home from './허민석/Home';
+import Home from './허민석/components/Home';
 
 //
-import Review from './박세현/Review';
+import ReviewList from './김이삭/ReviewList';
+
+//
+import AIRecommend from './박세현/AIRecommend';
 
 //
 import MovieScreen from './최근수/MovieScreen';
 import OTTScreen from './최근수/OTTScreen';
+import FindTheater from './최근수/components/FindTheater';
+
 
 const Stack = createNativeStackNavigator();
 
@@ -22,14 +25,14 @@ export default function App() {
     return (
         <NavigationContainer>
             <SafeAreaView style={styles.container}>
-                <Header />
                 <Stack.Navigator initialRouteName="Home">
-                    <Stack.Screen name="Home" component={Home} />
-                    <Stack.Screen name="Review" component={Review} />
-                    <Stack.Screen name="OTTScreen" component={OTTScreen} />
-                    <Stack.Screen name="MovieScreen" component={MovieScreen} />
+                    <Stack.Screen name="Home" component={Home} options={{headerShown: false}}/>
+                    <Stack.Screen name="ReviewList" component={ReviewList} options={{title: "리뷰 목록", headerTitleStyle:{fontWeight: 'bold'}}}/>
+                    <Stack.Screen name="OTTScreen" component={OTTScreen} options={{title: "OTT", headerTitleStyle:{fontWeight: 'bold'}}}/>
+                    <Stack.Screen name="MovieScreen" component={MovieScreen} options={{title: "영화", headerTitleStyle:{fontWeight: 'bold'}}}/>
+                    <Stack.Screen name="FindTheater" component={FindTheater} options={{title: "영화관 찾기", headerTitleStyle:{fontWeight: 'bold'}}}/>
+                    <Stack.Screen name="AIRecommend" component={AIRecommend} options={{title: "AI추천", headerTitleStyle:{fontWeight: 'bold'}}}/>
                 </Stack.Navigator>
-                <Footer />
             </SafeAreaView>
         </NavigationContainer>
     );
