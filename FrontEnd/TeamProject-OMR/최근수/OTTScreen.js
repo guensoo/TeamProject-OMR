@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { ScrollView, ActivityIndicator, StyleSheet } from 'react-native';
 import FilterButton from '../components/FilterButton';
 import OTTSection from '../components/OTTSection';
-import { getTrendingWithProviders } from './api/tmdb';
+import { getTrendingWithProviders } from '../공통/api/tmdb';
 
 const ottList = ['전체', '넷플릭스', '디즈니', '쿠팡플레이'];
 
