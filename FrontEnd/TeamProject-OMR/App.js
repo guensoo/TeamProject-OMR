@@ -6,18 +6,18 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 //공통
 
 //메인
-import Home from './허민석/components/Home';
+import Home from './Heo/pages/Home';
 
 //
-import ReviewList from './김이삭/ReviewList';
+import ReviewList from './Kim/ReviewList';
 
 //
-import AIRecommend from './박세현/AIRecommend';
+import AIRecommend from './Park/AIRecommend';
 
 //
-import MovieScreen from './최근수/MovieScreen';
-import OTTScreen from './최근수/OTTScreen';
-import FindTheater from './최근수/components/FindTheater';
+import MovieScreen from './Choi/MovieScreen';
+import OTTScreen from './Choi/OTTScreen';
+import FindTheater from './Choi/components/FindTheater';
 
 
 const Stack = createNativeStackNavigator();

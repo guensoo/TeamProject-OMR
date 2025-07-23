@@ -44,7 +44,6 @@ export const getAllOTTPopular = async () => {
             results[key] = [];
         }
     }
-    console.log("result:",results)
     return results;
 };
 
@@ -54,8 +53,16 @@ export const getMovieTrailer = async (movieId) => {
         const res = await axios.get(`${BASE_URL}/movie/${movieId}/videos`, {
             params: {
                 api_key: API_KEY,
+                language: 'ko-KR',
             }
         })
+
+        const koreanTrailer = res.data.results.find(
+            video => video.site === 'YouTube' && video.type === 'Trailer' && video.iso_639_1 === 'ko'
+        );
+        if (koreanTrailer) {
+            return koreanTrailer.key;
+        }
 
         const trailer = res.data.results.find((video) => video.site === 'YouTube' && video.type === 'Trailer')
 
@@ -70,14 +77,14 @@ export const getMovieTrailer = async (movieId) => {
 export const getMoviePopularWithTrailer = async (providerId) => {
     try {
         const movies = await getOTTPopular(providerId);
-        const limitOtt = movies.slice(0, 10);
+        const limitOtt = movies.slice(0, 8);
 
         const results = [];
 
-        for(const movie of limitOtt){
+        for (const movie of limitOtt) {
             const trailerKey = await getMovieTrailer(movie.id)
 
-            if(trailerKey){
+            if (trailerKey) {
                 results.push({
                     id: movie.id,
                     title: movie.title,
@@ -95,3 +102,40 @@ export const getMoviePopularWithTrailer = async (providerId) => {
         return [];
     }
 }
+
+//getOTTPopular를 이용하여 모든 OTT 인기작 + 예고편 key 함께 가져오기
+export const getAllOTTPopularWithTrailer = async () => {
+    const results = {};
+
+    for (const [key, providerId] of Object.entries(OTT_PROVIDERS)) {
+        try {
+            // OTT별 인기작 가져오기
+            const movies = await getOTTPopular(providerId);
+            const limitOtt = movies.slice(0, 8);
+
+            const movieList = [];
+
+            for (const movie of limitOtt) {
+                const trailerKey = await getMovieTrailer(movie.id);
+                if (trailerKey) {
+                    movieList.push({
+                        id: movie.id,
+                        title: movie.title,
+                        overview: movie.overview,
+                        poster_path: movie.poster_path,
+                        backdrop_path: movie.backdrop_path,
+                        trailerKey: trailerKey,
+                        provider: key,
+                    });
+                }
+            }
+
+            results[key] = movieList;
+        } catch (error) {
+            console.error(`getOTTPopularWithTrailer 실패 (${key}):`, error.message);
+            results[key] = [];
+        }
+    }
+
+    return results;
+};

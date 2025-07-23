@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import OTTSection from './components/OTTSection';
-import { getAllOTTPopular } from '../공통/api/tmdb';
+import { getAllOTTPopular } from '../All/api/tmdb';
 
 export default function OTTScreen() {
     const [loading, setLoading] = useState(true);
