@@ -2,7 +2,7 @@ import { FlatList, View, Image, Text, TouchableOpacity, Dimensions, StyleSheet }
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
-const Main_OTTList = ({ data, onPlay, provider }) => {
+const Main_OTTList = ({ data, provider }) => {
     return (
         <FlatList
             data={data.filter(item => item.provider === provider)}
@@ -16,7 +16,11 @@ const Main_OTTList = ({ data, onPlay, provider }) => {
                         style={styles.poster}
                         resizeMode="cover"
                     />
-                    <Text style={styles.title}>
+                    <Text 
+                        style={styles.title}
+                        numberOfLines={2}
+                        ellipsizeMode="tail"
+                    >
                         {item.title}
                     </Text>
                     <Text style={styles.providerText}>
@@ -50,7 +54,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
         textAlign: 'center',
-        width: SCREEN_WIDTH,
+        width: SCREEN_WIDTH * 0.33,
     },
     providerText: {
         fontSize: 14,

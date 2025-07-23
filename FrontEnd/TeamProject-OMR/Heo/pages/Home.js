@@ -3,23 +3,24 @@ import Header from "../components/Header"
 import Footer from "../components/Footer"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { useEffect, useState } from "react"
-import { getMoviePopularWithTrailer, getAllOTTPopularWithTrailer } from "../../All/api/tmdb"
-import YoutubePlayer from "react-native-youtube-iframe"
-import { Ionicons } from '@expo/vector-icons';
-import ProviderInfo from "../utils/ProviderInfo"
+import { getAllOTTPopular, getAllOTTPopularWithTrailer } from "../../All/api/tmdb"
 import Trailer from "../components/Trailer"
 import Main_OTTList from "../components/Main_OTTList"
 import TrailerModal from "../components/TrailerModal"
 import OTTSelector from "../utils/OTTSelector"
+import ProviderInfo from "../utils/ProviderInfo"
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
+const firstProvider = Object.keys(ProviderInfo)[0]; //인기작 Netflix 버튼
 
 const Home = () => {
-    const [allTrailers, setAllTrailers] = useState({});
+    const [allTrailers, setAllTrailers] = useState([]);
+    const [allPosters, setAllPosters] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedTrailer, setSelectedTrailer] = useState(null);
-    const [selectedProvider, setSelectedProvider] = useState(null);
+    const [selectedProvider, setSelectedProvider] = useState(firstProvider);
 
+    //예고편
     useEffect(() => {
         const fetchData = async () => {
             const data = await getAllOTTPopularWithTrailer();
@@ -28,6 +29,16 @@ const Home = () => {
         }
         fetchData();
     }, [])
+
+    //인기작 포스터
+    useEffect(() => {
+        const fetchPosters = async () => {
+            const data = await getAllOTTPopular();
+            const allMovies = Object.values(data).flat();
+            setAllPosters(allMovies);
+        };
+        fetchPosters();
+    }, []);
 
     const handlePlay = (trailerKey) => {
         setSelectedTrailer(trailerKey);
@@ -66,14 +77,14 @@ const Home = () => {
                     <>
                         <Text style={styles.popularTitle}>인기작</Text>
                         <Main_OTTList
-                            data={allTrailers}
+                            data={allPosters}
                             provider={selectedProvider}
                         />
                     </>
                 )}
-            </ScrollView>
 
-            <Footer />
+                <Footer />
+            </ScrollView>
 
             {/* 포스터에서 재생버튼 눌렀을 때 나오는 영상 모달창 */}
             <TrailerModal

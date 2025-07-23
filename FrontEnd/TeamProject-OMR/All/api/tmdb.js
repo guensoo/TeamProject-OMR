@@ -32,29 +32,22 @@ export const getOTTPopular = async (
     return res.data.results.slice(0, 20); // ✅ 무조건 10개만
 };
 
-// 모든 OTT 인기작 한 번에 가져오기
-// export const getAllOTTPopular = async () => {
-//     const results = {};
-//     for (const [key, providerId] of Object.entries(OTT_PROVIDERS)) {
-//         try {
-//             const data = await getOTTPopular(providerId);
-//             results[key] = data;
-//         } catch (err) {
-//             console.error(`Error fetching ${key}:`, err.message);
-//             results[key] = [];
-//         }
-//     }
-//     return results;
-// };
-
 //예고편 유튜브 key 가져오기
 export const getMovieTrailer = async (movieId) => {
     try {
         const res = await axios.get(`${BASE_URL}/movie/${movieId}/videos`, {
             params: {
                 api_key: API_KEY,
+                language: 'ko-KR',
             }
         })
+
+        const koreanTrailer = res.data.results.find(
+            video => video.site === 'YouTube' && video.type === 'Trailer' && video.iso_639_1 === 'ko'
+        );
+        if (koreanTrailer) {
+            return koreanTrailer.key;
+        }
 
         const trailer = res.data.results.find((video) => video.site === 'YouTube' && video.type === 'Trailer')
 
@@ -74,7 +67,11 @@ export const getAllOTTPopular = async () => {
             entries.map(async ([key, providerId]) => {
                 try {
                     const data = await getOTTPopular(providerId);
-                    return [key, data.slice(0, 10)]; // ✅ 상위 10개만 반환
+                    const dataWithProvider = data.slice(0, 10).map(movie => ({
+                        ...movie,
+                        provider: key,
+                    }));
+                    return [key, dataWithProvider]; // ✅ 상위 10개만 반환
                 } catch (err) {
                     console.error(`Error fetching ${key}:`, err.message);
                     return [key, []];
