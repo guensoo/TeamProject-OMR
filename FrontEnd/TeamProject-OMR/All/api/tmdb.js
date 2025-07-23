@@ -71,3 +71,32 @@ export const getAllOTTPopular = async () => {
     }
 };
 
+//getOTTPopular를 이용하여 인기작 + 예고편 key 함께 가져오기
+export const getMoviePopularWithTrailer = async (providerId) => {
+    try {
+        const movies = await getOTTPopular(providerId);
+        const limitOtt = movies.slice(0, 8);
+
+        const results = [];
+
+        for (const movie of limitOtt) {
+            const trailerKey = await getMovieTrailer(movie.id)
+
+            if (trailerKey) {
+                results.push({
+                    id: movie.id,
+                    title: movie.title,
+                    overview: movie.overview,
+                    poster_path: movie.poster_path,
+                    backdrop_path: movie.backdrop_path,
+                    trailerKey: trailerKey,
+                })
+            }
+        }
+
+        return results;
+    } catch (error) {
+        console.error('getOTTPopularWithTrailer 실패:', error.message);
+        return [];
+    }
+}
