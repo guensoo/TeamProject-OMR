@@ -8,6 +8,7 @@ import BottomTabMenu from './All/BottomTabMenu';
 
 //메인
 import Home from './Heo/pages/Home';
+import Login from './Heo/components/Login';
 
 //
 import ReviewList from './Kim/ReviewList';
@@ -33,17 +34,10 @@ export default function App() {
         <NavigationContainer>
             <SafeAreaView style={styles.container}>
                 <Stack.Navigator initialRouteName="BottomTabMenu">
-                    <Stack.Screen 
-                        name="BottomTabMenu" 
-                        component={BottomTabMenu} 
-                        options={{ headerShown: false }} 
-                    />
-                    {/* <Stack.Screen name="Home" component={Home} options={{headerShown: false}}/> */}
-                    {/* <Stack.Screen name="ReviewList" component={ReviewList} options={{title: "리뷰 목록", headerShown: false}}/> */}
-                    {/* <Stack.Screen name="OTTScreen" component={OTTScreen} options={{title: "OTT", headerTitleStyle:{fontWeight: 'bold'}}}/> */}
-                    <Stack.Screen name="OTTListScreen" component={OTTListScreen}  />
-                    {/* <Stack.Screen name="MovieScreen" component={MovieScreen} options={{title: "영화", headerTitleStyle:{fontWeight: 'bold'}}}/> */}
-                    <Stack.Screen name="MovieListScreen" component={MovieListScreen} />
+                    <Stack.Screen name="BottomTabMenu" component={BottomTabMenu} options={{ headerShown: false }} />
+                    <Stack.Screen name="Login" component={Login} options={{title: "로그인"}} />
+                    <Stack.Screen name="OTTListScreen" component={OTTListScreen} />
+                    <Stack.Screen name="MovieListScreen" component={MovieListScreen}/>
                     <Stack.Screen name="FindTheater" component={FindTheater} options={{title: "영화관 찾기", headerTitleStyle:{fontWeight: 'bold'}}}/>
                     <Stack.Screen name="MapScreen" component={MapScreen}/>
                     <Stack.Screen name="AIRecommend" component={AIRecommend} options={{title: "AI추천", headerTitleStyle:{fontWeight: 'bold'}}}/>
