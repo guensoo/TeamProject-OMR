@@ -12,8 +12,8 @@ import Home from './Heo/pages/Home';
 //
 import ReviewList from './Kim/ReviewList';
 
-//
-import AIRecommend from './Park/AIRecommend';
+// 박세현
+import ReviewDetail from './Park/ReviewDetail';
 
 //
 import MovieScreen from './Choi/MovieScreen';
@@ -22,6 +22,8 @@ import OTTScreen from './Choi/OTTScreen';
 import OTTListScreen from './Choi/OTTListScreen';
 import FindTheater from './Choi/components/FindTheater';
 import MapScreen from './Choi/MapScreen';
+
+import AIRecommend from './Park/AIRecommend';
 
 const Stack = createNativeStackNavigator();
 
@@ -44,6 +46,8 @@ export default function App() {
                     <Stack.Screen name="FindTheater" component={FindTheater} options={{title: "영화관 찾기", headerTitleStyle:{fontWeight: 'bold'}}}/>
                     <Stack.Screen name="MapScreen" component={MapScreen}/>
                     <Stack.Screen name="AIRecommend" component={AIRecommend} options={{title: "AI추천", headerTitleStyle:{fontWeight: 'bold'}}}/>
+
+                    <Stack.Screen name="ReviewDetail" component={ReviewDetail} />
                 </Stack.Navigator>
             </SafeAreaView>
         </NavigationContainer>
