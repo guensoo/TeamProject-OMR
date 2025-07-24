@@ -1,8 +1,9 @@
 import { useNavigation } from "@react-navigation/native"
-import { Alert, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native"
+import { Image, StyleSheet, Text, TouchableOpacity,View } from "react-native"
 
 export const ReviewComponent = (items) => {
     const navigation = useNavigation();
+
     
     return(
         <TouchableOpacity 

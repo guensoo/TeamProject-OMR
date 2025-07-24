@@ -1,13 +1,13 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, useAnimatedValue, Animated, Easing } from "react-native";
 import { Picker } from '@react-native-picker/picker';
 import Header from '../Heo/components/Header'
 import { ReviewComponent } from "./component/ReviewComponent";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const ReviewList = ({ navigation }) => {
     // 정렬상태값
     const [sort, setSort] = useState('latest');
-    const [review, setRivew] = useState([]);
+    const [review, setRview] = useState([]);
     
     // 필터 상태값
     const [selectedGenres, setSelectedGenres] = useState(new Set());
@@ -18,6 +18,32 @@ const ReviewList = ({ navigation }) => {
     useEffect(() => {
         // 여기에 데이터 fetching 로직
     }, [])
+
+    // 필터 애니메이션
+    const Anim = useRef(new Animated.Value(1)).current;
+
+    const shown = () => {
+        Animated.timing(Anim,{
+            toValue :1,
+            duration : 150,
+            easing: Easing.inOut(Easing.ease),
+            useNativeDriver : false,
+        }).start();
+    }
+
+    const unShown = () => {
+        Animated.timing(Anim,{
+            toValue:0,
+            duration:150,
+            easing: Easing.inOut(Easing.ease),
+            useNativeDriver:false,
+        }).start();
+    }
+
+    const AnimHeight = Anim.interpolate({
+        inputRange :[0,1],
+        outputRange:[0,170]
+    })
 
     // 장르 필터 토글
     const toggleGenre = (genre) => {
@@ -46,7 +72,7 @@ const ReviewList = ({ navigation }) => {
             <Header />
             <View style={styles.container}>
                 {/* 리뷰필터 */}
-                {show && <View style={styles.filterContainer}>
+                <Animated.View style={[styles.filterContainer,{height:AnimHeight, opacity:Anim}]}>
                     {/* 장르필터 */}
                     <View style={styles.filterSection}>
                         <Text style={styles.filterLabel}>장르</Text>
@@ -102,13 +128,21 @@ const ReviewList = ({ navigation }) => {
                             ))}
                         </ScrollView>
                     </View>
-                </View>}
+                </Animated.View>
 
                 {/* 필터 토글 버튼 */}
                 <View style={styles.toggleContainer}>
                     <TouchableOpacity 
                         style={styles.toggleButton}
-                        onPress={() => setShow(!show)}
+                        onPress={() => {
+                        if (show) {
+                            setShow(false);
+                            unShown();
+                        } else {
+                            setShow(true);
+                            shown();
+                        }
+                        }}
                         activeOpacity={0.7}
                     >
                         <Text style={styles.toggleText}>
@@ -144,10 +178,12 @@ const ReviewList = ({ navigation }) => {
                     showsVerticalScrollIndicator={false}
                     onScroll={(event)=>{
                         const offsetY = event.nativeEvent.contentOffset.y;
-                        if(offsetY > 10){
+                        if(offsetY > 50 && show){
                             setShow(false);
-                        }else{
+                            unShown();
+                        }else if(offsetY <= 50 && !show){
                             setShow(true);
+                            shown();
                         }
                     }}
                 >
