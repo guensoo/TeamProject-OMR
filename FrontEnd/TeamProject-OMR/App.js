@@ -31,7 +31,7 @@ export default function App() {
             <SafeAreaView style={styles.container}>
                 <Stack.Navigator initialRouteName="Home">
                     <Stack.Screen name="Home" component={Home} options={{headerShown: false}}/>
-                    <Stack.Screen name="ReviewList" component={ReviewList} options={{title: "리뷰 목록", headerTitleStyle:{fontWeight: 'bold'}}}/>
+                    <Stack.Screen name="ReviewList" component={ReviewList} options={{title: "리뷰 목록", headerShown: false}}/>
                     <Stack.Screen name="OTTScreen" component={OTTScreen} options={{title: "OTT", headerTitleStyle:{fontWeight: 'bold'}}}/>
                     <Stack.Screen name="OTTListScreen" component={OTTListScreen}/>
                     <Stack.Screen name="MovieScreen" component={MovieScreen} options={{title: "영화", headerTitleStyle:{fontWeight: 'bold'}}}/>
