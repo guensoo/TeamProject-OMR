@@ -250,15 +250,6 @@ const InfoDetail = ({ route, navigation }) => {
                             </View>
                             
                             <View style={styles.ratingCard}>
-                                <Text style={styles.ratingLabel}>기자·평론가</Text>
-                                <View style={styles.ratingRow}>
-                                    <Text style={styles.ratingScore}>{movie.expertsRating}</Text>
-                                    <Text style={styles.ratingMax}>/10</Text>
-                                </View>
-                                <Text style={styles.ratingCount}>{movie.expertsTotal}명</Text>
-                            </View>
-                            
-                            <View style={styles.ratingCard}>
                                 <Text style={styles.ratingLabel}>관람객</Text>
                                 <View style={styles.ratingRow}>
                                     <Text style={styles.ratingScore}>{movie.watchGrade}</Text>
