@@ -7,7 +7,7 @@ import {
     Text,
     StyleSheet
 } from 'react-native';
-import { getOTTPopular, OTT_PROVIDERS } from '../All/api/tmdb';
+import { getOTTPopularMovie, OTT_PROVIDERS } from '../All/api/tmdb';
 import OTTListCard from './components/card/OTTListCard';
 
 export default function OTTListScreen({ route }) {
@@ -28,7 +28,7 @@ export default function OTTListScreen({ route }) {
         try {
             setLoading(true);
             const providerId = OTT_PROVIDERS[providerKey];
-            const res = await getOTTPopular(providerId, pageNum, sortOption);
+            const res = await getOTTPopularMovie(providerId, pageNum, sortOption);
 
             if (!res || res.length === 0) {
                 setIsEnd(true);

@@ -14,7 +14,8 @@ export const OTT_PROVIDERS = {
     prime: 119,
 };
 
-export const getOTTPopular = async (
+//영화 인기작 가져오기
+export const getOTTPopularMovie = async (
     providerId,
     page = 1,
     sortBy = 'popularity.desc'
@@ -29,7 +30,26 @@ export const getOTTPopular = async (
             page: page,
         },
     });
-    return res.data.results.slice(0, 20); // ✅ 무조건 10개만
+    return res.data.results.slice(0, 20);
+};
+
+//TV프로그램 인기작 가져오기
+export const getOTTPopularTV = async (
+    providerId,
+    page = 1,
+    sortBy = 'popularity.desc'
+) => {
+    const res = await axios.get(`${BASE_URL}/discover/tv`, {
+        params: {
+            api_key: API_KEY,
+            language: 'ko-KR',
+            sort_by: sortBy,
+            watch_region: REGION,
+            with_watch_providers: providerId,
+            page: page,
+        },
+    });
+    return res.data.results.slice(0, 20);
 };
 
 //예고편 유튜브 key 가져오기
@@ -66,7 +86,7 @@ export const getAllOTTPopular = async () => {
         const responses = await Promise.all(
             entries.map(async ([key, providerId]) => {
                 try {
-                    const data = await getOTTPopular(providerId);
+                    const data = await getOTTPopularMovie(providerId);
                     const dataWithProvider = data.slice(0, 10).map(movie => ({
                         ...movie,
                         provider: key,
@@ -86,14 +106,14 @@ export const getAllOTTPopular = async () => {
     }
 };
 
-//getOTTPopular를 이용하여 모든 OTT 인기작 + 예고편 key 함께 가져오기
+//getOTTPopularMovie를 이용하여 모든 OTT 인기작 + 예고편 key 함께 가져오기
 export const getAllOTTPopularWithTrailer = async () => {
     const results = {};
 
     for (const [key, providerId] of Object.entries(OTT_PROVIDERS)) {
         try {
             // OTT별 인기작 가져오기
-            const movies = await getOTTPopular(providerId);
+            const movies = await getOTTPopularMovie(providerId);
             const limitOtt = movies.slice(0, 8);
 
             const movieList = [];
