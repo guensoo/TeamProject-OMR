@@ -27,12 +27,12 @@ const Trailer = ({ data, onPlay }) => {
                         >
                             <Ionicons name="play-circle" size={64} color="white" />
                         </TouchableOpacity>
-                        <Text style={styles.title}>
+                        {/* <Text style={styles.title}>
                             {item.title}
                         </Text>
                         <Text style={[styles.providerText, { color: providerData?.color || '#aaa' }]}>
                             {item.provider}
-                        </Text>
+                        </Text> */}
                     </View>
                 );
             }}
@@ -44,11 +44,15 @@ const styles = StyleSheet.create({
     itemContainer: {
         marginVertical: 10,
         alignItems: 'center',
+        width: SCREEN_WIDTH,
+        height: SCREEN_WIDTH * 1.5,
     },
     poster: {
-        width: SCREEN_WIDTH * 0.8,
-        height: SCREEN_WIDTH * 1.2,
-        borderRadius: 12,
+        // width: SCREEN_WIDTH * 0.8,
+        // height: SCREEN_WIDTH * 1.2,
+        width: SCREEN_WIDTH,
+        height: '100%',
+        // borderRadius: 12,
     },
     playButton: {
         position: 'absolute',

@@ -9,9 +9,15 @@ const Header = () => {
         <>
             <View style={styles.header}>
                 <Text style={styles.headerText}>OMR</Text>
-                <Text style={styles.headerSubText}>OMR MOVIE REVIEW</Text>
+                {/* <TouchableOpacity onPress={() => {console.log("영화")}}>
+                    <Text style={styles.menuItem}>영화</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => {console.log("OTT")}}>
+                    <Text style={styles.menuItem}>OTT</Text>
+                </TouchableOpacity> */}
+                {/* <Text style={styles.headerSubText}>OMR MOVIE REVIEW</Text> */}
             </View>
-            <View style={styles.menuContainer}>
+            {/* <View style={styles.menuContainer}>
                 <TouchableOpacity onPress={() => navigation.navigate('ReviewList')}>
                     <Text style={styles.menuItem}>리뷰</Text>
                 </TouchableOpacity>
@@ -31,7 +37,7 @@ const Header = () => {
                 <TouchableOpacity onPress={() => navigation.navigate('AIRecommend')}>
                     <Text style={styles.menuItem}>AI추천영상</Text>
                 </TouchableOpacity>
-            </View>
+            </View> */}
         </>
     )
 }
@@ -39,18 +45,19 @@ const Header = () => {
 const styles = StyleSheet.create({
     header: {
         height: 60,
-        paddingTop: 15,
-        backgroundColor: '#4A90E2', //변경할 것
-        justifyContent: 'center',
-        alignItems: 'center',
+        marginLeft: 10,
+        // paddingTop: 15,
+        backgroundColor: '#fff', //변경할 것
+        // justifyContent: 'center',
+        // alignItems: 'center',
     },
     headerText: {
-        color: '#fff',
+        color: '#000',
         fontSize: 24,
         fontWeight: 'bold',
     },
     headerSubText: {
-        color: '#fff',
+        color: '#4A90E2',
         fontSize: 14,
     },
     menuContainer: {

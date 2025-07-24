@@ -8,8 +8,7 @@ const REGION = 'KR';
 export const OTT_PROVIDERS = {
     netflix: 8,
     disney: 337,
-    coupang: 356,
-    wavve: 96,
+    wavve: 356,
     watcha: 97,
     prime: 119,
 };
@@ -27,6 +26,7 @@ export const getOTTPopularMovie = async (
             sort_by: sortBy,
             watch_region: REGION,
             with_watch_providers: providerId,
+            // with_original_language: 'ko',
             page: page,
         },
     });
@@ -46,10 +46,40 @@ export const getOTTPopularTV = async (
             sort_by: sortBy,
             watch_region: REGION,
             with_watch_providers: providerId,
+            // with_original_language: 'ko',
             page: page,
         },
     });
     return res.data.results.slice(0, 20);
+};
+
+// 영화 + TV프로그램 인기작 가져오기 ( 15개(수정가능) )
+export const getAllOTTPopular = async () => {
+    try {
+        const entries = Object.entries(OTT_PROVIDERS);
+
+        const responses = await Promise.all(
+            entries.map(async ([key, providerId]) => {
+                try {
+                    const movies = await getOTTPopularMovie(providerId);
+                    const tvs = await getOTTPopularTV(providerId);
+
+                    const combined = [...movies.slice(0, 5), ...tvs.slice(0, 5)]
+                        .map(item => ({ ...item, title: item.title || item.name, provider: key, }))
+
+                    return [key, combined];
+                } catch (err) {
+                    console.error(`Error fetching ${key}:`, err.message);
+                    return [key, []];
+                }
+            })
+        );
+
+        return Object.fromEntries(responses);
+    } catch (err) {
+        console.error("Error fetching all OTT popular data:", err.message);
+        return {};
+    }
 };
 
 //예고편 유튜브 key 가져오기
@@ -77,34 +107,6 @@ export const getMovieTrailer = async (movieId) => {
         return null;
     }
 }
-
-// 10개만 가져오기
-export const getAllOTTPopular = async () => {
-    try {
-        const entries = Object.entries(OTT_PROVIDERS);
-
-        const responses = await Promise.all(
-            entries.map(async ([key, providerId]) => {
-                try {
-                    const data = await getOTTPopularMovie(providerId);
-                    const dataWithProvider = data.slice(0, 10).map(movie => ({
-                        ...movie,
-                        provider: key,
-                    }));
-                    return [key, dataWithProvider]; // ✅ 상위 10개만 반환
-                } catch (err) {
-                    console.error(`Error fetching ${key}:`, err.message);
-                    return [key, []];
-                }
-            })
-        );
-
-        return Object.fromEntries(responses);
-    } catch (err) {
-        console.error("Error fetching all OTT popular data:", err.message);
-        return {};
-    }
-};
 
 //getOTTPopularMovie를 이용하여 모든 OTT 인기작 + 예고편 key 함께 가져오기
 export const getAllOTTPopularWithTrailer = async () => {

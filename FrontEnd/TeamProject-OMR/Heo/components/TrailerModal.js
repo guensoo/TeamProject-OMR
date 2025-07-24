@@ -1,4 +1,4 @@
-import { Modal, View, TouchableOpacity, StyleSheet } from "react-native";
+import { Modal, View, TouchableOpacity, StyleSheet, Dimensions } from "react-native";
 import YoutubePlayer from "react-native-youtube-iframe";
 import { Ionicons } from '@expo/vector-icons';
 

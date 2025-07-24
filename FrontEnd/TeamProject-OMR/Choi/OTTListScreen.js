@@ -1,12 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import {
-    View,
-    FlatList,
-    ActivityIndicator,
-    TouchableOpacity,
-    Text,
-    StyleSheet
-} from 'react-native';
+import { View, FlatList, ActivityIndicator, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { getOTTPopularMovie, OTT_PROVIDERS } from '../All/api/tmdb';
 import OTTListCard from './components/card/OTTListCard';
 

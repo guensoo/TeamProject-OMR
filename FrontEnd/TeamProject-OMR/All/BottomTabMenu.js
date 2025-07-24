@@ -1,0 +1,103 @@
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { View, TouchableOpacity, StyleSheet } from "react-native";
+import { Ionicons } from '@expo/vector-icons';
+
+import Home from "../Heo/pages/Home";
+import ReviewList from "../Kim/ReviewList";
+import OTTScreen from "../Choi/OTTScreen";
+import MovieScreen from "../Choi/MovieScreen";
+import FindTheater from "../Choi/components/FindTheater";
+import AIRecommend from "../Park/AIRecommend";
+import BottomAllMenu from "./BottomAllMenu";
+
+const BottomTab = createBottomTabNavigator();
+
+const CustomButton = ({ children, onPress }) => {
+    return (
+        <TouchableOpacity
+            style={styles.customButtonContainer}
+            onPress={onPress}
+            activeOpacity={0.7}
+        >
+            <View style={styles.customButton}>
+                {children}
+            </View>
+        </TouchableOpacity>
+    )
+}
+
+const BottomTabMenu = () => {
+    return (
+        <BottomTab.Navigator
+            initialRouteName="Home"
+            screenOptions={({ route }) => ({
+                headerShown: false,
+                tabBarActiveTintColor: '#000',
+                tabBarInactiveTintColor: '#000',
+                tabBarStyle: { backgroundColor: '#fff' },
+                tabBarIcon: ({ color, size }) => {
+                    let iconName;
+                    if (route.name === 'Home') iconName = 'home-outline';
+                    else if (route.name === 'ReviewList') iconName = 'chatbubble-ellipses-outline';
+                    else if (route.name === 'OTTScreen') iconName = 'tv-outline';
+                    else if (route.name === 'MovieScreen') iconName = 'film-outline';
+                    else if (route.name === 'FindTheater') iconName = 'location-outline';
+                    else if (route.name === 'AIRecommend') iconName = 'flash-outline';
+                    else if (route.name === 'BottomAllMenu') iconName = 'menu-outline';
+
+                    return <Ionicons name={iconName} size={size} color={color} />;
+                },
+            })}
+        >
+            <BottomTab.Screen name="OTTScreen" component={OTTScreen} options={{ title: 'OTT' }} />
+            <BottomTab.Screen name="MovieScreen" component={MovieScreen} options={{ title: '영화' }} />
+            <BottomTab.Screen
+                name="Home"
+                component={Home}
+                options={{
+                    tabBarButton: (props) => <CustomButton {...props} />,
+                    tabBarIcon: () => (
+                        <Ionicons
+                            name="home"
+                            size={30}
+                            color="#000"
+                        />
+                    ),
+                    title: '홈'
+                }}
+            />
+            <BottomTab.Screen name="ReviewList" component={ReviewList} options={{ title: '리뷰' }} />
+            <BottomTab.Screen name="BottomAllMenu" component={BottomAllMenu} options={{ title: '메뉴' }} />
+            {/* <BottomTab.Screen name="FindTheater" component={FindTheater} options={{title: '영화관 찾기'}}/>
+            <BottomTab.Screen name="AIRecommend" component={AIRecommend} options={{title: 'AI추천'}}/> */}
+        </BottomTab.Navigator>
+    )
+}
+
+const styles = StyleSheet.create({
+    customButtonContainer: {
+        top: -18,  // 위로 띄워서 둥근 버튼처럼 보이게
+        justifyContent: 'center',
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 5 },
+        shadowOpacity: 0.3,
+        shadowRadius: 5,
+        elevation: 5,
+    },
+    customButton: {
+        width: 70,
+        height: 70,
+        borderRadius: 35,
+        backgroundColor: '#ddd',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    customButtonLabel: {
+        color: '#fff',
+        fontSize: 12,
+        marginTop: 4,
+    }
+})
+
+export default BottomTabMenu;

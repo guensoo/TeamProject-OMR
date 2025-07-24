@@ -1,7 +1,10 @@
 import { ScrollView, TouchableOpacity, Text, StyleSheet } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import ProviderInfo from "./ProviderInfo";
 
-const OTTSelector = ({ selectedProvider, onSelectProvider }) => {
+const OTTSelector = () => {
+    const navigation = useNavigation();
+
     return (
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.container}>
             {Object.keys(ProviderInfo).map((provider) => {
@@ -9,11 +12,11 @@ const OTTSelector = ({ selectedProvider, onSelectProvider }) => {
                 return (
                     <TouchableOpacity
                         key={provider}
-                        style={[styles.button, selectedProvider === provider && { backgroundColor: info.color }]}
-                        onPress={() => onSelectProvider(provider)}
+                        style={[styles.button, { backgroundColor: info.color }]}
+                        onPress={() => navigation.navigate('OTTListScreen', {providerKey: provider})}
                     >
                         {info.icon}
-                        <Text style={[styles.text, selectedProvider === provider && { color: 'white' }]}>
+                        <Text style={[styles.text, { color: 'white' }]}>
                             {provider.charAt(0).toUpperCase() + provider.slice(1)}
                         </Text>
                     </TouchableOpacity>

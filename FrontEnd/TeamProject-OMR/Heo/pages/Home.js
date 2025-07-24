@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ScrollView, StatusBar, FlatList, Dimensions, Image, TouchableOpacity, Modal } from "react-native"
+import { Text, StyleSheet, ScrollView, StatusBar, Dimensions } from "react-native"
 import Header from "../components/Header"
 import Footer from "../components/Footer"
 import { SafeAreaView } from "react-native-safe-area-context"
@@ -67,15 +67,15 @@ const Home = () => {
                 <Trailer data={allTrailers} onPlay={handlePlay} />
 
                 {/* 2️⃣ OTT 선택 버튼 */}
-                <OTTSelector
-                    selectedProvider={selectedProvider}
-                    onSelectProvider={setSelectedProvider}
-                />
+                <>
+                    <Text style={styles.allTitle}>전체 보기</Text>
+                    <OTTSelector/>
+                </>
 
                 {/* 3️⃣ 선택한 OTT별 인기작 리스트 */}
                 {selectedProvider && (
                     <>
-                        <Text style={styles.popularTitle}>인기작</Text>
+                        <Text style={styles.popularTitle}>리뷰 인기순</Text>
                         <Main_OTTList
                             data={allPosters}
                             provider={selectedProvider}
@@ -102,6 +102,11 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#fff",
+    },
+    allTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginLeft: 16,
     },
     popularTitle: {
         fontSize: 20,
