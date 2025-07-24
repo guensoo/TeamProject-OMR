@@ -1,4 +1,5 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, useAnimatedValue, Animated, Easing } from "react-native";
+
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated, Easing } from "react-native";
 import { Picker } from '@react-native-picker/picker';
 import Header from '../Heo/components/Header'
 import { ReviewComponent } from "./component/ReviewComponent";
@@ -25,7 +26,7 @@ const ReviewList = ({ navigation }) => {
     const shown = () => {
         Animated.timing(Anim,{
             toValue :1,
-            duration : 150,
+            duration : 300,
             easing: Easing.inOut(Easing.ease),
             useNativeDriver : false,
         }).start();
@@ -34,11 +35,13 @@ const ReviewList = ({ navigation }) => {
     const unShown = () => {
         Animated.timing(Anim,{
             toValue:0,
-            duration:150,
+            duration:300,
             easing: Easing.inOut(Easing.ease),
             useNativeDriver:false,
         }).start();
     }
+
+    const isAnimatingRef = useRef(false);
 
     const AnimHeight = Anim.interpolate({
         inputRange :[0,1],
@@ -176,14 +179,22 @@ const ReviewList = ({ navigation }) => {
                     style={styles.scrollView}
                     contentContainerStyle={styles.dataContainer}
                     showsVerticalScrollIndicator={false}
+                    scrollEventThrottle={100}
                     onScroll={(event)=>{
                         const offsetY = event.nativeEvent.contentOffset.y;
-                        if(offsetY > 50 && show){
+                        
+                        if(isAnimatingRef.current) return;
+
+                        if(offsetY > 120 && show){
+                            isAnimatingRef.current = true;
                             setShow(false);
                             unShown();
-                        }else if(offsetY <= 50 && !show){
+                            setTimeout(() => isAnimatingRef.current = false, 300);
+                        }else if(offsetY <= 30 && !show){
+                            isAnimatingRef.current = true;
                             setShow(true);
                             shown();
+                            setTimeout(() => isAnimatingRef.current = false, 300);
                         }
                     }}
                 >
