@@ -2,7 +2,7 @@ import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native
 import MovieCard from './card/MovieCard';
 
 export default function MovieSection({
-    title, onPressAll, data, activeCard, onToggle, renderRankBadge
+    title, onPressAll, data, activeCard, onToggle, renderRankBadge, sectionKey
 }) {
     return (
         <View style={styles.sectionContainer}>
@@ -24,9 +24,12 @@ export default function MovieSection({
                             rank={index + 1}
                             image={item.poster_path}
                             title={item.title}
-                            isActive={activeCard === item.id}
-                            onToggle={() => onToggle(item.id)}
-                            // ... 등등
+                            isActive={
+                                activeCard &&
+                                activeCard.section === sectionKey && // ← 여기!
+                                activeCard.id === item.id
+                            }
+                            onToggle={() => onToggle(sectionKey, item.id)}
                         />
                     </View>
                 )}

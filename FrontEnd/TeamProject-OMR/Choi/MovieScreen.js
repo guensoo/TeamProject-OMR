@@ -45,7 +45,14 @@ export default function MovieScreen() {
     }, []);
 
 
-    const handleToggle = (id) => setActiveCard((prev) => (prev === id ? null : id));
+    const handleToggle = (section, id) => {
+        setActiveCard(prev =>
+            prev && prev.section === section && prev.id === id
+                ? null
+                : { section, id }
+        );
+    };
+
 
     // 뱃지는 전체 인기순만 (필요시 아래처럼 구분)
     const renderRankBadge = (catKey) => (rank) => {
@@ -69,20 +76,15 @@ export default function MovieScreen() {
             <StatusBar barStyle="light-content" backgroundColor="#1a1a2e" />
             <ScrollView>
                 {CATEGORY_OPTIONS.map((category) => (
-                    <Animated.View key={category.key} style={styles.sectionWrapper}>
-                        <View style={[styles.sectionHeader, { borderLeftColor: category.color }]}>
-                            <Text style={styles.sectionIcon}>{category.icon}</Text>
-                            <Text style={styles.sectionTitle}>{category.label}</Text>
-                        </View>
-                        <MovieSection
-                            title=""
-                            data={movieRows[category.key] || []}  // ✅ movieRows로 변경
-                            activeCard={activeCard}
-                            onPressAll={() =>
-                                navigation.navigate('MovieListScreen', { categoryKey: category.key })
-                            }
-                        />
-                    </Animated.View>
+                    <MovieSection
+                        key={category.key}
+                        sectionKey={category.key}
+                        title={category.label}
+                        data={movieRows[category.key] || []}
+                        activeCard={activeCard}  // 카테고리별로!
+                        onToggle={handleToggle} // 카테고리 정보 함께!
+                    // ...기타 props
+                    />
                 ))}
             </ScrollView>
         </View>
