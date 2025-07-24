@@ -1,21 +1,22 @@
-import { useEffect, useState, useCallback } from 'react';
-import { View, FlatList, ActivityIndicator, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, FlatList, ActivityIndicator, TouchableOpacity, Text, StyleSheet, Dimensions } from 'react-native';
+import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import { getOTTPopularMovie, OTT_PROVIDERS } from '../All/api/tmdb';
 import OTTListCard from './components/card/OTTListCard';
 
-export default function OTTListScreen({ route }) {
-    const { providerKey } = route.params;
+const initialLayout = { width: Dimensions.get('window').width };
+
+function OTTTabContent({ providerKey, sortBy }) {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
-    const [sortBy, setSortBy] = useState('popularity.desc');
     const [isEnd, setIsEnd] = useState(false);
-    const [activeCard, setActiveCard] = useState(null); // ✅ 토글(펼치기) 상태
+    const [activeCard, setActiveCard] = useState(null);
 
     useEffect(() => {
         fetchData(1, sortBy);
         setActiveCard(null);
-    }, [sortBy]);
+    }, [sortBy, providerKey]);
 
     const fetchData = async (pageNum, sortOption) => {
         try {
@@ -68,26 +69,13 @@ export default function OTTListScreen({ route }) {
         );
     }
 
-    // 🟡 카드 토글 핸들러 (한번 더 누르면 닫힘)
+    // 카드 토글 핸들러 (한번 더 누르면 닫힘)
     const handleToggleCard = (id) => {
         setActiveCard((prev) => (prev === id ? null : id));
     };
 
     return (
-        <View style={styles.container}>
-            <View style={styles.sortContainer}>
-                <TouchableOpacity onPress={() => setSortBy('popularity.desc')}>
-                    <Text style={[styles.sortButton, sortBy === 'popularity.desc' && styles.active]}>
-                        인기순
-                    </Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => setSortBy('release_date.desc')}>
-                    <Text style={[styles.sortButton, sortBy === 'release_date.desc' && styles.active]}>
-                        최신순
-                    </Text>
-                </TouchableOpacity>
-            </View>
-
+        <View style={styles.tabContainer}>
             {loading && page === 1 ? (
                 <ActivityIndicator size="large" />
             ) : (
@@ -121,11 +109,48 @@ export default function OTTListScreen({ route }) {
     );
 }
 
+export default function OTTListScreen({ route }) {
+    const { providerKey } = route.params;
+    const [index, setIndex] = useState(0);
+    const [routes] = useState([
+        { key: 'popular', title: '인기순' },
+        { key: 'recent', title: '최신순' }
+    ]);
+
+    const renderScene = ({ route }) => {
+        switch (route.key) {
+            case 'popular':
+                return <OTTTabContent providerKey={providerKey} sortBy="popularity.desc" />;
+            case 'recent':
+                return <OTTTabContent providerKey={providerKey} sortBy="release_date.desc" />;
+            default:
+                return null;
+        }
+    };
+
+    return (
+        <TabView
+            navigationState={{ index, routes }}
+            renderScene={renderScene}
+            onIndexChange={setIndex}
+            initialLayout={initialLayout}
+            renderTabBar={props =>
+                <TabBar
+                    {...props}
+                    style={{ backgroundColor: '#181830' }}
+                    indicatorStyle={{ backgroundColor: '#fff' }}
+                    labelStyle={{ color: '#fff', fontWeight: 'bold' }}
+                    inactiveColor="#aaa"
+                    activeColor="#fff"
+                />
+            }
+            style={{ backgroundColor: '#0f0f23' }}
+        />
+    );
+}
+
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#0f0f23', padding: 10 },
-    sortContainer: { flexDirection: 'row', justifyContent: 'center', marginBottom: 10 },
-    sortButton: { color: '#aaa', fontSize: 16, marginHorizontal: 10 },
-    active: { color: '#fff', fontWeight: 'bold' },
+    tabContainer: { flex: 1, backgroundColor: '#0f0f23', padding: 10 },
     detailBox: {
         backgroundColor: '#232336',
         borderRadius: 12,
