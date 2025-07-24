@@ -14,6 +14,7 @@ import ReviewList from './Kim/ReviewList';
 
 // 박세현
 import ReviewDetail from './Park/ReviewDetail';
+import InfoDetail from './Park/InfoDetail';
 
 //
 import MovieScreen from './Choi/MovieScreen';
@@ -48,6 +49,8 @@ export default function App() {
                     <Stack.Screen name="AIRecommend" component={AIRecommend} options={{title: "AI추천", headerTitleStyle:{fontWeight: 'bold'}}}/>
 
                     <Stack.Screen name="ReviewDetail" component={ReviewDetail} />
+                    <Stack.Screen name="InfoDetail" component={InfoDetail} />
+                    
                 </Stack.Navigator>
             </SafeAreaView>
         </NavigationContainer>

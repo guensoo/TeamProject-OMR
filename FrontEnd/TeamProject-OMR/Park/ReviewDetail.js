@@ -65,7 +65,7 @@ const sampleComments = [
     },
 ];
 
-const ReviewDetail = ({ route }) => {
+const ReviewDetail = ({ route, navigation }) => {
     const { reviewId } = route.params;
     const [review, setReview] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -240,12 +240,16 @@ const ReviewDetail = ({ route }) => {
                 </View>
 
                 {/* 관련 영상 배너 */}
-                <TouchableOpacity style={styles.videoBanner}>
+                <View style={styles.videoBanner}>
                     <Text style={styles.videoBannerText}>
-                        🎬 이 영화가 궁금하다면? 
-                        <Text style={styles.videoBannerLink}> 상세보기</Text>
+                        🎬 이 영화가 궁금하다면?
+                        <TouchableOpacity
+                            onPress={() => navigation.navigate('InfoDetail', { reviewId })}
+                        >
+                            <Text style={styles.videoBannerLink}> 상세보기</Text>
+                        </TouchableOpacity>
                     </Text>
-                </TouchableOpacity>
+                </View>
 
                 {/* 댓글 섹션 */}
                 <View style={styles.commentSection}>
