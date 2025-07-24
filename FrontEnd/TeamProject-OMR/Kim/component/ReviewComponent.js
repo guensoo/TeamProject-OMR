@@ -7,8 +7,7 @@ export const ReviewComponent = (items) => {
     return(
         <TouchableOpacity 
             style={styles.container}
-            // onPress={()=>{navigation.navigate('',items)}}
-            onPress={()=>{Alert.alert('미구현','컴포넌트 주소를 몰라서 연결 못했습니다')}}
+            onPress={() => navigation.navigate("ReviewDetail", { reviewId: items.id })}
             activeOpacity={0.8}
         >
             {/* 사진영역 */}

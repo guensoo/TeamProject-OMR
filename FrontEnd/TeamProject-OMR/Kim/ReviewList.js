@@ -142,6 +142,14 @@ const ReviewList = ({ navigation }) => {
                     style={styles.scrollView}
                     contentContainerStyle={styles.dataContainer}
                     showsVerticalScrollIndicator={false}
+                    onScroll={(event)=>{
+                        const offsetY = event.nativeEvent.contentOffset.y;
+                        if(offsetY > 10){
+                            setShow(false);
+                        }else{
+                            setShow(true);
+                        }
+                    }}
                 >
                     <ReviewComponent />
                     <ReviewComponent />
