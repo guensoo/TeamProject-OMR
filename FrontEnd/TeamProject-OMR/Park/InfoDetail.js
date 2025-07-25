@@ -237,25 +237,25 @@ const InfoDetail = ({ route, navigation }) => {
                         
                         <Text style={styles.directorText}>감독 {movie.director}</Text>
                         <Text style={styles.castText}>출연 {movie.cast.join(', ')}</Text>
-                        
-                        {/* 평점 섹션 */}
-                        <View style={styles.ratingsSection}>
-                            <View style={styles.ratingCard}>
-                                <Text style={styles.ratingLabel}>네티즌 평점</Text>
-                                <View style={styles.ratingRow}>
-                                    <Text style={styles.ratingScore}>{movie.netizensRating}</Text>
-                                    <Text style={styles.ratingMax}>/10</Text>
-                                </View>
-                                <Text style={styles.ratingCount}>{movie.netizensTotal.toLocaleString()}명 참여</Text>
-                            </View>
-                            
-                            <View style={styles.ratingCard}>
-                                <Text style={styles.ratingLabel}>관람객</Text>
-                                <View style={styles.ratingRow}>
-                                    <Text style={styles.ratingScore}>{movie.watchGrade}</Text>
-                                    <Text style={styles.ratingMax}>/10</Text>
-                                </View>
-                            </View>
+                    </View>
+                </View>
+
+                {/* 평점 섹션 */}
+                <View style={styles.ratingsSection}>
+                    <View style={styles.ratingCard}>
+                        <Text style={styles.ratingLabel}>네티즌 평점</Text>
+                        <View style={styles.ratingRow}>
+                            <Text style={styles.ratingScore}>{movie.netizensRating}</Text>
+                            <Text style={styles.ratingMax}>/10</Text>
+                        </View>
+                        <Text style={styles.ratingCount}>{movie.netizensTotal.toLocaleString()}명 참여</Text>
+                    </View>
+                    
+                    <View style={styles.ratingCard}>
+                        <Text style={styles.ratingLabel}>관람객</Text>
+                        <View style={styles.ratingRow}>
+                            <Text style={styles.ratingScore}>{movie.watchGrade}</Text>
+                            <Text style={styles.ratingMax}>/10</Text>
                         </View>
                     </View>
                 </View>
@@ -517,18 +517,22 @@ const styles = StyleSheet.create({
         marginBottom: 16,
     },
 
-    // 평점 섹션
+    // 평점 섹션 스타일 수정
     ratingsSection: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
+        paddingHorizontal: 20,
+        paddingVertical: 16,
+        backgroundColor: '#FFFFFF',
+        borderBottomWidth: 1,
+        borderBottomColor: '#F0F0F0',
     },
     ratingCard: {
         flex: 1,
         alignItems: 'center',
         paddingVertical: 12,
-        marginHorizontal: 4,
         backgroundColor: '#F8F9FA',
         borderRadius: 8,
+        marginHorizontal: 4, // 카드 사이 작은 간격
     },
     ratingLabel: {
         fontSize: 12,

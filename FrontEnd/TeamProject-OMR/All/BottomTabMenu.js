@@ -1,5 +1,5 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { View, TouchableOpacity, StyleSheet, Text } from "react-native";
+import { View, TouchableOpacity, StyleSheet, Text, Image } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
 
 import Home from "../Heo/pages/Home";
@@ -42,7 +42,7 @@ const BottomTabMenu = () => {
                     headerShown: false,
                     tabBarActiveTintColor: '#000',
                     tabBarInactiveTintColor: '#000',
-                    tabBarStyle: { backgroundColor: '#fff' },
+                    tabBarStyle: { backgroundColor: '#fff' }, // 탭바 높이 원래대로
                     tabBarIcon: ({ color, size }) => {
                         let iconName;
                         if (route.name === 'Home') iconName = 'home-outline';
@@ -65,13 +65,18 @@ const BottomTabMenu = () => {
                     options={{
                         tabBarButton: (props) => <CustomButton {...props} />,
                         tabBarIcon: () => (
-                            <Ionicons
-                                name="home"
-                                size={30}
-                                color="#000"
+                            <Image
+                                source={require('../assets/OMR_MainLogo.png')}
+                                style={{ 
+                                    width: 70, 
+                                    height: 70, 
+                                    borderRadius: 35, // 이미지에도 원형 radius 적용
+                                    top: 8
+                                }} 
+                                resizeMode="cover" // 영역을 꽉 채움
                             />
                         ),
-                        title: '홈'
+                        title: '',
                     }}
                 />
                 <BottomTab.Screen name="ReviewList" component={ReviewList} options={{ title: '리뷰' }} />
@@ -99,7 +104,8 @@ const BottomTabMenu = () => {
 
 const styles = StyleSheet.create({
     customButtonContainer: {
-        top: -18,  // 위로 띄워서 둥근 버튼처럼 보이게
+        flex: 1, // 전체 탭 영역 사용
+        top: -18,  // 원래 위치로 복원
         justifyContent: 'center',
         alignItems: 'center',
         shadowColor: '#000',
@@ -109,12 +115,13 @@ const styles = StyleSheet.create({
         elevation: 5,
     },
     customButton: {
-        width: 70,
+        width: 70,  // 원래 크기로 복원
         height: 70,
         borderRadius: 35,
         backgroundColor: '#ddd',
         justifyContent: 'center',
         alignItems: 'center',
+        overflow: 'hidden', // 이미지가 원형을 벗어나지 않도록
     },
     customButtonLabel: {
         color: '#fff',
