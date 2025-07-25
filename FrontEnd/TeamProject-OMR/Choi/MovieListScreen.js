@@ -120,8 +120,15 @@ export default function MovieListScreen({ route }) {
                                     title={item.title}
                                     isActive={activeCard === item.id}
                                     onToggle={() => handleToggleCard(item.id)}
-                                    onReviewPress={() => console.log('리뷰', item.title)}
-                                    onDetailPress={() => console.log('상세', item.title)}
+                                    onReviewPress={() => {
+                                        console.log('리뷰', item.title)
+                                        navigation.navigate("ReviewDetail", { reviewId: item.id})
+                                    }}
+                                    onDetailPress={() => {
+                                        console.log('상세', item.title)
+                                        console.log('MovieListScreen.js')
+                                        // navigation.navigate("ReviewDetail", { reviewId: item.id})
+                                    }}
                                 />
                             </TouchableOpacity>
                         </View>

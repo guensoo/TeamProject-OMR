@@ -3,15 +3,18 @@ import { View, FlatList, ActivityIndicator, TouchableOpacity, Text, StyleSheet, 
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import { getOTTPopularMovie, OTT_PROVIDERS } from '../All/api/tmdb';
 import OTTListCard from './components/card/OTTListCard';
+import { useNavigation } from '@react-navigation/native';
 
 const initialLayout = { width: Dimensions.get('window').width };
 
-function OTTTabContent({ providerKey, sortBy }) {
+function OTTTabContent({providerKey, sortBy }) {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
     const [isEnd, setIsEnd] = useState(false);
     const [activeCard, setActiveCard] = useState(null);
+
+    const navigation = useNavigation();
 
     useEffect(() => {
         fetchData(1, sortBy);
@@ -97,8 +100,15 @@ function OTTTabContent({ providerKey, sortBy }) {
                                     title={item.title || item.name}
                                     isActive={activeCard === item.id}
                                     onToggle={() => handleToggleCard(item.id)}
-                                    onReviewPress={() => console.log('리뷰', item.title)}
-                                    onDetailPress={() => console.log('상세', item.title)}
+                                    onReviewPress={() => {
+                                        console.log('리뷰', item.title)
+                                        navigation.navigate("ReviewDetail", { reviewId: item.id })
+                                    }}
+                                    onDetailPress={() => {
+                                        console.log('상세', item.title)
+                                        console.log('OTTListScreent.js')
+                                        // navigation.navigate("ReviewDetail", { reviewId: item.id })
+                                    }}
                                 />
                             </TouchableOpacity>
                         </View>

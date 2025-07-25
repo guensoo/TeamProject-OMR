@@ -29,8 +29,15 @@ function OTTSection({ title, data, activeCard, onToggle, providerKey }) {
                         title={item.title || item.name}
                         isActive={activeCard === item.id} // ✅ 현재 활성화된 카드
                         onToggle={() => onToggle(item.id)} // ✅ 클릭 시 토글
-                        onReviewPress={() => console.log(`${item.title} 리뷰보기 클릭`)}
-                        onDetailPress={() => console.log(`${item.title} 상세정보 클릭`)}
+                        onReviewPress={() => {
+                            console.log(`${item.title} 리뷰보기 클릭`)
+                            navigation.navigate("ReviewDetail", { reviewId: item.id.toString() })
+                        }}
+                        onDetailPress={() => {
+                            console.log(`${item.title} 상세정보 클릭`)
+                            console.log(`OTTSection.js`)
+                            // navigation.navigate("ReviewDetail", { reviewId: item.id.toString() })
+                        }}
                     />
                 )}
             />

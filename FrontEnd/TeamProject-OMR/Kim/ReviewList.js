@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from "react";
 const ReviewList = ({ navigation }) => {
     // 정렬상태값
     const [sort, setSort] = useState('latest');
+    // 불러온 리뷰리스트
     const [review, setRview] = useState([]);
     
     // 필터 상태값
@@ -155,6 +156,15 @@ const ReviewList = ({ navigation }) => {
                             <Text style={styles.toggleIcon}>⏬</Text>
                         </View>
                     </TouchableOpacity>
+
+                    <TouchableOpacity onPress={()=>{navigation.navigate('SupportMain')}}>
+                        <Text>고객센터로</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity onPress={()=>{navigation.navigate('ReviewWrite')}}>
+                        <Text>리뷰쓰기로</Text>
+                    </TouchableOpacity>
+
                 </View>
 
                 {/* 총개수 및 정렬 필터 */}

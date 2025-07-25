@@ -1,9 +1,12 @@
 import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
 import MovieCard from './card/MovieCard';
+import { useNavigation } from '@react-navigation/native';
 
 export default function MovieSection({
     title, onPressAll, data, activeCard, onToggle, renderRankBadge, sectionKey
 }) {
+    const navigation = useNavigation();
+
     return (
         <View style={styles.sectionContainer}>
             <View style={styles.header}>
@@ -29,6 +32,15 @@ export default function MovieSection({
                                 activeCard.section === sectionKey && // ← 여기!
                                 activeCard.id === item.id
                             }
+                            onReviewPress={()=>{
+                                console.log('영화리뷰', item.title)
+                                navigation.navigate("ReviewDetail", { reviewId: item.id})
+                            }}
+                            onDetailPress={()=>{
+                                console.log('영화상세', item.title)
+                                console.log('MovieSection.js')
+                                // navigation.navigate("ReviewDetail", { reviewId: item.id})
+                            }}
                             onToggle={() => onToggle(sectionKey, item.id)}
                         />
                     </View>

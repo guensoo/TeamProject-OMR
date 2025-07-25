@@ -26,6 +26,11 @@ import FindTheater from './Choi/components/FindTheater';
 import MapScreen from './Choi/MapScreen';
 
 import AIRecommend from './Park/AIRecommend';
+import { ReviewWrite } from './Kim/ReviewWrite';
+import { SupportMain } from './Kim/supportCenter/SupportMain';
+import { FAQ } from './Kim/supportCenter/FAQ';
+import { QnA } from './Kim/supportCenter/QnA';
+import { Notice } from './Kim/supportCenter/Notice';
 
 const Stack = createNativeStackNavigator();
 
@@ -43,6 +48,12 @@ export default function App() {
                     <Stack.Screen name="AIRecommend" component={AIRecommend} options={{title: "AI추천", headerTitleStyle:{fontWeight: 'bold'}}}/>
 
                     <Stack.Screen name="ReviewDetail" component={ReviewDetail} />
+                    <Stack.Screen name="ReviewWrite" component={ReviewWrite} options={{headerShown:false}}/>
+                    <Stack.Screen name="SupportMain" component={SupportMain} options={{headerShown:false}}/>
+                    <Stack.Screen name="FAQ" component={FAQ} options={{headerShown:false}}/>
+                    <Stack.Screen name="QnA" component={QnA} options={{headerShown:false}}/>
+                    <Stack.Screen name="Notice" component={Notice} options={{headerShown:false}}/>
+
                     <Stack.Screen name="InfoDetail" component={InfoDetail} />
                     
                 </Stack.Navigator>

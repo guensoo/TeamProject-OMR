@@ -2,9 +2,11 @@ import { useNavigation } from "@react-navigation/native"
 import { Image, StyleSheet, Text, TouchableOpacity,View } from "react-native"
 
 export const ReviewComponent = (items) => {
+    // 이동가능
     const navigation = useNavigation();
 
-    
+    // console.log(items)
+
     return(
         <TouchableOpacity 
             style={styles.container}
@@ -27,14 +29,14 @@ export const ReviewComponent = (items) => {
                 </View>
                 
                 <Text style={styles.titleText} numberOfLines={1}>
-                    {"영화 제목이 여기에 표시됩니다"}
+                    {items.title?items.title:"영화 제목이 여기에 표시됩니다"}
                 </Text>
                 
                 <Text style={styles.descriptionText} numberOfLines={3}>
-                    {'이곳에는 영화에 대한 간단한 리뷰 내용이 표시됩니다. 최대 3줄까지 보여지며, 넘치는 내용은 말줄임표로 처리됩니다.'}
+                    {items.content?items.content:'이곳에는 영화에 대한 간단한 리뷰 내용이 표시됩니다. 최대 3줄까지 보여지며, 넘치는 내용은 말줄임표로 처리됩니다.'}
                 </Text>
                 
-                <Text style={styles.dateText}>{'2024.07.24'}</Text>
+                <Text style={styles.dateText}>{items.createAt?items.createAt:'2024.07.24'}</Text>
             </View>
         </TouchableOpacity>
     )
