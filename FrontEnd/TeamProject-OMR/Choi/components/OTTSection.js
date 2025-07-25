@@ -35,8 +35,7 @@ function OTTSection({ title, data, activeCard, onToggle, providerKey }) {
                         }}
                         onDetailPress={() => {
                             console.log(`${item.title} 상세정보 클릭`)
-                            console.log(`OTTSection.js`)
-                            // navigation.navigate("ReviewDetail", { reviewId: item.id.toString() })
+                            navigation.navigate("InfoDetail", { reviewId: item.id.toString() })
                         }}
                     />
                 )}

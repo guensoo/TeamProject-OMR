@@ -159,6 +159,20 @@ export const ReviewWrite = ({ navigation }) => {
 
                     {/* 제목 입력 섹션 */}
                     <View style={styles.inputSection}>
+                        <Text style={styles.sectionTitle}>영화제목</Text>
+                        <TextInput
+                            style={styles.titleInput}
+                            placeholder="리뷰 제목을 입력하세요"
+                            placeholderTextColor="#999"
+                            value={title}
+                            onChangeText={setTitle}
+                            maxLength={100}
+                        />
+                        <Text style={styles.charCount}>{title.length}/100</Text>
+                    </View>
+
+                    {/* 제목 입력 섹션 */}
+                    <View style={styles.inputSection}>
                         <Text style={styles.sectionTitle}>제목</Text>
                         <TextInput
                             style={styles.titleInput}

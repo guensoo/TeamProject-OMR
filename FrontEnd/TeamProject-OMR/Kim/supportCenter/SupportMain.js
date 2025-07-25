@@ -2,9 +2,16 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-nati
 import { useNavigation } from '@react-navigation/native';
 import Header from "../../Heo/components/Header";
 import { SupportNavbar } from "./SupportNavbar";
+import { useContext } from "react";
+import {SupportContext} from '../context/SupportContext'
+import { QnA } from "./QnA";
+import { Notice } from "./Notice";
+import { FAQ } from "./FAQ";
 
 export const SupportMain = () => {
     const navigation = useNavigation();
+
+    const {supportData,setSupportData} = useContext(SupportContext);
 
     const supportMenus = [
         {
@@ -66,6 +73,18 @@ export const SupportMain = () => {
     const handleMenuPress = (route) => {
         navigation.navigate(route);
     };
+
+    if(supportData==='QnA'){
+        return <QnA/>
+    }
+
+    if(supportData==='Notice'){
+        return <Notice/>
+    }
+
+    if(supportData==='FAQ'){
+        return <FAQ/>
+    }
 
     return (
         <>

@@ -38,8 +38,7 @@ export default function MovieSection({
                             }}
                             onDetailPress={()=>{
                                 console.log('영화상세', item.title)
-                                console.log('MovieSection.js')
-                                // navigation.navigate("ReviewDetail", { reviewId: item.id})
+                                navigation.navigate("InfoDetail", { reviewId: item.id})
                             }}
                             onToggle={() => onToggle(sectionKey, item.id)}
                         />

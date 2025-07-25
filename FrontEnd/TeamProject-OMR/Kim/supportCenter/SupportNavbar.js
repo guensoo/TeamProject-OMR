@@ -1,13 +1,13 @@
-import { useNavigation } from '@react-navigation/native';
 import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
-import { useState } from 'react';
-import { useRoute } from '@react-navigation/native';
+import { useContext, useState } from 'react';
+import { SupportContext } from '../context/SupportContext';
 
 export const SupportNavbar = () => {
-    const navigation = useNavigation();
-    const route = useRoute();
     const [pressedButton, setPressedButton] = useState(null);
 
+    const {supportData,setSupportData} = useContext(SupportContext);
+
+    // 밑줄
     const handlePressIn = (buttonName) => {
         setPressedButton(buttonName);
     };
@@ -38,7 +38,7 @@ export const SupportNavbar = () => {
     ];
 
     const isActive = (routeName) => {
-        return route.name === routeName;
+        return supportData === routeName;
     };
 
     return (
@@ -52,7 +52,7 @@ export const SupportNavbar = () => {
                                 isActive(item.route) && styles.navButtonActive,
                                 pressedButton === item.key && styles.navButtonPressed
                             ]}
-                            onPress={() => navigation.navigate(item.route)}
+                            onPress={() => setSupportData(item.key)}
                             onPressIn={() => handlePressIn(item.key)}
                             onPressOut={handlePressOut}
                             activeOpacity={1}
@@ -60,14 +60,14 @@ export const SupportNavbar = () => {
                             <View style={styles.navButtonContent}>
                                 <Text style={[
                                     styles.navIcon,
-                                    isActive(item.route) && styles.navIconActive,
+                                    isActive(item.key) && styles.navIconActive,
                                     pressedButton === item.key && styles.navIconPressed
                                 ]}>
                                     {item.icon}
                                 </Text>
                                 <Text style={[
                                     styles.navText,
-                                    isActive(item.route) && styles.navTextActive,
+                                    isActive(item.key) && styles.navTextActive,
                                     pressedButton === item.key && styles.navTextPressed
                                 ]}>
                                     {item.label}
@@ -75,12 +75,12 @@ export const SupportNavbar = () => {
                             </View>
                             
                             {/* 활성 상태 인디케이터 */}
-                            {isActive(item.route) && (
+                            {isActive(item.key) && (
                                 <View style={styles.activeIndicator} />
                             )}
                             
                             {/* 터치 시 밑줄 */}
-                            {pressedButton === item.key && !isActive(item.route) && (
+                            {pressedButton === item.key && !isActive(item.key) && (
                                 <View style={styles.pressedIndicator} />
                             )}
                         </TouchableOpacity>

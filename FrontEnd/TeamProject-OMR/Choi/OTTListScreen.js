@@ -106,8 +106,7 @@ function OTTTabContent({providerKey, sortBy }) {
                                     }}
                                     onDetailPress={() => {
                                         console.log('상세', item.title)
-                                        console.log('OTTListScreent.js')
-                                        // navigation.navigate("ReviewDetail", { reviewId: item.id })
+                                        navigation.navigate("InfoDetail", { reviewId: item.id })
                                     }}
                                 />
                             </TouchableOpacity>

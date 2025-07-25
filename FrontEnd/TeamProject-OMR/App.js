@@ -31,6 +31,7 @@ import { SupportMain } from './Kim/supportCenter/SupportMain';
 import { FAQ } from './Kim/supportCenter/FAQ';
 import { QnA } from './Kim/supportCenter/QnA';
 import { Notice } from './Kim/supportCenter/Notice';
+import { SupportWrapper } from './Kim/supportCenter/SupportWrapper';
 
 const Stack = createNativeStackNavigator();
 
@@ -49,10 +50,7 @@ export default function App() {
 
                     <Stack.Screen name="ReviewDetail" component={ReviewDetail} />
                     <Stack.Screen name="ReviewWrite" component={ReviewWrite} options={{headerShown:false}}/>
-                    <Stack.Screen name="SupportMain" component={SupportMain} options={{headerShown:false}}/>
-                    <Stack.Screen name="FAQ" component={FAQ} options={{headerShown:false}}/>
-                    <Stack.Screen name="QnA" component={QnA} options={{headerShown:false}}/>
-                    <Stack.Screen name="Notice" component={Notice} options={{headerShown:false}}/>
+                    <Stack.Screen name="Support" component={SupportWrapper} options={{headerShown:false}}/>
 
                     <Stack.Screen name="InfoDetail" component={InfoDetail} />
                     
