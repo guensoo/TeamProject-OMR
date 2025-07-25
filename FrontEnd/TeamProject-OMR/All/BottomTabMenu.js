@@ -71,7 +71,7 @@ const BottomTabMenu = () => {
                                     width: 70, 
                                     height: 70, 
                                     borderRadius: 35, // 이미지에도 원형 radius 적용
-                                    top: 8
+                                    top: 7
                                 }} 
                                 resizeMode="cover" // 영역을 꽉 채움
                             />
