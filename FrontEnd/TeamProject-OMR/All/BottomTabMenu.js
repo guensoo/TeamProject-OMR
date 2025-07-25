@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
         width: 70,  // 원래 크기로 복원
         height: 70,
         borderRadius: 35,
-        backgroundColor: '#ddd',
+        backgroundColor: '#f2f0ed',
         justifyContent: 'center',
         alignItems: 'center',
         overflow: 'hidden', // 이미지가 원형을 벗어나지 않도록

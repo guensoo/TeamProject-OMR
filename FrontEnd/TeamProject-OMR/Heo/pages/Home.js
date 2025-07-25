@@ -60,7 +60,7 @@ const Home = () => {
                 translucent
                 barStyle="dark-content"
             />
-            <Header />
+            {/* <Header /> */}
 
             <ScrollView showsVerticalScrollIndicator={false}>
                 {/* 1️⃣ 상단 메인 트레일러(예고편) */}

@@ -2,7 +2,7 @@ import { FlatList, View, Image, Text, TouchableOpacity, Dimensions, StyleSheet }
 import ProviderInfo from "../utils/ProviderInfo";
 import { Ionicons } from '@expo/vector-icons';
 
-const { width: SCREEN_WIDTH } = Dimensions.get("window");
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 const Trailer = ({ data, onPlay }) => {
     return (
@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
         marginVertical: 10,
         alignItems: 'center',
         width: SCREEN_WIDTH,
-        height: SCREEN_WIDTH * 1.5,
+        height: SCREEN_HEIGHT * 0.85,
     },
     poster: {
         // width: SCREEN_WIDTH * 0.8,
