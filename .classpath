@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="BackEnd/teamProject.OMR/src/main/java"/>
+	<classpathentry kind="src" path="BackEnd/teamProject.OMR/src/test/java"/>
+	<classpathentry kind="src" path="FrontEnd/TeamProject-OMR/node_modules/@react-native-picker/picker/android/src/fabric/java"/>
+	<classpathentry kind="src" path="FrontEnd/TeamProject-OMR/node_modules/@react-native-picker/picker/android/src/main/java"/>
+	<classpathentry kind="src" path="FrontEnd/TeamProject-OMR/node_modules/@react-native-picker/picker/android/src/paper/java"/>
+	<classpathentry kind="src" path="FrontEnd/TeamProject-OMR/node_modules/expo-image-loader/android/src/main/java"/>
+	<classpathentry kind="src" path="FrontEnd/TeamProject-OMR/node_modules/expo-linear-gradient/android/src/main/java"/>
+	<classpathentry kind="src" path="FrontEnd/TeamProject-OMR/node_modules/expo-modules-core/android/src/main/java"/>
+	<classpathentry kind="src" path="FrontEnd/TeamProject-OMR/node_modules/react-native/ReactAndroid/src/main/java"/>
+	<classpathentry kind="src" path="FrontEnd/TeamProject-OMR/node_modules/react-native-gesture-handler/android/paper/src/main/java"/>
+	<classpathentry kind="src" path="FrontEnd/TeamProject-OMR/node_modules/react-native-gesture-handler/android/paper77/src/main/java"/>
+	<classpathentry kind="src" path="FrontEnd/TeamProject-OMR/node_modules/react-native-gesture-handler/android/src/main/java"/>
+	<classpathentry kind="src" path="FrontEnd/TeamProject-OMR/node_modules/react-native-maps/android/src/main/java"/>
+	<classpathentry kind="src" path="FrontEnd/TeamProject-OMR/node_modules/react-native-reanimated/android/src/fabric/java"/>
+	<classpathentry kind="src" path="FrontEnd/TeamProject-OMR/node_modules/react-native-reanimated/android/src/main/java"/>
+	<classpathentry kind="src" path="FrontEnd/TeamProject-OMR/node_modules/react-native-reanimated/android/src/paper/java"/>
+	<classpathentry kind="src" path="FrontEnd/TeamProject-OMR/node_modules/react-native-reanimated/android/src/reactNativeVersionPatch/BorderRadiiDrawableUtils/75"/>
+	<classpathentry kind="src" path="FrontEnd/TeamProject-OMR/node_modules/react-native-reanimated/android/src/reactNativeVersionPatch/BorderRadiiDrawableUtils/latest"/>
+	<classpathentry kind="src" path="FrontEnd/TeamProject-OMR/node_modules/react-native-reanimated/android/src/reactNativeVersionPatch/ReanimatedNativeHierarchyManager/75"/>
+	<classpathentry kind="src" path="FrontEnd/TeamProject-OMR/node_modules/react-native-reanimated/android/src/reactNativeVersionPatch/ReanimatedNativeHierarchyManager/latest"/>
+	<classpathentry kind="src" path="FrontEnd/TeamProject-OMR/node_modules/react-native-safe-area-context/android/src/paper/java"/>
+	<classpathentry kind="src" path="FrontEnd/TeamProject-OMR/node_modules/react-native-screens/android/src/paper/java"/>
+	<classpathentry kind="src" path="FrontEnd/TeamProject-OMR/node_modules/react-native-webview/android/src/main/java"/>
+	<classpathentry kind="src" path="FrontEnd/TeamProject-OMR/node_modules/react-native-webview/android/src/newarch"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-17"/>
+	<classpathentry kind="src" path="FrontEnd/TeamProject-OMR/node_modules/react-native-webview/android/src/oldarch"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
