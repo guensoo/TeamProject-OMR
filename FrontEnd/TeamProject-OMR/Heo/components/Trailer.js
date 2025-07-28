@@ -27,12 +27,9 @@ const Trailer = ({ data, onPlay }) => {
                         >
                             <Ionicons name="play-circle" size={64} color="white" />
                         </TouchableOpacity>
-                        {/* <Text style={styles.title}>
-                            {item.title}
-                        </Text>
                         <Text style={[styles.providerText, { color: providerData?.color || '#aaa' }]}>
                             {item.provider}
-                        </Text> */}
+                        </Text>
                     </View>
                 );
             }}

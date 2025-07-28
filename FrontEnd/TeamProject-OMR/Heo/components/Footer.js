@@ -14,6 +14,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         backgroundColor: '#fff',
         alignItems: 'center',
+        marginBottom: 20,
     },
     footerText: {
         color: '#000',

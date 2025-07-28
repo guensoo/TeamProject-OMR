@@ -1,4 +1,4 @@
-import { Text, StyleSheet, ScrollView, StatusBar, Dimensions } from "react-native"
+import { Text, StyleSheet, ScrollView, StatusBar, Dimensions, TouchableOpacity, View } from "react-native"
 import Header from "../components/Header"
 import Footer from "../components/Footer"
 import { SafeAreaView } from "react-native-safe-area-context"
@@ -9,11 +9,14 @@ import Main_OTTList from "../components/Main_OTTList"
 import TrailerModal from "../components/TrailerModal"
 import OTTSelector from "../utils/OTTSelector"
 import ProviderInfo from "../utils/ProviderInfo"
+import { useNavigation } from "@react-navigation/native"
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const firstProvider = Object.keys(ProviderInfo)[0]; //인기작 Netflix 버튼
 
 const Home = () => {
+    const navigation = useNavigation();
+
     const [allTrailers, setAllTrailers] = useState([]);
     const [allPosters, setAllPosters] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
@@ -68,14 +71,29 @@ const Home = () => {
 
                 {/* 2️⃣ OTT 선택 버튼 */}
                 <>
-                    <Text style={styles.allTitle}>전체 보기</Text>
-                    <OTTSelector/>
+                    <Text style={styles.allTitle}>카테고리 선택</Text>
+                    <OTTSelector />
                 </>
 
                 {/* 3️⃣ 선택한 OTT별 인기작 리스트 */}
                 {selectedProvider && (
                     <>
-                        <Text style={styles.popularTitle}>리뷰 인기순</Text>
+                        <View style={styles.popularHeader}>
+                            <Text style={styles.popularTitle}>리뷰 인기순</Text>
+                            <TouchableOpacity onPress={() => navigation.navigate("ReviewList")}>
+                                <Text style={styles.seeAllText}>전체보기</Text>
+                            </TouchableOpacity>
+                        </View>
+                        <Main_OTTList
+                            data={allPosters}
+                            provider={selectedProvider}
+                        />
+                        <View style={styles.popularHeader}>
+                            <Text style={styles.popularTitle}>리뷰 인기순</Text>
+                            <TouchableOpacity onPress={() => navigation.navigate("ReviewList")}>
+                                <Text style={styles.seeAllText}>전체보기</Text>
+                            </TouchableOpacity>
+                        </View>
                         <Main_OTTList
                             data={allPosters}
                             provider={selectedProvider}
@@ -108,11 +126,22 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginLeft: 16,
     },
+    popularHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginTop: 20,
+    },
     popularTitle: {
         fontSize: 20,
         fontWeight: 'bold',
         marginLeft: 16,
         marginVertical: 10,
+    },
+    seeAllText: {
+        fontSize: 16,
+        color: '#007bff',
+        marginRight: 12,
     },
 })
 

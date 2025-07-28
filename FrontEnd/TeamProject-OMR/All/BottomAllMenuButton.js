@@ -2,12 +2,12 @@ import { Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-nativ
 import Modal from 'react-native-modal'
 import { Ionicons } from '@expo/vector-icons'
 
-const BottomAllMenu = ({ isVisible, onClose, navigation }) => {
+const BottomAllMenuButton = ({ isVisible, onClose, navigation }) => {
     const tabScreens = ['ReviewList', 'OTTScreen', 'MovieScreen'];
 
     const handleNavigate = (screenName) => {
         if (tabScreens.includes(screenName)) {
-            navigation.navigate('BottomTabMenu', { screen : screenName } );
+            navigation.navigate('BottomTabMenu', { screen: screenName });
         } else {
             navigation.navigate(screenName);
         }
@@ -79,8 +79,16 @@ const BottomAllMenu = ({ isVisible, onClose, navigation }) => {
                         style={styles.menuItem}
                         onPress={() => handleNavigate('AIRecommend')}
                     >
-                        <Ionicons name="flash-outline" size={24} color="#333" />
+                        <Ionicons name="cloud-outline" size={24} color="#333" />
                         <Text style={styles.menuText}>AI 추천</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        style={styles.menuItem}
+                        onPress={() => handleNavigate('')}
+                    >
+                        <Ionicons name="call-outline" size={24} color="#333" />
+                        <Text style={styles.menuText}>고객센터</Text>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -128,4 +136,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default BottomAllMenu;
+export default BottomAllMenuButton;

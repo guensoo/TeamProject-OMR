@@ -8,7 +8,7 @@ import OTTScreen from "../Choi/OTTScreen";
 import MovieScreen from "../Choi/MovieScreen";
 import FindTheater from "../Choi/components/FindTheater";
 import AIRecommend from "../Park/AIRecommend";
-import BottomAllMenu from "./BottomAllMenu";
+import BottomAllMenuButton from "./BottomAllMenuButton";
 import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 
@@ -51,7 +51,7 @@ const BottomTabMenu = () => {
                         else if (route.name === 'MovieScreen') iconName = 'film-outline';
                         else if (route.name === 'FindTheater') iconName = 'location-outline';
                         else if (route.name === 'AIRecommend') iconName = 'flash-outline';
-                        else if (route.name === 'BottomAllMenu') iconName = 'menu-outline';
+                        else if (route.name === 'BottomAllMenuButton') iconName = 'menu-outline';
 
                         return <Ionicons name={iconName} size={size} color={color} />;
                     },
@@ -81,7 +81,7 @@ const BottomTabMenu = () => {
                 />
                 <BottomTab.Screen name="ReviewList" component={ReviewList} options={{ title: '리뷰' }} />
                 <BottomTab.Screen
-                    name="BottomAllMenu"
+                    name="BottomAllMenuButton"
                     component={EmptyScreen} // placeholder, 안 쓰임
                     options={{
                         tabBarButton: (props) => (
@@ -97,7 +97,7 @@ const BottomTabMenu = () => {
                 />
             </BottomTab.Navigator>
 
-            <BottomAllMenu isVisible={menuVisible} onClose={() => setMenuVisible(false)} navigation={navigation}/>
+            <BottomAllMenuButton isVisible={menuVisible} onClose={() => setMenuVisible(false)} navigation={navigation}/>
         </>
     )
 }

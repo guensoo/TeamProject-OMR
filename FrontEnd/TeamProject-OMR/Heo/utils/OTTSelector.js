@@ -37,14 +37,12 @@ const styles = StyleSheet.create({
         paddingHorizontal: 12,
         paddingVertical: 8,
         borderRadius: 20,
-        backgroundColor: '#f0f0f0',
         marginRight: 8,
     },
     text: {
-        marginLeft: 6,
+        marginLeft: 2,
         fontSize: 14,
         fontWeight: '600',
-        color: '#333',
     },
 });
 

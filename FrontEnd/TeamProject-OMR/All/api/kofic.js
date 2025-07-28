@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getMovieTrailer } from './tmdb';
 
 const KOFIC_KEY = 'ddffa88cc27b9e0d42017d1df6153a29';
 const TMDB_KEY = '46ae6607955da617463546b9cd029255';
@@ -93,3 +94,100 @@ export const getBoxOfficeWithPosters = async (
         return [];
     }
 };
+
+//영화 포스터 + 예고편
+export const getBoxOfficeWithPostersAndTrailer = async (
+    date,
+    {
+        type = 'daily', // 'daily', 'weekly'
+        weekGb = '0',   // (주간 only) 0:주간, 1:주말, 2:주중
+        multiMovieYn,   // "Y": 다양성(독립), "N": 상업, undefined: 전체
+        repNationCd,    // "K": 한국, "F": 외국, undefined: 전체
+    } = {}
+) => {
+    try {
+        // 1. KOFIC API URL 및 파라미터 설정
+        let url;
+        let params = { key: KOFIC_KEY, targetDt: date };
+        if (type === 'weekly') {
+            url = `${KOFIC_BASE_URL}/boxoffice/searchWeeklyBoxOfficeList.json`;
+            params.weekGb = weekGb;
+        } else {
+            url = `${KOFIC_BASE_URL}/boxoffice/searchDailyBoxOfficeList.json`;
+        }
+        if (multiMovieYn) params.multiMovieYn = multiMovieYn;
+        if (repNationCd) params.repNationCd = repNationCd;
+
+        // 2. KOFIC 박스오피스 데이터 요청
+        const res = await axios.get(url, { params });
+
+        // 3. 박스오피스 리스트 선택
+        const boxOfficeList =
+            (type === 'weekly'
+                ? res.data.boxOfficeResult.weeklyBoxOfficeList
+                : res.data.boxOfficeResult.dailyBoxOfficeList) || [];
+
+        // 4. TMDB와 매칭하여 포스터와 예고편 가져오기
+        const results = await Promise.all(
+            boxOfficeList.map(async (item) => {
+                try {
+                    const year = item.openDt ? item.openDt.split('-')[0] : '';
+                    const query = cleanTitle(item.movieNm);
+
+                    // TMDB 영화 검색 (한국어 우선)
+                    let tmdbRes = await axios.get(`${TMDB_BASE_URL}/search/movie`, {
+                        params: {
+                            api_key: TMDB_KEY,
+                            language: 'ko-KR',
+                            query: query,
+                            year: year,
+                        },
+                    });
+
+                    // 한국어 검색 결과 없으면 다국어 재검색
+                    if (!tmdbRes.data.results.length) {
+                        tmdbRes = await axios.get(`${TMDB_BASE_URL}/search/movie`, {
+                            params: {
+                                api_key: TMDB_KEY,
+                                query: query,
+                                year: year,
+                            },
+                        });
+                    }
+
+                    const matched = tmdbRes.data.results[0];
+
+                    // TMDB 포스터 URL
+                    const poster = matched?.poster_path
+                        ? `https://image.tmdb.org/t/p/w500${matched.poster_path}`
+                        : 'https://via.placeholder.com/120x180?text=No+Image';
+
+                    // TMDB 예고편 key (YouTube)
+                    const trailerKey = matched ? await getMovieTrailer(matched.id) : null;
+
+                    return {
+                        id: item.movieCd,
+                        title: item.movieNm,
+                        poster_path: poster,
+                        rank: item.rank,
+                        trailerKey: trailerKey,  // 예고편 유튜브 key 추가
+                    };
+                } catch (error) {
+                    console.error('TMDB 매칭 또는 예고편 조회 실패:', error.message);
+                    return {
+                        id: item.movieCd,
+                        title: item.movieNm,
+                        poster_path: 'https://via.placeholder.com/120x180?text=No+Image',
+                        rank: item.rank,
+                        trailerKey: null,
+                    };
+                }
+            })
+        );
+
+        return results;
+    } catch (error) {
+        console.error('KOFIC API Error: ', error.message);
+        return [];
+    }
+}
