@@ -66,7 +66,6 @@ export default function OTTScreen() {
     const ottServices = [
         { key: 'netflix', title: '넷플릭스 인기 순', color: '#e50914', icon: '🎬' },
         { key: 'disney', title: '디즈니+ 인기 순', color: '#113ccf', icon: '✨' },
-        { key: 'coupang', title: '쿠팡플레이 인기 순', color: '#ff7b00', icon: '🎭' },
         { key: 'wavve', title: '웨이브 인기 순', color: '#1f4788', icon: '🌊' },
         { key: 'watcha', title: '왓챠 인기 순', color: '#ff0558', icon: '👁️' },
         { key: 'prime', title: 'Prime Video 인기 순', color: '#00a8e1', icon: '📺' },

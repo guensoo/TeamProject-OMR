@@ -24,6 +24,7 @@ import OTTScreen from './Choi/OTTScreen';
 import OTTListScreen from './Choi/OTTListScreen';
 import FindTheater from './Choi/components/FindTheater';
 import MapScreen from './Choi/MapScreen';
+import SearchList from './Choi/SearchList';
 
 import AIRecommend from './Park/AIRecommend';
 import { ReviewWrite } from './Kim/ReviewWrite';
@@ -42,11 +43,12 @@ export default function App() {
                 <Stack.Navigator initialRouteName="BottomTabMenu">
                     <Stack.Screen name="BottomTabMenu" component={BottomTabMenu} options={{ headerShown: false }} />
                     <Stack.Screen name="Login" component={Login} options={{title: "로그인"}} />
-                    <Stack.Screen name="OTTListScreen" component={OTTListScreen} />
-                    <Stack.Screen name="MovieListScreen" component={MovieListScreen}/>
+                    <Stack.Screen name="OTTListScreen" component={OTTListScreen} options={{headerShown:false}}/>
+                    <Stack.Screen name="MovieListScreen" component={MovieListScreen} options={{headerShown:false}}/>
                     <Stack.Screen name="FindTheater" component={FindTheater} options={{title: "영화관 찾기", headerTitleStyle:{fontWeight: 'bold'}}}/>
                     <Stack.Screen name="MapScreen" component={MapScreen}/>
                     <Stack.Screen name="AIRecommend" component={AIRecommend} options={{title: "AI추천", headerTitleStyle:{fontWeight: 'bold'}}}/>
+                    <Stack.Screen name="SearchList" component={SearchList} options={{headerShown:false}}/>
 
                     <Stack.Screen name="ReviewDetail" component={ReviewDetail} />
                     <Stack.Screen name="ReviewWrite" component={ReviewWrite} options={{headerShown:false}}/>

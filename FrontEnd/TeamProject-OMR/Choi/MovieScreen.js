@@ -62,6 +62,13 @@ export default function MovieScreen() {
         // (생략)
     };
 
+    const handlePressAll = (catKey, catLabel) => {
+        navigation.navigate('MovieListScreen', {
+            category: catKey,
+            title: catLabel
+        });
+    };
+
     if (loading) {
         return (
             <View style={styles.loadingContainer}>
@@ -83,6 +90,7 @@ export default function MovieScreen() {
                         data={movieRows[category.key] || []}
                         activeCard={activeCard}  // 카테고리별로!
                         onToggle={handleToggle} // 카테고리 정보 함께!
+                        onPressAll={() => handlePressAll(category.key, category.label)}
                     // ...기타 props
                     />
                 ))}

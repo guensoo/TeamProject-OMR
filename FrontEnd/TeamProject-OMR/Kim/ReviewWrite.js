@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { 
-    View, 
-    Text, 
-    StyleSheet, 
-    ScrollView, 
+import {
+    View,
+    Text,
+    StyleSheet,
+    ScrollView,
     TextInput,
     TouchableOpacity,
     SafeAreaView,
@@ -20,6 +20,7 @@ export const ReviewWrite = ({ navigation }) => {
     const [rating, setRating] = useState(0);
     const [selectedImages, setSelectedImages] = useState([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [selectedMovie, setSelectedMovie] = useState(null);
 
     // 별점 선택 핸들러
     const handleRatingPress = (selectedRating) => {
@@ -67,11 +68,11 @@ export const ReviewWrite = ({ navigation }) => {
         }
 
         setIsSubmitting(true);
-        
+
         try {
             // 실제로는 API 호출
             await new Promise(resolve => setTimeout(resolve, 1500));
-            
+
             Alert.alert('완료', '리뷰가 성공적으로 작성되었습니다!', [
                 { text: '확인', onPress: () => navigation.goBack() }
             ]);
@@ -87,24 +88,33 @@ export const ReviewWrite = ({ navigation }) => {
         Alert.alert('임시저장', '작성 중인 내용이 임시저장되었습니다.');
     };
 
+    // 작품 선택 핸들러
+    const handleSelectMovie = () => {
+        navigation.navigate('SearchList', {
+            onSelect: (movie) => {
+                setSelectedMovie(movie);   // ← 선택한 정보 저장!
+            }
+        });
+    };
+
     return (
         <SafeAreaView style={styles.safeArea}>
-            <KeyboardAvoidingView 
+            <KeyboardAvoidingView
                 style={styles.keyboardView}
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             >
                 {/* 헤더 */}
                 <View style={styles.header}>
-                    <TouchableOpacity 
+                    <TouchableOpacity
                         style={styles.headerButton}
                         onPress={() => navigation.goBack()}
                     >
                         <Text style={styles.headerButtonText}>취소</Text>
                     </TouchableOpacity>
-                    
+
                     <Text style={styles.headerTitle}>리뷰 작성</Text>
-                    
-                    <TouchableOpacity 
+
+                    <TouchableOpacity
                         style={styles.headerButton}
                         onPress={handleSaveDraft}
                     >
@@ -112,7 +122,7 @@ export const ReviewWrite = ({ navigation }) => {
                     </TouchableOpacity>
                 </View>
 
-                <ScrollView 
+                <ScrollView
                     style={styles.scrollView}
                     contentContainerStyle={styles.container}
                     showsVerticalScrollIndicator={false}
@@ -140,9 +150,9 @@ export const ReviewWrite = ({ navigation }) => {
                                         onPress={() => handleRatingPress(star)}
                                         style={styles.starButton}
                                     >
-                                        <Text 
+                                        <Text
                                             style={[
-                                                styles.star, 
+                                                styles.star,
                                                 star <= rating ? styles.starFilled : styles.starEmpty
                                             ]}
                                         >
@@ -157,18 +167,26 @@ export const ReviewWrite = ({ navigation }) => {
                         </View>
                     </View>
 
-                    {/* 제목 입력 섹션 */}
+                    {/* 영화 선택 섹션 - 수정된 부분 */}
                     <View style={styles.inputSection}>
-                        <Text style={styles.sectionTitle}>영화제목</Text>
-                        <TextInput
-                            style={styles.titleInput}
-                            placeholder="리뷰 제목을 입력하세요"
-                            placeholderTextColor="#999"
-                            value={title}
-                            onChangeText={setTitle}
-                            maxLength={100}
-                        />
-                        <Text style={styles.charCount}>{title.length}/100</Text>
+                        <Text style={styles.sectionTitle}>작품선택</Text>
+                        <TouchableOpacity
+                            style={styles.movieSelectButton}
+                            onPress={handleSelectMovie}
+                            activeOpacity={0.7}
+                        >
+                            <View style={styles.movieSelectContent}>
+                                <Text style={[
+                                    styles.movieSelectText,
+                                    selectedMovie ? null : styles.moviePlaceholder
+                                ]}>
+                                    {selectedMovie
+                                        ? `${selectedMovie.title || selectedMovie.name} (${(selectedMovie.release_date || selectedMovie.first_air_date || '').slice(0, 4)})`
+                                        : '리뷰할 작품을 선택해주세요'}
+                                </Text>
+                                <Text style={styles.movieSelectArrow}>▶</Text>
+                            </View>
+                        </TouchableOpacity>
                     </View>
 
                     {/* 제목 입력 섹션 */}
@@ -207,15 +225,15 @@ export const ReviewWrite = ({ navigation }) => {
                             <Text style={styles.sectionTitle}>사진 추가</Text>
                             <Text style={styles.sectionSubtitle}>최대 5장</Text>
                         </View>
-                        
-                        <ScrollView 
-                            horizontal 
+
+                        <ScrollView
+                            horizontal
                             showsHorizontalScrollIndicator={false}
                             style={styles.imageScrollView}
                         >
                             {/* 이미지 추가 버튼 */}
                             {selectedImages.length < 5 && (
-                                <TouchableOpacity 
+                                <TouchableOpacity
                                     style={styles.imageAddButton}
                                     onPress={handleImagePicker}
                                 >
@@ -223,15 +241,15 @@ export const ReviewWrite = ({ navigation }) => {
                                     <Text style={styles.imageAddText}>사진 추가</Text>
                                 </TouchableOpacity>
                             )}
-                            
+
                             {/* 선택된 이미지들 */}
                             {selectedImages.map((image, index) => (
                                 <View key={index} style={styles.imageContainer}>
-                                    <Image 
-                                        source={{ uri: image.uri }} 
-                                        style={styles.selectedImage} 
+                                    <Image
+                                        source={{ uri: image.uri }}
+                                        style={styles.selectedImage}
                                     />
-                                    <TouchableOpacity 
+                                    <TouchableOpacity
                                         style={styles.imageRemoveButton}
                                         onPress={() => handleRemoveImage(index)}
                                     >
@@ -253,11 +271,11 @@ export const ReviewWrite = ({ navigation }) => {
 
                 {/* 하단 제출 버튼 */}
                 <View style={styles.submitSection}>
-                    <TouchableOpacity 
+                    <TouchableOpacity
                         style={[
                             styles.submitButton,
-                            (title.trim() && content.trim() && rating > 0) 
-                                ? styles.submitButtonActive 
+                            (title.trim() && content.trim() && rating > 0)
+                                ? styles.submitButtonActive
                                 : styles.submitButtonInactive
                         ]}
                         onPress={handleSubmit}
@@ -265,8 +283,8 @@ export const ReviewWrite = ({ navigation }) => {
                     >
                         <Text style={[
                             styles.submitButtonText,
-                            (title.trim() && content.trim() && rating > 0) 
-                                ? styles.submitButtonTextActive 
+                            (title.trim() && content.trim() && rating > 0)
+                                ? styles.submitButtonTextActive
                                 : styles.submitButtonTextInactive
                         ]}>
                             {isSubmitting ? '작성 중...' : '리뷰 작성 완료'}
@@ -286,7 +304,7 @@ const styles = StyleSheet.create({
     keyboardView: {
         flex: 1,
     },
-    
+
     // 헤더
     header: {
         flexDirection: 'row',
@@ -553,5 +571,42 @@ const styles = StyleSheet.create({
     },
     submitButtonTextInactive: {
         color: "#ADB5BD",
+    },
+    movieSelectButton: {
+        backgroundColor: "#FF6B6B",
+        borderRadius: 12,
+        paddingVertical: 16,
+        paddingHorizontal: 20,
+        marginBottom: 8,
+        elevation: 2,
+        shadowColor: "#FF6B6B",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+    },
+    movieSelectContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+    movieSelectText: {
+        fontSize: 16,
+        color: "#FFFFFF",
+        fontWeight: "500",
+        flex: 1,
+    },
+    moviePlaceholder: {
+        opacity: 0.9,
+    },
+    movieSelectArrow: {
+        fontSize: 14,
+        color: "#FFFFFF",
+        marginLeft: 8,
+    },
+    selectedMovieInfo: {
+        marginTop: 8,
+        color: '#ffd700',
+        fontWeight: 'bold',
+        fontSize: 15,
     },
 });

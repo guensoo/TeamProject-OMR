@@ -85,7 +85,7 @@ const BottomAllMenuButton = ({ isVisible, onClose, navigation }) => {
 
                     <TouchableOpacity
                         style={styles.menuItem}
-                        onPress={() => handleNavigate('')}
+                        onPress={() => handleNavigate('Support')}
                     >
                         <Ionicons name="call-outline" size={24} color="#333" />
                         <Text style={styles.menuText}>고객센터</Text>

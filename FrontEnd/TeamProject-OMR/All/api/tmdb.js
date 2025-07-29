@@ -144,3 +144,38 @@ export const getAllOTTPopularWithTrailer = async () => {
 
     return results;
 };
+
+// 전세계
+export const getAllPopularGlobal = async (count = 20, type = 'all') => {
+    try {
+        // 인기 영화
+        const resMovie = await axios.get(`${BASE_URL}/movie/popular`, {
+            params: {
+                api_key: API_KEY,
+                language: 'ko-KR',
+                page: 1,
+            },
+        });
+        const movies = resMovie.data.results || [];
+
+        // 인기 드라마(TV)
+        const resTv = await axios.get(`${BASE_URL}/tv/popular`, {
+            params: {
+                api_key: API_KEY,
+                language: 'ko-KR',
+                page: 1,
+            },
+        });
+        const tvs = resTv.data.results || [];
+
+        let merged;
+        if (type === 'movie') merged = movies;
+        else if (type === 'tv') merged = tvs;
+        else merged = [...movies, ...tvs].sort((a, b) => (b.popularity || 0) - (a.popularity || 0));
+
+        return merged.slice(0, count);
+    } catch (err) {
+        console.error('Error fetching global popular movies/tv:', err.message);
+        return [];
+    }
+};
