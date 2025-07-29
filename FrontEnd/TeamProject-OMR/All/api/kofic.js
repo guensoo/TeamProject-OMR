@@ -134,6 +134,8 @@ export const getBoxOfficeWithPostersAndTrailer = async (
                     const year = item.openDt ? item.openDt.split('-')[0] : '';
                     const query = cleanTitle(item.movieNm);
 
+                    //  console.log(`\n[START] 영화 검색: ${item.movieNm} (${item.movieCd}), 년도: ${year}`);
+
                     // TMDB 영화 검색 (한국어 우선)
                     let tmdbRes = await axios.get(`${TMDB_BASE_URL}/search/movie`, {
                         params: {
@@ -157,6 +159,10 @@ export const getBoxOfficeWithPostersAndTrailer = async (
 
                     const matched = tmdbRes.data.results[0];
 
+                    // console.log(`TMDB 검색 성공: ${matched.title} (ID: ${matched.id})`);
+
+                    // console.log(`예고편 조회 시작: TMDB ID ${matched.id}`);
+
                     // TMDB 포스터 URL
                     const poster = matched?.poster_path
                         ? `https://image.tmdb.org/t/p/w500${matched.poster_path}`
@@ -164,6 +170,8 @@ export const getBoxOfficeWithPostersAndTrailer = async (
 
                     // TMDB 예고편 key (YouTube)
                     const trailerKey = matched ? await getMovieTrailer(matched.id) : null;
+
+                    // console.log(`예고편 조회 완료: ${trailerKey ? trailerKey : "예고편 없음"}`);
 
                     return {
                         id: item.movieCd,
@@ -173,7 +181,7 @@ export const getBoxOfficeWithPostersAndTrailer = async (
                         trailerKey: trailerKey,  // 예고편 유튜브 key 추가
                     };
                 } catch (error) {
-                    console.error('TMDB 매칭 또는 예고편 조회 실패:', error.message);
+                    // console.error(`[ERROR] TMDB 매칭 또는 예고편 조회 실패: ${item.movieNm} (${item.movieCd}) - ${error.message}`);
                     return {
                         id: item.movieCd,
                         title: item.movieNm,

@@ -1,71 +1,91 @@
-import { FlatList, View, Image, Text, TouchableOpacity, Dimensions, StyleSheet } from "react-native";
-import ProviderInfo from "../utils/ProviderInfo";
-import { Ionicons } from '@expo/vector-icons';
+import { View, Text, FlatList, Image, TouchableOpacity, StyleSheet, Dimensions } from "react-native";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
+const SCREEN_RATIO = SCREEN_HEIGHT / SCREEN_WIDTH;
+
 const Trailer = ({ data, onPlay }) => {
+    if (!data || data.length === 0) return null;
+
+    const getFullPosterUrl = (item) => {
+        if (item.posterPath) {
+            // 이미 전체 URL인 경우
+            return item.posterPath;
+        } else if (item.poster_path) {
+            // TMDB 경로 조각일 경우
+            return `https://image.tmdb.org/t/p/w500${item.poster_path}`;
+        }
+        return null; // 없으면 null 처리
+    };
+
+    const renderItem = ({ item }) => {
+        return (
+            <TouchableOpacity 
+                style={styles.card} 
+                onPress={() => onPlay(item.trailerKey) }
+                activeOpacity={1}   // 터치 시 반짝임 제거
+                >
+                <Image source={{ uri: getFullPosterUrl(item) }} style={styles.poster} />
+                <View style={styles.playIconContainer}>
+                    <Text style={styles.playIcon}>▶</Text>
+                </View>
+            </TouchableOpacity>
+        );
+    };
+
     return (
-        <FlatList
-            data={data}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            pagingEnabled
-            keyExtractor={(item) => `${item.provider}_${item.id}`}
-            renderItem={({ item }) => {
-                const providerData = ProviderInfo[item.provider];
-                return (
-                    <View style={styles.itemContainer}>
-                        <Image
-                            source={{ uri: `https://image.tmdb.org/t/p/w500${item.poster_path}` }}
-                            style={styles.poster}
-                            resizeMode="cover"
-                        />
-                        <TouchableOpacity
-                            style={styles.playButton}
-                            onPress={() => onPlay(item.trailerKey)}
-                        >
-                            <Ionicons name="play-circle" size={64} color="white" />
-                        </TouchableOpacity>
-                        <Text style={[styles.providerText, { color: providerData?.color || '#aaa' }]}>
-                            {item.provider}
-                        </Text>
-                    </View>
-                );
-            }}
-        />
+        <View>
+            {/* <Text style={styles.header}>🔥 지금 뜨는 예고편</Text> */}
+            <FlatList
+                data={data}
+                keyExtractor={(item, index) => item.id?.toString() || index.toString()}
+                renderItem={renderItem}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                pagingEnabled                 // 스와이프할 때 1페이지씩
+                decelerationRate="fast"      // 스와이프 감속 빠르게
+            />
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
-    itemContainer: {
-        marginVertical: 10,
-        alignItems: 'center',
+    header: {
+        fontSize: 22,
+        fontWeight: "bold",
+        marginLeft: 16,
+        marginBottom: 10,
+    },
+    card: {
         width: SCREEN_WIDTH,
-        height: SCREEN_HEIGHT * 0.85,
     },
     poster: {
-        // width: SCREEN_WIDTH * 0.8,
-        // height: SCREEN_WIDTH * 1.2,
-        width: SCREEN_WIDTH,
-        height: '100%',
-        // borderRadius: 12,
+        width: "100%",
+        // height: SCREEN_WIDTH * 2.2,
+        height: SCREEN_HEIGHT * 0.9,
     },
-    playButton: {
-        position: 'absolute',
-        top: '40%',
-        alignSelf: 'center',
+    infoContainer: {
+        marginTop: 8,
     },
     title: {
         fontSize: 16,
-        fontWeight: 'bold',
-        textAlign: 'center',
-        width: SCREEN_WIDTH,
+        fontWeight: "600",
     },
-    providerText: {
-        fontSize: 14,
-        textTransform: 'capitalize',
+    playIconContainer: {
+        position: "absolute",
+        top: "45%",
+        left: "45%",
+        backgroundColor: "rgba(0, 0, 0, 0.6)",
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        justifyContent: "center",
+        alignItems: "center",
     },
-})
+    playIcon: {
+        color: "#fff",
+        fontSize: 28,
+    },
+});
 
 export default Trailer;
