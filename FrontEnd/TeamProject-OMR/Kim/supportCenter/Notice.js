@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, ScrollView, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, ScrollView, Text, TouchableOpacity, StyleSheet, TextInput } from 'react-native';
 import Header from "../../Heo/components/Header";
 import { SupportNavbar } from "./SupportNavbar";
 
@@ -136,6 +136,9 @@ const NoticeItem = ({ item, isExpanded, onToggle }) => (
 export const Notice = () => {
   const [expandedItems, setExpandedItems] = useState(new Set());
   const [selectedCategory, setSelectedCategory] = useState('전체');
+  const [showNewInquiry, setShowNewInquiry] = useState(false);
+  const [inquiryTitle, setInquiryTitle] = useState('');
+  const [inquiryContent, setInquiryContent] = useState('');
 
   const categories = ['전체', '시스템', '업데이트', '정책', '고객센터', '이벤트'];
 
@@ -153,13 +156,101 @@ export const Notice = () => {
     ? noticeData 
     : noticeData.filter(notice => notice.category === selectedCategory);
 
+  const handleNewInquiry = () => {
+    setShowNewInquiry(true);
+  };
+  
+  const handleSubmitInquiry = () => {
+    if (inquiryTitle.trim() && inquiryContent.trim()) {
+      // 문의 제출 로직
+      console.log('문의 제출:', { title: inquiryTitle, content: inquiryContent });
+      setInquiryTitle('');
+      setInquiryContent('');
+      setShowNewInquiry(false);
+      alert('문의가 성공적으로 접수되었습니다.');
+    } else {
+      alert('제목과 내용을 모두 입력해주세요.');
+    }
+  };
+
+  const handleCancel = () => {
+    setShowNewInquiry(false);
+    setInquiryTitle('');
+    setInquiryContent('');
+  };
+
+  // 글 작성하기
+  if (showNewInquiry) {
+    return (
+      <>
+        <Header />
+        <SupportNavbar />
+        <ScrollView style={styles.container}>
+          <View style={styles.content}>
+            <Text style={styles.title}>새 문의 작성</Text>
+            
+            <View style={styles.formContainer}>
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>문의 제목</Text>
+                <TextInput
+                  style={styles.titleInput}
+                  placeholder="문의 제목을 입력해주세요"
+                  value={inquiryTitle}
+                  onChangeText={setInquiryTitle}
+                />
+              </View>
+              
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>문의 내용</Text>
+                <TextInput
+                  style={styles.contentInput}
+                  placeholder="문의 내용을 자세히 입력해주세요"
+                  value={inquiryContent}
+                  onChangeText={setInquiryContent}
+                  multiline
+                  numberOfLines={8}
+                  textAlignVertical="top"
+                />
+              </View>
+              
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity 
+                  style={[styles.actionButton, styles.secondaryButton]} 
+                  onPress={handleCancel}
+                >
+                  <Text style={styles.secondaryButtonText}>취소</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={[styles.actionButton, styles.primaryButton]} 
+                  onPress={handleSubmitInquiry}
+                >
+                  <Text style={styles.primaryButtonText}>문의 제출</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </ScrollView>
+      </>
+    );
+  }
+  
+
   return (
     <>
       <Header />
       <SupportNavbar />
       <ScrollView style={styles.container}>
         <View style={styles.content}>
-          <Text style={styles.title}>공지사항</Text>
+          <View style={styles.headerSection}> 
+            <Text style={styles.title}>공지사항</Text>
+            <TouchableOpacity 
+              style={styles.newInquiryButton} 
+              onPress={handleNewInquiry}
+            >
+            <Text style={styles.newInquiryButtonText}>+ 새 공지사항</Text>
+            </TouchableOpacity>
+          </View>
           <Text style={styles.subtitle}>
             서비스 관련 중요한 소식을 확인하세요.
           </Text>
@@ -216,6 +307,91 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f8f9fa',
+  },
+  headerSection: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  newInquiryButton: {
+    backgroundColor: '#007AFF',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 6,
+  },
+  newInquiryButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  formContainer: {
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  inputGroup: {
+    marginBottom: 20,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 8,
+  },
+  titleInput: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    backgroundColor: '#fff',
+  },
+  contentInput: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    backgroundColor: '#fff',
+    minHeight: 120,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 10,
+  },
+  actionButton: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  primaryButton: {
+    backgroundColor: '#007AFF',
+  },
+  secondaryButton: {
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: '#007AFF',
+  },
+  primaryButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  secondaryButtonText: {
+    color: '#007AFF',
+    fontSize: 16,
+    fontWeight: '600',
   },
   content: {
     padding: 20,

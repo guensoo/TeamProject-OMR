@@ -1,10 +1,12 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Animated } from "react-native";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useContext } from "react";
 import Header from "../../Heo/components/Header";
 import { SupportNavbar } from "./SupportNavbar";
+import { SupportContext } from "../context/SupportContext";
 
 // FAQ 아이템 컴포넌트
 const FAQItem = ({ question, answer, isExpanded, onToggle }) => {
+
     const animatedHeight = useRef(new Animated.Value(0)).current;
     const rotation = useRef(new Animated.Value(0)).current;
 
@@ -75,6 +77,8 @@ export const FAQ = () => {
     const [selectedCategory, setSelectedCategory] = useState('전체');
 
     const categories = ['전체', '계정/로그인', '서비스 이용', '결제/환불', '기술 문제'];
+
+    const {setSupportData} = useContext(SupportContext);
 
     const faqData = [
         {
@@ -193,7 +197,8 @@ export const FAQ = () => {
                         <Text style={styles.helpDescription}>
                             1:1 문의를 통해 개별 상담을 받아보세요
                         </Text>
-                        <TouchableOpacity style={styles.helpButton}>
+                        <TouchableOpacity style={styles.helpButton} 
+                            onPress={() => setSupportData('QnA')} >
                             <Text style={styles.helpButtonText}>1:1 문의하기</Text>
                         </TouchableOpacity>
                     </View>
@@ -386,5 +391,6 @@ const styles = StyleSheet.create({
 
     bottomSpacing: {
         height: 20,
+        marginBottom:20
     },
 });
