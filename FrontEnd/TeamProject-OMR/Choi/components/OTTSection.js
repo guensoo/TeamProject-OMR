@@ -2,30 +2,9 @@ import { memo } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
 import OTTCard from './card/OTTCard';
-import { getMovieDetail, getTVDetail } from '../../All/api/tmdb'; // ← 실제 경로로!
 
 function OTTSection({ title, data, activeCard, onToggle, providerKey }) {
     const navigation = useNavigation();
-
-    // 상세 fetch → navigation
-    const handleDetailPress = async (item) => {
-        try {
-            let detail = null;
-            if (item.media_type === 'movie' || item.title) {
-                detail = await getMovieDetail(item.id);
-            } else {
-                detail = await getTVDetail(item.id);
-            }
-            if (detail) {
-                navigation.navigate("InfoDetail", { ott: detail });
-            } else {
-                alert('상세 정보를 불러올 수 없습니다.');
-            }
-        } catch (e) {
-            alert('상세 정보를 불러오는 중 오류가 발생했습니다.');
-        }
-    };
-
     return (
         <View style={styles.section}>
             <View style={styles.header}>
@@ -48,13 +27,16 @@ function OTTSection({ title, data, activeCard, onToggle, providerKey }) {
                         rank={index + 1}
                         image={`https://image.tmdb.org/t/p/w500${item.poster_path}`}
                         title={item.title || item.name}
-                        isActive={activeCard === item.id}
-                        onToggle={() => onToggle(item.id)}
+                        isActive={activeCard === item.id} // ✅ 현재 활성화된 카드
+                        onToggle={() => onToggle(item.id)} // ✅ 클릭 시 토글
                         onReviewPress={() => {
                             console.log(`${item.title} 리뷰보기 클릭`)
                             navigation.navigate("ReviewDetail", { reviewId: item.id.toString() })
                         }}
-                        onDetailPress={() => handleDetailPress(item)}
+                        onDetailPress={() => {
+                            console.log(`${item.title} 상세정보 클릭`)
+                            navigation.navigate("InfoDetail", { reviewId: item.id.toString() })
+                        }}
                     />
                 )}
             />

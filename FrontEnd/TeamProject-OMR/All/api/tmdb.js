@@ -145,7 +145,7 @@ export const getAllOTTPopularWithTrailer = async () => {
     return results;
 };
 
-// 전세계 인기작
+// 전세계
 export const getAllPopularGlobal = async (count = 20, type = 'all') => {
     try {
         // 인기 영화
@@ -177,36 +177,5 @@ export const getAllPopularGlobal = async (count = 20, type = 'all') => {
     } catch (err) {
         console.error('Error fetching global popular movies/tv:', err.message);
         return [];
-    }
-};
-
-// 상세정보 + 추가자료 fetch
-export const getMovieDetail = async (movieId) => {
-    try {
-        const res = await axios.get(`${BASE_URL}/movie/${movieId}`, {
-            params: {
-                api_key: API_KEY,
-                language: 'ko-KR',
-                append_to_response: 'videos,credits,images,release_dates', // ← 추가!
-            },
-        });
-
-        // 연령가 파싱 (KR 기준)
-        let certification = null;
-        const releaseDates = res.data.release_dates?.results || [];
-        const krRelease = releaseDates.find(item => item.iso_3166_1 === 'KR');
-        if (krRelease && krRelease.release_dates.length > 0) {
-            const theater = krRelease.release_dates.find(d => d.type === 3 && d.certification);
-            certification = (theater || krRelease.release_dates[0]).certification || null;
-        }
-
-        // certification 필드를 추가해서 반환
-        return {
-            ...res.data,
-            certification,
-        };
-    } catch (err) {
-        console.error('영화 상세정보 가져오기 실패:', err.message);
-        return null;
     }
 };

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Animated, Text, View, ScrollView, StatusBar, StyleSheet, ActivityIndicator } from 'react-native';
-import { getBoxOfficeWithPostersAndTrailer } from '../All/api/kofic';
+import { getBoxOfficeWithPosters } from '../All/api/kofic';
 import { useNavigation } from '@react-navigation/native';
 import MovieSection from './components/MovieSection';
 
@@ -31,7 +31,7 @@ export default function MovieScreen() {
         // 카테고리별 API를 한 번에 병렬 요청!
         Promise.all(
             CATEGORY_OPTIONS.map(cat =>
-                getBoxOfficeWithPostersAndTrailer(date, cat.params).then(data => ({
+                getBoxOfficeWithPosters(date, cat.params).then(data => ({
                     key: cat.key,
                     data: data.slice(0, 10)
                 }))
@@ -51,6 +51,15 @@ export default function MovieScreen() {
                 ? null
                 : { section, id }
         );
+    };
+
+
+    // 뱃지는 전체 인기순만 (필요시 아래처럼 구분)
+    const renderRankBadge = (catKey) => (rank) => {
+        if (catKey !== 'all') return null;
+        if (rank > 3) return null;
+        // ... 뱃지 스타일/코드는 기존과 동일
+        // (생략)
     };
 
     const handlePressAll = (catKey, catLabel) => {
@@ -74,7 +83,6 @@ export default function MovieScreen() {
             <StatusBar barStyle="light-content" backgroundColor="#1a1a2e" />
             <ScrollView>
                 {CATEGORY_OPTIONS.map((category) => (
-                    
                     <MovieSection
                         key={category.key}
                         sectionKey={category.key}
@@ -83,7 +91,6 @@ export default function MovieScreen() {
                         activeCard={activeCard}  // 카테고리별로!
                         onToggle={handleToggle} // 카테고리 정보 함께!
                         onPressAll={() => handlePressAll(category.key, category.label)}
-                        navigation={navigation}
                     // ...기타 props
                     />
                 ))}
