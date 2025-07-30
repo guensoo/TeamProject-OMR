@@ -1,17 +1,21 @@
 package OMR.teamProject.OMR.Review.DTO;
 
-import java.time.LocalDateTime;
+import OMR.teamProject.OMR.User.DTO.UserResponseDto;
+import lombok.Data;
 
-import lombok.Getter;
-import lombok.Setter;
-
-@Getter @Setter
+@Data
 public class ReviewResponseDto {
-    private Long id;
+    private Long reviewId;
     private String title;
     private String content;
-    private Long userId;
+    private int rating;
     private Long movieId;
-    private Integer rating;
-    private LocalDateTime createdAt;
+    private SelectedMovieDto selectMovie;
+    private String createdAt;
+    private String updateAt;
+    private Boolean isUpdate;
+    private Integer views;
+    private Integer liked;
+    private Integer commentCount;
+    private UserResponseDto userData; // 유저 정보
 }

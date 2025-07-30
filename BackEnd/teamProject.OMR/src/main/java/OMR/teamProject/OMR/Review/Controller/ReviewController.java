@@ -18,6 +18,7 @@ public class ReviewController {
 
     @PostMapping
     public ReviewResponseDto create(@RequestBody ReviewRequestDto dto) {
+    	System.out.println("너 들어오니?");
         return reviewService.create(dto);
     }
 }

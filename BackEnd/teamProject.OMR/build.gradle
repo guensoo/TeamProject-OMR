@@ -24,15 +24,52 @@ repositories {
 }
 
 dependencies {
+	// Spring Data JPA, Web
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	
+    // Spring Security
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    
+    // JWT 처리
+    // implementation 'io.jsonwebtoken:jjwt:0.9.1'
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+	runtimeOnly   'io.jsonwebtoken:jjwt-impl:0.11.5'
+	runtimeOnly   'io.jsonwebtoken:jjwt-jackson:0.11.5'
+    
+	implementation 'jakarta.xml.bind:jakarta.xml.bind-api:3.0.1'
+	runtimeOnly   'org.glassfish.jaxb:jaxb-runtime:3.0.2'
+    
+    // 비밀번호 암호화 (BCrypt)
+    implementation 'org.springframework.security:spring-security-crypto'
+
+    // Lombok    	
 	compileOnly 'org.projectlombok:lombok'
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	annotationProcessor 'org.projectlombok:lombok'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.security:spring-security-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	
+    // 개발 편의를 위한 DevTools
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	
+	// MySQL 드라이버
+	runtimeOnly 'com.mysql:mysql-connector-j'
+	
+    // 테스트
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    
+    // 적합성 체크
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    
+	// 이메일 전송
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
+	
+	// 토큰 저장용 JPA
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	
+	// swagger
+	implementation("io.swagger.core.v3:swagger-annotations:2.2.32")
+	
+	implementation 'org.postgresql:postgresql:42.7.3'
 }
 
 tasks.named('test') {
