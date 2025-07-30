@@ -37,7 +37,7 @@ public class ReviewService {
 
     // 리뷰 등록
     public ReviewResponseDto reviewCreate(ReviewRequestDto dto) {
-        UserEntity user = userRepository.findById(dto.getUserId())
+        UserEntity user = userRepository.findById(dto.getUserData().getId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
         String selectMovieJson = serializeToJson(dto.getSelectMovie());
@@ -84,7 +84,7 @@ public class ReviewService {
         if (user == null) return null;
         return UserResponseDto.builder()
                 .id(user.getId())
-                .username(user.getUsername())
+                .userId(user.getUserId())
                 .nickname(user.getNickname())
                 .email(user.getEmail())
                 .role(user.getRole())

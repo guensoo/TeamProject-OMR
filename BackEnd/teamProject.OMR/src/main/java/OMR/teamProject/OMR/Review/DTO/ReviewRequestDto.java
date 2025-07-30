@@ -1,5 +1,6 @@
 package OMR.teamProject.OMR.Review.DTO;
 
+import OMR.teamProject.OMR.User.Entity.UserEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -24,5 +25,6 @@ public class ReviewRequestDto {
     private Integer liked; // 좋아요 수
     private Integer commentCount; // 댓글 수
 
-    private Long userId; // 사용자 id
+    private String userId; // 사용자 id
+    private UserEntity userData;
 }

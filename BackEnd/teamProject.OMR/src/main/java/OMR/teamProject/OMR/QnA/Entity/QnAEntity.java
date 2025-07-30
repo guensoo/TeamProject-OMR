@@ -44,7 +44,7 @@ public class QnAEntity {
     private LocalDateTime updatedAt;
     
     @ManyToOne
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "user_id")
     private UserEntity userId;
     
     
@@ -72,7 +72,7 @@ public class QnAEntity {
     				.answer(answer)
     				.createdAt(createdAt)
     				.updatedAt(updatedAt)
-    				.userId(dto.getId())
+    				.userData2(dto.getId())
     				.userName(dto.getNickname())
     				.userData(dto)
     			.build();

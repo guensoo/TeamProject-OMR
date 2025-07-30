@@ -30,9 +30,10 @@ public class QnADto {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     
-    private Long userId;
+    private String userId;
     private String userName;
     private UserResponseDto userData;
+    private UserEntity userData2;
     
     public QnAEntity toEntity(UserEntity entity) {
     	return QnAEntity

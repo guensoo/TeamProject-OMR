@@ -9,7 +9,7 @@ import lombok.Setter;
 public class ReviewCommentResponseDto {
     private Long id;
     private Long reviewId;
-    private Long userId;
+    private String userId;
     private String content;
     private LocalDateTime createdAt;
 }

@@ -7,7 +7,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import BottomTabMenu from './All/BottomTabMenu';
 
 //메인
-import Login from './Heo/components/Login';
+import Login from './Heo/pages/Login';
+import Signup from './Heo/pages/Signup';
+import FindId from './Heo/pages/FindId';
+import FindPassword from './Heo/pages/FindPassword';
 
 //
 
@@ -38,6 +41,7 @@ export default function App() {
             <SafeAreaView style={styles.container}>
                 <Stack.Navigator initialRouteName="BottomTabMenu">
                     <Stack.Screen name="BottomTabMenu" component={BottomTabMenu} options={{ headerShown: false }} />
+
                     <Stack.Screen name="Login" component={Login} options={{title: "로그인"}} />
                     <Stack.Screen name="OTTListScreen" component={OTTListScreen} options={{headerShown:false}}/>
                     <Stack.Screen name="MovieListScreen" component={MovieListScreen} options={{headerShown:false}}/>
@@ -51,6 +55,10 @@ export default function App() {
                     <Stack.Screen name="Support" component={SupportWrapper} options={{headerShown:false}}/>
 
                     <Stack.Screen name="InfoDetail" component={InfoDetail} />
+
+                    <Stack.Screen name="Signup" component={Signup} options={{title: '회원가입'}}/>
+                    <Stack.Screen name="FindId" component={FindId} options={{title: '아이디찾기'}}/>
+                    <Stack.Screen name="FindPassword" component={FindPassword} options={{title: '비밀번호찾기'}}/>
                     
                 </Stack.Navigator>
             </SafeAreaView>

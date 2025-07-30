@@ -20,7 +20,7 @@ public class UserEntity {
     private Long id;
 
     @Column(unique = true, nullable = false)
-    private String username;      // 로그인ID
+    private String userId;      // 로그인ID
 
     @Column(nullable = false)
     private String password;

@@ -44,7 +44,7 @@ public class NoticeEntity {
     private LocalDateTime updatedAt;
     
     @ManyToOne
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "user_id")
     private UserEntity userId;
     
     

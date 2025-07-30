@@ -28,7 +28,7 @@ public class FAQDto {
     
     
     //유저 정보들
-    private Long userId;
+    private String userId;
     private String userName;
     private UserResponseDto userData;
     

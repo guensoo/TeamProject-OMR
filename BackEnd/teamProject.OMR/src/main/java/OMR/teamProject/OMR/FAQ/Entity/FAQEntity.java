@@ -44,7 +44,7 @@ public class FAQEntity {
     private LocalDateTime updatedAt;
     
     @ManyToOne
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "user_id")
     private UserEntity userId;
     
     private Integer sortOrder; // 정렬용
@@ -72,9 +72,8 @@ public class FAQEntity {
     				.answer(answer)
     				.createdAt(createdAt)
     				.updatedAt(updatedAt)
-    				.userId(dto.getId())
+    				.userId(dto.getUserId())
     				.userData(dto)
-    				.userName(dto.getUsername())
     				.sortOrder(sortOrder)
     			.build();
     }    

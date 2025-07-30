@@ -26,7 +26,7 @@ public class QnAService {
     		throw new RuntimeException("[write]이미 존재 id입니다.");
     	}
     	
-    	UserEntity userEntity = userRepository.findById(dto.getUserId()).get();
+    	UserEntity userEntity = userRepository.findById(dto.getUserData().getId()).get();
     	
     	QnAEntity entity = dto.toEntity(userEntity);
     	System.out.println("[(wrte)notice 들어온 값] :: "+entity);

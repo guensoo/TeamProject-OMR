@@ -22,7 +22,7 @@ public class ReviewCommentEntity {
     private Long id;
 
     private Long reviewId;    // FK to Review
-    private Long userId;      // FK to User
+    private String userId;      // FK to User
 
     @Column(columnDefinition = "TEXT")
     private String content;

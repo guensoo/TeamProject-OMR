@@ -12,7 +12,4 @@ import OMR.teamProject.OMR.FAQ.Entity.FAQEntity;
 @Repository
 public interface FAQRepository extends JpaRepository<FAQEntity, Long> {
     List<FAQEntity> findAllByOrderBySortOrderAsc();
-    
-    @Query("SELECT f FROM FAQEntity f JOIN FETCH f.userData WHERE f.id = :id")
-    FAQEntity findWithUserDataById(@Param("id")Long id);
 }
