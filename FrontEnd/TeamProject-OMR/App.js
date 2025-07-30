@@ -7,27 +7,23 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import BottomTabMenu from './All/BottomTabMenu';
 
 //메인
-import Home from './Heo/pages/Home';
 import Login from './Heo/components/Login';
 
 //
-import ReviewList from './Kim/ReviewList';
 
 // 박세현
 import ReviewDetail from './Park/ReviewDetail';
 import InfoDetail from './Park/InfoDetail';
 
 //
-import MovieScreen from './Choi/MovieScreen';
 import MovieListScreen from './Choi/MovieListScreen';
-import OTTScreen from './Choi/OTTScreen';
 import OTTListScreen from './Choi/OTTListScreen';
 import FindTheater from './Choi/components/FindTheater';
 import MapScreen from './Choi/MapScreen';
 import SearchList from './Choi/SearchList';
 
 import AIRecommend from './Park/AIRecommend';
-import { ReviewWrite } from './Kim/ReviewWrite';
+import { ReviewWrite }from './Kim/component/ReviewWrite';
 import { SupportMain } from './Kim/supportCenter/SupportMain';
 import { FAQ } from './Kim/supportCenter/FAQ';
 import { QnA } from './Kim/supportCenter/QnA';

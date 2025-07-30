@@ -3,7 +3,7 @@ import { View, TouchableOpacity, StyleSheet, Text, Image } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
 
 import Home from "../Heo/pages/Home";
-import ReviewList from "../Kim/ReviewList";
+import ReviewList from "../Kim/component/ReviewList";
 import OTTScreen from "../Choi/OTTScreen";
 import MovieScreen from "../Choi/MovieScreen";
 import FindTheater from "../Choi/components/FindTheater";

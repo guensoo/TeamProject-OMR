@@ -1,5 +1,8 @@
 package OMR.teamProject.OMR.Review.Controller;
 
+import java.util.List;
+
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,14 +14,21 @@ import OMR.teamProject.OMR.Review.Service.ReviewService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/reviews")
+@RequestMapping("/api/review")
 @RequiredArgsConstructor
 public class ReviewController {
     private final ReviewService reviewService;
 
+    // 전체 리뷰 목록 조회 (GET /api/review)
+    @GetMapping
+    public List<ReviewResponseDto> getAllReviews() {
+    	System.out.println("너 조회인데 들어오니?");
+        return reviewService.getAllReviews();
+    }
+    
     @PostMapping
-    public ReviewResponseDto create(@RequestBody ReviewRequestDto dto) {
-    	System.out.println("너 들어오니?");
-        return reviewService.create(dto);
+    public ReviewResponseDto reviewCreate(@RequestBody ReviewRequestDto dto) {
+    	System.out.println("너 생성인데 들어오니?");
+        return reviewService.reviewCreate(dto);
     }
 }

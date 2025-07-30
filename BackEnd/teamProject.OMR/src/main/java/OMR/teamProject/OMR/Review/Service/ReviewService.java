@@ -1,6 +1,8 @@
 package OMR.teamProject.OMR.Review.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,28 +21,27 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final UserRepository userRepository;
-    private final ObjectMapper objectMapper; // Jackson
+    private final ObjectMapper objectMapper;
 
-    @Transactional
-    public ReviewResponseDto create(ReviewRequestDto dto) {
-        // 1. UserEntity 조회
+    // 전체 리뷰 목록 조회
+    @Transactional(readOnly = true)
+    public List<ReviewResponseDto> getAllReviews() {
+        return reviewRepository.findAll().stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+    }
+
+    // 리뷰 등록
+    public ReviewResponseDto reviewCreate(ReviewRequestDto dto) {
         UserEntity user = userRepository.findById(dto.getUserId())
-            .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
-        // 2. selectMovie를 JSON String으로 변환
-        String selectMovieJson = null;
-        if (dto.getSelectMovie() != null) {
-            try {
-                selectMovieJson = objectMapper.writeValueAsString(dto.getSelectMovie());
-            } catch (Exception e) {
-                throw new RuntimeException("영화 정보 변환 실패", e);
-            }
-        }
+        String selectMovieJson = serializeToJson(dto.getSelectMovie());
 
-        // 3. DTO -> Entity 변환
         ReviewEntity review = ReviewEntity.builder()
                 .title(dto.getTitle())
                 .content(dto.getContent())
@@ -56,51 +57,62 @@ public class ReviewService {
                 .user(user)
                 .build();
 
-        // 4. DB 저장
-        ReviewEntity saved = reviewRepository.save(review);
-
-        // 5. Entity -> Response DTO 변환
-        return toDto(saved);
+        return toDto(reviewRepository.save(review));
     }
 
+    // Entity → DTO 변환
     private ReviewResponseDto toDto(ReviewEntity review) {
-        ReviewResponseDto dto = new ReviewResponseDto();
-        dto.setReviewId(review.getReviewId());
-        dto.setTitle(review.getTitle());
-        dto.setContent(review.getContent());
-        dto.setMovieId(review.getMovieId());
-        dto.setRating(review.getRating());
+        return ReviewResponseDto.builder()
+                .reviewId(review.getReviewId())
+                .title(review.getTitle())
+                .content(review.getContent())
+                .movieId(review.getMovieId())
+                .rating(review.getRating())
+                .createdAt(formatDateTime(review.getCreateAt()))
+                .updateAt(formatDateTime(review.getUpdateAt()))
+                .isUpdate(review.getIsUpdate())
+                .views(review.getViews())
+                .liked(review.getLiked())
+                .commentCount(review.getCommentCount())
+                .userData(toUserDto(review.getUser()))
+                .selectMovie(deserializeFromJson(review.getSelectMovie()))
+                .build();
+    }
 
-        // user 정보 DTO로 변환
-        if (review.getUser() != null) {
-            UserEntity user = review.getUser();
-            UserResponseDto userDto = new UserResponseDto();
-            userDto.setId(user.getId());
-            userDto.setUsername(user.getUsername());
-            userDto.setNickname(user.getNickname());
-            userDto.setEmail(user.getEmail());
-            userDto.setRole(user.getRole());
-            dto.setUserData(userDto);
+    // 유저 변환
+    private UserResponseDto toUserDto(UserEntity user) {
+        if (user == null) return null;
+        return UserResponseDto.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .nickname(user.getNickname())
+                .email(user.getEmail())
+                .role(user.getRole())
+                .build();
+    }
+
+    // 영화 정보 직렬화
+    private String serializeToJson(Object obj) {
+        if (obj == null) return null;
+        try {
+            return objectMapper.writeValueAsString(obj);
+        } catch (Exception e) {
+            throw new RuntimeException("JSON 직렬화 실패", e);
         }
+    }
 
-        // selectMovie 정보 복원(필요하면)
-        if (review.getSelectMovie() != null) {
-            try {
-                SelectedMovieDto movieDto = objectMapper.readValue(
-                    review.getSelectMovie(), SelectedMovieDto.class);
-                dto.setSelectMovie(movieDto);
-            } catch (Exception e) {
-                dto.setSelectMovie(null);
-            }
+    // 영화 정보 역직렬화
+    private SelectedMovieDto deserializeFromJson(String json) {
+        if (json == null) return null;
+        try {
+            return objectMapper.readValue(json, SelectedMovieDto.class);
+        } catch (Exception e) {
+            return null; // 혹은 에러 로깅
         }
+    }
 
-        dto.setCreatedAt(review.getCreateAt() != null ? review.getCreateAt().toString() : null);
-        dto.setUpdateAt(review.getUpdateAt() != null ? review.getUpdateAt().toString() : null);
-        dto.setIsUpdate(review.getIsUpdate());
-        dto.setViews(review.getViews());
-        dto.setLiked(review.getLiked());
-        dto.setCommentCount(review.getCommentCount());
-
-        return dto;
+    // 날짜 포맷 (필요시 형식 맞추기)
+    private String formatDateTime(LocalDateTime time) {
+        return time != null ? time.toString() : null;
     }
 }

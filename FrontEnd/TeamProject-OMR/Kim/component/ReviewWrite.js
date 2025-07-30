@@ -65,7 +65,7 @@ export const ReviewWrite = ({ navigation }) => {
         setIsSubmitting(true);
 
         try {
-            const response = await fetch('http://10.0.2.2:8888/api/reviews', {
+            const response = await fetch('http://10.0.2.2:8888/api/review', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
