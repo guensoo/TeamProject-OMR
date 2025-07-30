@@ -6,100 +6,34 @@ const TMDB_KEY = '46ae6607955da617463546b9cd029255';
 const KOFIC_BASE_URL = 'http://www.kobis.or.kr/kobisopenapi/webservice/rest';
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 
-const cleanTitle = (title) => title.replace(/\s+/g, ' ').trim(); // 띄어쓰기 정규화
+const cleanTitle = (title) => title.replace(/\s+/g, ' ').trim();
 
-// ✅ "일간/주간" 선택형, 필터 파라미터 수용, TMDB 연동까지!
-export const getBoxOfficeWithPosters = async (
-    date,
-    {
-        type = 'daily', // 'daily', 'weekly'
-        weekGb = '0',   // (주간 only) 0:주간, 1:주말, 2:주중
-        multiMovieYn,   // "Y": 다양성(독립), "N": 상업, undefined: 전체
-        repNationCd,    // "K": 한국, "F": 외국, undefined: 전체
-    } = {}
-) => {
+// ⭐ TMDB 연령가(등급) fetch
+async function getMovieCertification(tmdbId) {
+    if (!tmdbId) return null;
     try {
-        // 1. 요청 API URL/파라미터
-        let url;
-        let params = { key: KOFIC_KEY, targetDt: date };
-        if (type === 'weekly') {
-            url = `${KOFIC_BASE_URL}/boxoffice/searchWeeklyBoxOfficeList.json`;
-            params.weekGb = weekGb;
-        } else {
-            url = `${KOFIC_BASE_URL}/boxoffice/searchDailyBoxOfficeList.json`;
+        const res = await axios.get(`${TMDB_BASE_URL}/movie/${tmdbId}/release_dates`, {
+            params: { api_key: TMDB_KEY },
+        });
+        // 한국 등급(KR) 우선
+        const kr = res.data.results.find(r => r.iso_3166_1 === 'KR');
+        if (kr && kr.release_dates.length > 0) {
+            // certification(등급)이 공란일 수도 있음
+            const cert = kr.release_dates[0].certification;
+            return cert || null;
         }
-        if (multiMovieYn) params.multiMovieYn = multiMovieYn;
-        if (repNationCd) params.repNationCd = repNationCd;
-
-        // 2. 박스오피스 데이터 조회
-        const res = await axios.get(url, { params });
-        const boxOfficeList =
-            (type === 'weekly'
-                ? res.data.boxOfficeResult.weeklyBoxOfficeList
-                : res.data.boxOfficeResult.dailyBoxOfficeList) || [];
-
-        // 3. TMDB 포스터 매칭
-        const results = await Promise.all(
-            boxOfficeList.map(async (item) => {
-                try {
-                    const year = item.openDt ? item.openDt.split('-')[0] : '';
-                    const query = cleanTitle(item.movieNm);
-
-                    // ✅ 1차: 한국어 제목
-                    let tmdbRes = await axios.get(`${TMDB_BASE_URL}/search/movie`, {
-                        params: {
-                            api_key: TMDB_KEY,
-                            language: 'ko-KR',
-                            query: query,
-                            year: year,
-                        },
-                    });
-
-                    // ✅ 2차: 다국어 fallback
-                    if (!tmdbRes.data.results.length) {
-                        tmdbRes = await axios.get(`${TMDB_BASE_URL}/search/movie`, {
-                            params: {
-                                api_key: TMDB_KEY,
-                                query: query,
-                                year: year,
-                            },
-                        });
-                    }
-
-                    const matched = tmdbRes.data.results[0];
-                    const poster = matched?.poster_path
-                        ? `https://image.tmdb.org/t/p/w500${matched.poster_path}`
-                        : 'https://via.placeholder.com/120x180?text=No+Image';
-
-                    return {
-                        id: item.movieCd,
-                        title: item.movieNm,
-                        poster_path: poster,
-                        rank: item.rank,
-                    };
-                } catch {
-                    return {
-                        id: item.movieCd,
-                        title: item.movieNm,
-                        poster_path: 'https://via.placeholder.com/120x180?text=No+Image',
-                        rank: item.rank,
-                    };
-                }
-            })
-        );
-
-        return results;
-    } catch (err) {
-        console.error('kofic API Error:', err.message);
-        return [];
+        // 없으면 null
+        return null;
+    } catch {
+        return null;
     }
-};
+}
 
-//영화 포스터 + 예고편
+// ✅ "일간/주간" + TMDB 포스터 + 등급 + 예고편 + TMDB ID까지!
 export const getBoxOfficeWithPostersAndTrailer = async (
     date,
     {
-        type = 'daily', // 'daily', 'weekly'
+        type = 'daily', // 'daily' | 'weekly'
         weekGb = '0',   // (주간 only) 0:주간, 1:주말, 2:주중
         multiMovieYn,   // "Y": 다양성(독립), "N": 상업, undefined: 전체
         repNationCd,    // "K": 한국, "F": 외국, undefined: 전체
@@ -127,16 +61,14 @@ export const getBoxOfficeWithPostersAndTrailer = async (
                 ? res.data.boxOfficeResult.weeklyBoxOfficeList
                 : res.data.boxOfficeResult.dailyBoxOfficeList) || [];
 
-        // 4. TMDB와 매칭하여 포스터와 예고편 가져오기
+        // 4. TMDB 매핑
         const results = await Promise.all(
             boxOfficeList.map(async (item) => {
                 try {
                     const year = item.openDt ? item.openDt.split('-')[0] : '';
                     const query = cleanTitle(item.movieNm);
 
-                    //  console.log(`\n[START] 영화 검색: ${item.movieNm} (${item.movieCd}), 년도: ${year}`);
-
-                    // TMDB 영화 검색 (한국어 우선)
+                    // 1차: 한국어 제목
                     let tmdbRes = await axios.get(`${TMDB_BASE_URL}/search/movie`, {
                         params: {
                             api_key: TMDB_KEY,
@@ -145,8 +77,7 @@ export const getBoxOfficeWithPostersAndTrailer = async (
                             year: year,
                         },
                     });
-
-                    // 한국어 검색 결과 없으면 다국어 재검색
+                    // 2차: 다국어 fallback
                     if (!tmdbRes.data.results.length) {
                         tmdbRes = await axios.get(`${TMDB_BASE_URL}/search/movie`, {
                             params: {
@@ -158,36 +89,39 @@ export const getBoxOfficeWithPostersAndTrailer = async (
                     }
 
                     const matched = tmdbRes.data.results[0];
-
-                    // console.log(`TMDB 검색 성공: ${matched.title} (ID: ${matched.id})`);
-
-                    // console.log(`예고편 조회 시작: TMDB ID ${matched.id}`);
-
-                    // TMDB 포스터 URL
                     const poster = matched?.poster_path
                         ? `https://image.tmdb.org/t/p/w500${matched.poster_path}`
                         : 'https://via.placeholder.com/120x180?text=No+Image';
 
-                    // TMDB 예고편 key (YouTube)
-                    const trailerKey = matched ? await getMovieTrailer(matched.id) : null;
+                    // ⭐ 등급(연령가) 정보 가져오기
+                    let certification = null;
+                    if (matched?.id) {
+                        certification = await getMovieCertification(matched.id);
+                    }
 
-                    // console.log(`예고편 조회 완료: ${trailerKey ? trailerKey : "예고편 없음"}`);
+                    // 예고편(유튜브 key)
+                    const trailerKey = matched ? await getMovieTrailer(matched.id) : null;
 
                     return {
                         id: item.movieCd,
                         title: item.movieNm,
                         poster_path: poster,
                         rank: item.rank,
-                        trailerKey: trailerKey,  // 예고편 유튜브 key 추가
+                        trailerKey,
+                        tmdbId: matched?.id || null,
+                        openDt: item.openDt,
+                        certification, // ⭐ 추가
                     };
                 } catch (error) {
-                    // console.error(`[ERROR] TMDB 매칭 또는 예고편 조회 실패: ${item.movieNm} (${item.movieCd}) - ${error.message}`);
                     return {
                         id: item.movieCd,
                         title: item.movieNm,
                         poster_path: 'https://via.placeholder.com/120x180?text=No+Image',
                         rank: item.rank,
                         trailerKey: null,
+                        tmdbId: null,
+                        openDt: item.openDt,
+                        certification: null,
                     };
                 }
             })
@@ -198,4 +132,4 @@ export const getBoxOfficeWithPostersAndTrailer = async (
         console.error('KOFIC API Error: ', error.message);
         return [];
     }
-}
+};
