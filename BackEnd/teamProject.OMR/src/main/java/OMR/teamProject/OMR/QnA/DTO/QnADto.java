@@ -1,8 +1,8 @@
-package OMR.teamProject.OMR.FAQ.DTO;
+package OMR.teamProject.OMR.QnA.DTO;
 
 import java.time.LocalDateTime;
 
-import OMR.teamProject.OMR.FAQ.Entity.FAQEntity;
+import OMR.teamProject.OMR.QnA.Entity.QnAEntity;
 import OMR.teamProject.OMR.User.DTO.UserResponseDto;
 import OMR.teamProject.OMR.User.Entity.UserEntity;
 import lombok.AllArgsConstructor;
@@ -11,41 +11,41 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter @Setter@Builder
+@Getter @Setter @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class FAQDto {
+public class QnADto {
 	//고유 아이디
-    private Long id;
-    //카테고리
-    private String category;
-    //질문
-    private String question;
-    //답변
+	private long id;
+	//답변 상태
+	private boolean status;
+	//질문 제목
+    private String title;
+    //질문 내용
+    private String content;
+    //관리자 답변
     private String answer;
+    
+    
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     
-    
-    //유저 정보들
     private Long userId;
     private String userName;
     private UserResponseDto userData;
     
-    //정렬용?
-    private Integer sortOrder;
-    
-    public FAQEntity toEntity(UserEntity entity) {
-    	return FAQEntity
+    public QnAEntity toEntity(UserEntity entity) {
+    	return QnAEntity
     			.builder()
     				.id(id)
-    				.category(category)
-    				.question(question)
+    				.status(status)
+    				.title(title)
+    				.content(content)
     				.answer(answer)
     				.createdAt(createdAt)
     				.updatedAt(updatedAt)
     				.userId(entity)
-    				.sortOrder(sortOrder)
     			.build();
     }
+    
 }
