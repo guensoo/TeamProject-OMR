@@ -64,9 +64,7 @@ public class SecurityConfig {
                 "http://10.0.2.2:8888",
                 "http://10.0.2.2:3000",
                 "http://192.168.3.24:8888",
-                "http://192.168.3.24:3000",
-                "http://192.168.3.23:8888",
-                "http://192.168.3.23:3000"
+                "http://192.168.3.24:3000"
         ));
         config.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS", "PATCH"));
         config.setAllowCredentials(true);
