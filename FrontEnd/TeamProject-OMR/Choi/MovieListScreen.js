@@ -7,8 +7,9 @@ import {
     Text,
     StyleSheet
 } from 'react-native';
-import { getBoxOfficeWithPosters } from '../All/api/kofic';
-import MovieListCard from './components/card/MovieListCard'; // MovieCard or 커스텀 컴포넌트
+import { getBoxOfficeWithPostersAndTrailer } from '../All/api/kofic';
+import { getMovieDetail } from '../All/api/tmdb'; // 상세 fetch 추가!
+import MovieListCard from './components/card/MovieListCard';
 
 const DEFAULT_SORT_BY = {
     all: 'rank',
@@ -19,22 +20,21 @@ const DEFAULT_SORT_BY = {
 };
 
 const CATEGORY_LABELS = {
-  all: '박스오피스 순위',
-  korean: '한국 영화 인기순',
-  global: '외국 영화 인기순',
-  commercial: '상업 영화 인기순',
-  indie: '독립 영화 인기순',
+    all: '박스오피스 순위',
+    korean: '한국 영화 인기순',
+    global: '외국 영화 인기순',
+    commercial: '상업 영화 인기순',
+    indie: '독립 영화 인기순',
 };
 
-export default function MovieListScreen({ route }) {
-    // (필터) 카테고리값 route로 받아도 되고 내부 상태로 해도 됨
-    const { categoryKey } = route?.params || {}; // 예: 'all', 'korean', 'global', 'commercial', 'indie'
+export default function MovieListScreen({ route, navigation }) {
+    const { categoryKey } = route?.params || {};
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [sortBy, setSortBy] = useState(DEFAULT_SORT_BY[categoryKey] || 'rank'); // 박스오피스는 보통 랭크순
+    const [sortBy, setSortBy] = useState(DEFAULT_SORT_BY[categoryKey] || 'rank');
     const [activeCard, setActiveCard] = useState(null);
+    const [fetchingDetail, setFetchingDetail] = useState(false);
 
-    // 카테고리별 params 매핑 (카테고리별로 route로 받아도 되고 상단 버튼도 OK)
     const CATEGORY_PARAMS = {
         all: {},
         korean: { repNationCd: 'K' },
@@ -45,7 +45,6 @@ export default function MovieListScreen({ route }) {
     const selectedParams = CATEGORY_PARAMS[categoryKey] || {};
 
     useEffect(() => {
-
         const today = new Date();
         today.setDate(today.getDate() - 1);
         const y = today.getFullYear();
@@ -55,8 +54,8 @@ export default function MovieListScreen({ route }) {
 
         const fetchData = async () => {
             setLoading(true);
-            setActiveCard(null); // 정렬/카테고리 바뀌면 펼침 초기화
-            const res = await getBoxOfficeWithPosters(targetDt, selectedParams);
+            setActiveCard(null);
+            const res = await getBoxOfficeWithPostersAndTrailer(targetDt, selectedParams);
             setData(res.slice(0, 10));
             setLoading(false);
             setSortBy(DEFAULT_SORT_BY[categoryKey] || 'rank');
@@ -64,7 +63,6 @@ export default function MovieListScreen({ route }) {
         fetchData();
     }, [categoryKey]);
 
-    // 1~3등만 뱃지
     function renderRankBadge(rank) {
         if (sortBy !== 'rank') return null;
         if (rank > 3) return null;
@@ -88,6 +86,28 @@ export default function MovieListScreen({ route }) {
         setActiveCard((prev) => (prev === id ? null : id));
     };
 
+    // ✅ 상세보기 버튼에서 항상 TMDB fetch 후 이동!
+    const handleDetailPress = async (item) => {
+        const tmdbId = item.tmdbId;
+        if (!tmdbId) {
+            alert('TMDB ID가 없어 상세정보를 볼 수 없습니다.');
+            return;
+        }
+        try {
+            setFetchingDetail(true);
+            const detail = await getMovieDetail(tmdbId);
+            setFetchingDetail(false);
+            if (detail) {
+                navigation.navigate("InfoDetail", { movie: detail });
+            } else {
+                alert('상세 정보를 불러올 수 없습니다.');
+            }
+        } catch (err) {
+            setFetchingDetail(false);
+            alert('상세 정보 조회 중 오류가 발생했습니다.');
+        }
+    };
+
     return (
         <View style={styles.container}>
             <View style={styles.sortContainer}>
@@ -99,7 +119,7 @@ export default function MovieListScreen({ route }) {
                 {/* 필요하면 최신순 등 다른 정렬 버튼도 추가 */}
             </View>
 
-            {loading ? (
+            {loading || fetchingDetail ? (
                 <ActivityIndicator size="large" />
             ) : (
                 <FlatList
@@ -121,13 +141,9 @@ export default function MovieListScreen({ route }) {
                                     isActive={activeCard === item.id}
                                     onToggle={() => handleToggleCard(item.id)}
                                     onReviewPress={() => {
-                                        console.log('리뷰', item.title)
-                                        navigation.navigate("ReviewDetail", { reviewId: item.id})
+                                        navigation.navigate("ReviewDetail", { reviewId: item.id });
                                     }}
-                                    onDetailPress={() => {
-                                        console.log('상세', item.title)
-                                        navigation.navigate("InfoDetail", { reviewId: item.id})
-                                    }}
+                                    onDetailPress={() => handleDetailPress(item)}
                                 />
                             </TouchableOpacity>
                         </View>

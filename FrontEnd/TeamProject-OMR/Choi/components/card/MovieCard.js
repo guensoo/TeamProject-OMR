@@ -32,7 +32,12 @@ export default function MovieCard({ rank, image, title, onReviewPress, onDetailP
                     <TouchableOpacity style={styles.reviewButton} onPress={onReviewPress}>
                         <Text style={styles.reviewText}>리뷰보기</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.detailButton} onPress={onDetailPress}>
+                    <TouchableOpacity
+                        style={styles.detailButton}
+                        onPress={e => {
+                            e.stopPropagation?.();
+                            onDetailPress();
+                        }}>
                         <Text style={styles.detailText}>상세정보</Text>
                     </TouchableOpacity>
                 </View>

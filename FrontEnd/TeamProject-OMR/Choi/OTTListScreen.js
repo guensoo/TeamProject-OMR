@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, FlatList, ActivityIndicator, TouchableOpacity, Text, StyleSheet, Dimensions } from 'react-native';
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
-import { getOTTPopularMovie, OTT_PROVIDERS } from '../All/api/tmdb';
+import { getOTTPopularMovie, OTT_PROVIDERS, getMovieDetail, getTVDetail } from '../All/api/tmdb'; // ⭐ 상세 fetch import!
 import OTTListCard from './components/card/OTTListCard';
 import { useNavigation } from '@react-navigation/native';
 
@@ -13,6 +13,7 @@ function OTTTabContent({providerKey, sortBy }) {
     const [page, setPage] = useState(1);
     const [isEnd, setIsEnd] = useState(false);
     const [activeCard, setActiveCard] = useState(null);
+    const [fetchingDetail, setFetchingDetail] = useState(false); // ⭐ 상세로딩 상태
 
     const navigation = useNavigation();
 
@@ -77,9 +78,31 @@ function OTTTabContent({providerKey, sortBy }) {
         setActiveCard((prev) => (prev === id ? null : id));
     };
 
+    // ⭐⭐ 상세 fetch 후 InfoDetail로 넘기는 로직!
+    const handleDetailPress = async (item) => {
+        setFetchingDetail(true);
+        try {
+            let detail = null;
+            if (item.media_type === 'movie' || item.title) {
+                detail = await getMovieDetail(item.id);
+            } else {
+                detail = await getTVDetail(item.id);
+            }
+            setFetchingDetail(false);
+            if (detail) {
+                navigation.navigate("InfoDetail", { ott: detail });
+            } else {
+                alert('상세 정보를 불러올 수 없습니다.');
+            }
+        } catch (e) {
+            setFetchingDetail(false);
+            alert('상세 정보를 불러오는 중 오류가 발생했습니다.');
+        }
+    };
+
     return (
         <View style={styles.tabContainer}>
-            {loading && page === 1 ? (
+            {(loading && page === 1) || fetchingDetail ? (
                 <ActivityIndicator size="large" />
             ) : (
                 <FlatList
@@ -101,13 +124,9 @@ function OTTTabContent({providerKey, sortBy }) {
                                     isActive={activeCard === item.id}
                                     onToggle={() => handleToggleCard(item.id)}
                                     onReviewPress={() => {
-                                        console.log('리뷰', item.title)
                                         navigation.navigate("ReviewDetail", { reviewId: item.id })
                                     }}
-                                    onDetailPress={() => {
-                                        console.log('상세', item.title)
-                                        navigation.navigate("InfoDetail", { reviewId: item.id })
-                                    }}
+                                    onDetailPress={() => handleDetailPress(item)} // ⭐ 여기!
                                 />
                             </TouchableOpacity>
                         </View>
