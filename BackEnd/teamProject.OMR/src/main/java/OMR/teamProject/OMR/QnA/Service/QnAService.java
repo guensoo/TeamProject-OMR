@@ -10,6 +10,7 @@ import OMR.teamProject.OMR.QnA.Repository.QnARepository;
 import OMR.teamProject.OMR.User.DTO.UserResponseDto;
 import OMR.teamProject.OMR.User.Entity.UserEntity;
 import OMR.teamProject.OMR.User.Repository.UserRepository;
+import OMR.teamProject.OMR.User.Service.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
@@ -18,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 public class QnAService {
     private final QnARepository qnaRepository;
     private final UserRepository userRepository;
+    private final UserService userService;
     
   //C
     public List<QnADto> write(QnADto dto){
@@ -26,9 +28,15 @@ public class QnAService {
     		throw new RuntimeException("[write]이미 존재 id입니다.");
     	}
     	
-    	UserEntity userEntity = userRepository.findById(dto.getUserData().getId()).get();
+    	UserEntity userEntity = userRepository.findById(dto.getUserData().getId())
+    								.orElseThrow(() -> new RuntimeException("사용자 정보가 없습니다."));
     	
-    	QnAEntity entity = dto.toEntity(userEntity);
+    	QnAEntity entity = dto.toEntity(UserResponseDto
+    										.builder()
+	    							            .id(userEntity.getId())
+	    							            .nickname(userEntity.getNickname())
+	    							            .email(userEntity.getEmail())
+    										.build());
     	System.out.println("[(wrte)notice 들어온 값] :: "+entity);
     	
     	qnaRepository.save(entity);
@@ -40,14 +48,9 @@ public class QnAService {
     public List<QnADto> findAll() {
         return qnaRepository.findAll().stream()
             .map(qna -> {
-                UserEntity user = userRepository.findById(qna.getUserId().getId()).orElse(null);
-                UserResponseDto userDto = UserResponseDto
-                		.builder()
-                		 .id(user.getId())
-                		 .nickname(user.getNickname())
-                		 .email(user.getEmail())
-                		.build();
-                return qna.toDto(userDto);
+                UserEntity user = userRepository.findById(qna.getUserId().getId())
+                			.orElseThrow(() -> new RuntimeException("사용자 정보가 없습니다."));
+                return qna.toDto(user);
             })
             .toList();
     }

@@ -63,7 +63,7 @@ public class NoticeEntity {
 //    			.build();
 //    }
     
-    public NoticeDto toDto(UserResponseDto dto) {
+    public NoticeDto toDto(UserEntity entity) {
     	return NoticeDto
     			.builder()
     				.id(id)
@@ -74,9 +74,15 @@ public class NoticeEntity {
     				.content(content)
     				.createdAt(createdAt)
     				.updatedAt(updatedAt)
-    				.userId(dto.getId())
-    				.userName(dto.getNickname())
-    				.userData(dto)
+    				.userId(entity.getUserId())
+    				.userName(entity.getNickname())
+    				.userData(UserResponseDto
+    						.builder()
+    							.id(entity.getId())
+    							.userId(entity.getUserId())
+    							.nickname(entity.getNickname())
+    							.email(entity.getEmail())
+    						.build())
     			.build();
     }
 }

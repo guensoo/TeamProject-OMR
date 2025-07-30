@@ -38,7 +38,7 @@ public class NoticeDto {
     private UserResponseDto userData;
     
     
-    public NoticeEntity toEntity(UserEntity entity) {
+    public NoticeEntity toEntity(UserResponseDto dto) {
     	return NoticeEntity.builder()
     							.id(id)
     							.category(category)
@@ -48,7 +48,13 @@ public class NoticeDto {
     							.content(content)
     							.createdAt(createdAt)
     							.updatedAt(updatedAt)
-    							.userId(entity)
+    							.userId(UserEntity.
+    									builder()
+    										.userId(dto.getUserId())
+    										.id(dto.getId())
+    										.nickname(dto.getNickname())
+    										.email(dto.getEmail())
+    									.build())
     						.build();
     }
 }

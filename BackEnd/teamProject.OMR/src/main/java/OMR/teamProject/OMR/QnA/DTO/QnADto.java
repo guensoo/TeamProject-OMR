@@ -33,9 +33,8 @@ public class QnADto {
     private String userId;
     private String userName;
     private UserResponseDto userData;
-    private UserEntity userData2;
     
-    public QnAEntity toEntity(UserEntity entity) {
+    public QnAEntity toEntity(UserResponseDto dto) {
     	return QnAEntity
     			.builder()
     				.id(id)
@@ -45,7 +44,12 @@ public class QnADto {
     				.answer(answer)
     				.createdAt(createdAt)
     				.updatedAt(updatedAt)
-    				.userId(entity)
+    				.userId(UserEntity
+    						.builder()
+    							.id(dto.getId())
+    							.nickname(dto.getNickname())
+    							.email(dto.getEmail())
+    						.build())
     			.build();
     }
     

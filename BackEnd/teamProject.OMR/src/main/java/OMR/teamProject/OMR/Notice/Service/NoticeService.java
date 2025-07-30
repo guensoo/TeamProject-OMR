@@ -26,9 +26,15 @@ public class NoticeService {
     		throw new RuntimeException("[write]이미 존재 id입니다.");
     	}
     	
-    	UserEntity userEntity = userRepository.findById(dto.getId()).get();
+    	UserEntity userEntity = userRepository.findById(dto.getId())
+    			.orElseThrow(() -> new RuntimeException("사용자 정보가 없습니다."));
     	
-    	NoticeEntity entity = dto.toEntity(userEntity);
+    	NoticeEntity entity = dto.toEntity(UserResponseDto
+				.builder()
+		            .id(userEntity.getId())
+		            .nickname(userEntity.getNickname())
+		            .email(userEntity.getEmail())
+			.build());
     	System.out.println("[(wrte)notice 들어온 값] :: "+entity);
     	
     	noticeRepository.save(entity);
@@ -40,14 +46,9 @@ public class NoticeService {
     public List<NoticeDto> findAll() {
         return noticeRepository.findAll().stream()
             .map(notice -> {
-                UserEntity user = userRepository.findById(notice.getUserId().getId()).orElse(null);                
-                UserResponseDto userDto = UserResponseDto
-                		.builder()
-                		 .id(user.getId())
-                		 .nickname(user.getNickname())
-                		 .email(user.getEmail())
-                		.build();
-                return notice.toDto(userDto);
+                UserEntity user = userRepository.findById(notice.getUserId().getId())
+                		 .orElseThrow(() -> new RuntimeException("사용자 정보가 없습니다."));
+                return notice.toDto(user);
             })
             .toList();
     }

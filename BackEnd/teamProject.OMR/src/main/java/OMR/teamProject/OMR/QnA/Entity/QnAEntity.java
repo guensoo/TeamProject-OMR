@@ -48,21 +48,7 @@ public class QnAEntity {
     private UserEntity userId;
     
     
-//    public QnADto toDto() {
-//    	return QnADto
-//    			.builder()
-//    				.id(id)
-//    				.status(status)
-//    				.title(title)
-//    				.content(content)
-//    				.answer(asnwer)
-//    				.createdAt(createdAt)
-//    				.updatedAt(updatedAt)
-//    				.userId(userId)
-//    			.build();
-//    }
-    
-    public QnADto toDto(UserResponseDto dto) {
+    public QnADto toDto(UserEntity entity) {
     	return QnADto
     			.builder()
     				.id(id)
@@ -72,9 +58,14 @@ public class QnAEntity {
     				.answer(answer)
     				.createdAt(createdAt)
     				.updatedAt(updatedAt)
-    				.userData2(dto.getId())
-    				.userName(dto.getNickname())
-    				.userData(dto)
+    				.userName(entity.getNickname())
+    				.userData(UserResponseDto
+    						.builder()
+    							.email(entity.getEmail())
+    							.nickname(entity.getNickname())
+    							.userId(entity.getUserId())
+    							.id(entity.getId())
+    						.build())
     			.build();
     }
 }
