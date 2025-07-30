@@ -23,7 +23,6 @@ const ReviewDetail = ({ route, navigation }) => {
     // 리뷰 전체 객체를 route로 받음
     const review = route.params?.review;
 
-    // 별도 API 호출 없으므로 loading state 필요 X
     const [liked, setLiked] = useState(false);
     const [commentText, setCommentText] = useState('');
     const [comments, setComments] = useState(sampleComments);
