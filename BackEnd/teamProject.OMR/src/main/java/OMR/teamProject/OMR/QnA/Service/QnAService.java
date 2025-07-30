@@ -1,82 +1,54 @@
 package OMR.teamProject.OMR.QnA.Service;
 
-import java.util.List;
+import java.time.LocalDateTime;
 
 import org.springframework.stereotype.Service;
 
-import OMR.teamProject.OMR.QnA.DTO.QnADto;
+import OMR.teamProject.OMR.QnA.DTO.QnAAnswerDto;
+import OMR.teamProject.OMR.QnA.DTO.QnARequestDto;
+import OMR.teamProject.OMR.QnA.DTO.QnAResponseDto;
 import OMR.teamProject.OMR.QnA.Entity.QnAEntity;
+import OMR.teamProject.OMR.QnA.Repository.QnAAnswerRepository;
 import OMR.teamProject.OMR.QnA.Repository.QnARepository;
-import OMR.teamProject.OMR.User.DTO.UserResponseDto;
-import OMR.teamProject.OMR.User.Entity.UserEntity;
-import OMR.teamProject.OMR.User.Repository.UserRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class QnAService {
     private final QnARepository qnaRepository;
-    private final UserRepository userRepository;
-    
-  //C
-    public List<QnADto> write(QnADto dto){
-    	
-    	if(qnaRepository.existsById(dto.getId())) {
-    		throw new RuntimeException("[write]이미 존재 id입니다.");
-    	}
-    	
-    	UserEntity userEntity = userRepository.findById(dto.getUserId()).get();
-    	
-    	QnAEntity entity = dto.toEntity(userEntity);
-    	System.out.println("[(wrte)notice 들어온 값] :: "+entity);
-    	
-    	qnaRepository.save(entity);
-    	
-    	return findAll();
-    }
-    
-    //R
-    public List<QnADto> findAll() {
-        return qnaRepository.findAll().stream()
-            .map(qna -> {
-                UserEntity user = userRepository.findById(qna.getUserId().getId()).orElse(null);
-                UserResponseDto userDto = UserResponseDto
-                		.builder()
-                		 .id(user.getId())
-                		 .nickname(user.getNickname())
-                		 .email(user.getEmail())
-                		.build();
-                return qna.toDto(userDto);
-            })
-            .toList();
-    }
+    private final QnAAnswerRepository qnaAnswerRepository;
 
-    
-    //U
-    @Transactional
-    public boolean update(QnADto dto){
-    	
-    	QnAEntity result = qnaRepository.findById(dto.getId())
-    			.orElseThrow(()->new RuntimeException("[update]존재하지 않는 id입니다."));
-    	result.setAnswer(dto.getAnswer());
-    	result.setTitle(dto.getTitle());
-    	result.setContent(dto.getContent());
-    	result.setStatus(dto.isStatus());
-    	
-    	return true;
+    public QnAResponseDto createQnA(QnARequestDto dto) {
+        QnAEntity qna = QnAEntity.builder()
+            .title(dto.getTitle())
+            .content(dto.getContent())
+            .authorId(dto.getAuthorId())
+            .isSecret(dto.getIsSecret())
+            .password(dto.getPassword())
+            .createdAt(LocalDateTime.now())
+            .build();
+        qnaRepository.save(qna);
+        return toDto(qna);
     }
-    
-    //D
-    public boolean delete(long id) {
-    	
-    	QnAEntity result = qnaRepository.findById(id)
-    			.orElseThrow(()->new RuntimeException("[delete]존재 하지 않는 id입니다."));
-    	
-    	qnaRepository.delete(result);
-    	
-    	return true;
+    private QnAResponseDto toDto(QnAEntity qna) {
+        QnAResponseDto dto = new QnAResponseDto();
+        dto.setId(qna.getId());
+        dto.setTitle(qna.getTitle());
+        dto.setContent(qna.getContent());
+        dto.setAuthorId(qna.getAuthorId());
+        dto.setIsSecret(qna.getIsSecret());
+        dto.setIsReported(qna.getIsReported());
+        dto.setCreatedAt(qna.getCreatedAt());
+
+        // 답변 DTO (있으면)
+        qnaAnswerRepository.findByQnaId(qna.getId()).ifPresent(answer -> {
+            QnAAnswerDto answerDto = new QnAAnswerDto();
+            answerDto.setId(answer.getId());
+            answerDto.setContent(answer.getContent());
+            answerDto.setWriterId(answer.getWriterId());
+            answerDto.setCreatedAt(answer.getCreatedAt());
+            dto.setAnswer(answerDto);
+        });
+        return dto;
     }
-
-
 }
