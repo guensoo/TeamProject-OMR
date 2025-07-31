@@ -1,17 +1,37 @@
 import { useContext } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { UserContext } from '../../All/context/UserContext';
+import { formatDate } from "../utils/FormatDate";
+import { useNavigation } from "@react-navigation/native";
 
 const MyPage = () => {
-    const { user } = useContext(UserContext);
+    const { user, logoutUserInfo } = useContext(UserContext);
+    const navigation = useNavigation();
+
     const menuItems = [
         { icon: "settings-outline", title: "계정 설정", color: "#6C63FF" },
         { icon: "notifications-outline", title: "알림 설정", color: "#FF6B6B" },
         { icon: "help-circle-outline", title: "고객 지원", color: "#4ECDC4" },
         { icon: "document-text-outline", title: "이용약관", color: "#45B7D1" },
     ];
+
+    if (!user) return null;
+
+    const handleLogout = () => {
+        Alert.alert("로그아웃", "로그아웃 하시겠습니까?", [
+            { text: '취소', style: 'cancel' },
+            {
+                text: '확인',
+                onPress: () => {
+                    Alert.alert("로그아웃", "로그아웃 되셨습니다.");
+                    logoutUserInfo();
+                    navigation.navigate("BottomTabMenu", { screen: 'Home' })
+                }
+            }
+        ])
+    }
 
     return (
         <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -59,7 +79,7 @@ const MyPage = () => {
                         </View>
                         <View style={styles.infoContent}>
                             <Text style={styles.infoLabel}>가입일</Text>
-                            <Text style={styles.infoValue}>{user.createAt}</Text>
+                            <Text style={styles.infoValue}>{formatDate(user.createAt)}</Text>
                         </View>
                     </View>
                 </View>
@@ -100,7 +120,7 @@ const MyPage = () => {
                 </View>
 
                 {/* 로그아웃 버튼 */}
-                <TouchableOpacity style={styles.logoutButton}>
+                <TouchableOpacity style={styles.logoutButton} onPress={() => handleLogout()}>
                     <LinearGradient
                         colors={['#FF6B6B', '#FF8E8E']}
                         style={styles.logoutGradient}

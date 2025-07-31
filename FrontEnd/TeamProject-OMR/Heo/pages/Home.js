@@ -106,7 +106,7 @@ const Home = () => {
         const fetchData = async () => {
             try {
                 setIsLoadingTrailers(true); // 로딩 시작
-                
+
                 const ottData = await getAllOTTPopularWithTrailer();
 
                 const today = new Date();
@@ -132,15 +132,57 @@ const Home = () => {
         fetchData();
     }, [])
 
-    //인기작 포스터
+    // //인기작 포스터
+    // useEffect(() => {
+    //     const fetchPosters = async () => {
+    //         const data = await getAllOTTPopular();
+    //         const allMovies = Object.values(data).flat();
+    //         setAllPosters(allMovies);
+    //     };
+    //     fetchPosters();
+    // }, []);
     useEffect(() => {
-        const fetchPosters = async () => {
-            const data = await getAllOTTPopular();
-            const allMovies = Object.values(data).flat();
-            setAllPosters(allMovies);
+        const fetchAllPopular = async () => {
+            const ottData = await getAllOTTPopular();
+            const allOTT = Object.values(ottData).flat().map(item => ({
+                ...item,
+                type: 'ott',
+            }));
+
+            const today = new Date().toISOString().split('T')[0].replace(/-/g, ''); // YYYYMMDD
+            const movieData = await getBoxOfficeWithPostersAndTrailer(today);
+            const allMovies = movieData.map(item => ({
+                ...item,
+                provider: '영화',  // 👉 provider 없을 수 있으니 명시적으로
+                type: 'movie',
+            }));
+
+            const combined = [...allOTT, ...allMovies];
+
+            console.log("OTT sample data:", allOTT.slice(0, 10));
+            console.log("Movie sample data:", allMovies.slice(0, 10));
+            console.log("Combined sample data:", combined.slice(0, 10));
+
+            // 🔽 정렬: TMDB 인기순(popularity), 또는 rank 기반 정렬
+            const sorted = combined.sort((a, b) => {
+                if (a.rank && b.rank) {
+                    return Number(a.rank) - Number(b.rank); // 박스오피스 기준
+                }
+                if (a.popularity && b.popularity) {
+                    return b.popularity - a.popularity; // TMDB 기준
+                }
+                return 0;
+            });
+
+            setAllPosters(sorted);
         };
-        fetchPosters();
+
+        fetchAllPopular();
     }, []);
+
+    useEffect(() => {
+  console.log("allPosters 상태 변경됨:", allPosters.slice(0, 20));
+}, [allPosters]);
 
     const handlePlay = (trailerKey) => {
         setSelectedTrailer(trailerKey);

@@ -87,7 +87,7 @@ export const getBoxOfficeWithPostersAndTrailer = async (
                             },
                         });
                     }
-
+ 
                     const matched = tmdbRes.data.results[0];
                     const poster = matched?.poster_path
                         ? `https://image.tmdb.org/t/p/w500${matched.poster_path}`

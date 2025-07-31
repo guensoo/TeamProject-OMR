@@ -2,10 +2,11 @@ import { FlatList, View, Image, Text, TouchableOpacity, Dimensions, StyleSheet }
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
-const Main_OTTList = ({ data, provider }) => {
+const Main_OTTList = ({ data }) => {
     return (
         <FlatList
-            data={data.filter(item => item.provider === provider)}
+            // data={data.filter(item => item.provider === provider)}
+            data={data}
             horizontal
             showsHorizontalScrollIndicator={false}
             keyExtractor={(item) => `${item.provider}_${item.id}`}
@@ -24,7 +25,7 @@ const Main_OTTList = ({ data, provider }) => {
                         {item.title}
                     </Text>
                     <Text style={styles.providerText}>
-                        {provider}
+                        {item.provider}
                     </Text>
                 </View>
             )}

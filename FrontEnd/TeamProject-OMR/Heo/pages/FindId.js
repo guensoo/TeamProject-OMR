@@ -1,6 +1,8 @@
 import { useContext, useState } from 'react';
 import { Text, View, StyleSheet, TextInput, TouchableOpacity, SafeAreaView, KeyboardAvoidingView, Platform, Alert } from "react-native";
 import { useNavigation } from '@react-navigation/native';
+import { findId } from '../../All/api/UserApi';
+import { measure } from 'react-native-reanimated';
 
 const FindId = () => {
     const navigation = useNavigation();
@@ -8,8 +10,8 @@ const FindId = () => {
     const [email, setEmail] = useState('');
     const [error, setError] = useState('');
 
-    const handleFindId = () => {
-        if(!email){
+    const handleFindId = async () => {
+        if (!email) {
             setError("이메일을 입력해주세요.")
             return;
         }
@@ -22,17 +24,12 @@ const FindId = () => {
 
         setError('');
 
-        // TODO: 이메일을 기반으로 아이디 찾는 API 호출 예:
-        // findIdByEmail(email)
-        //   .then(res => {
-        //      Alert.alert("아이디 찾기 완료", `회원님의 아이디는 ${res.userId} 입니다.`);
-        //   })
-        //   .catch(err => {
-        //      Alert.alert("오류", err.message || "아이디를 찾을 수 없습니다.");
-        //   });
-
-        // 지금은 예시로 바로 성공 알림만 띄움
-        Alert.alert("완료", "입력하신 이메일로 아이디가 전송되었습니다.");
+        try {
+            const res = await findId(email);
+            Alert.alert("아이디 찾기 완료", `회원님의 아이디는 ${res.userId} 입니다.`);
+        } catch (error) {
+            Alert.alert("오류", error.message || "아이디를 찾을 수 없습니다.");
+        }
     }
 
     return (
@@ -58,15 +55,15 @@ const FindId = () => {
                                 autoCapitalize="none"
                                 autoCorrect={false}
                             />
-                            {error ? <Text style={styles.errorText}>{error}</Text> : null}
+                            {error && <Text style={styles.errorText}>{error}</Text>}
                         </View>
 
                         <TouchableOpacity style={styles.findButton} onPress={handleFindId}>
                             <Text style={styles.findButtonText}>아이디 찾기</Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity onPress={() => navigation.goBack()}>
-                            <Text style={styles.goBackText}>로그인 화면으로 돌아가기</Text>
+                        <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+                            <Text style={styles.goLoginText}>로그인 화면으로 돌아가기</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -135,7 +132,7 @@ const styles = StyleSheet.create({
         marginLeft: 4,
         marginTop: 6,
     },
-    goBackText: {
+    goLoginText: {
         color: '#6366F1',
         fontWeight: '600',
         textAlign: 'center',

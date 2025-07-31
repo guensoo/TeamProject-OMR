@@ -70,6 +70,9 @@ dependencies {
 	implementation("io.swagger.core.v3:swagger-annotations:2.2.32")
 	
 	implementation 'org.postgresql:postgresql:42.7.3'
+	
+	//메일 발송
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
 }
 
 tasks.named('test') {

@@ -27,3 +27,36 @@ export async function loginUser(userData) {
         throw new Error(message);
     }
 }
+
+//아이디찾기 api
+export async function findId(email) {
+    try {
+        const res = await axios.post(`${API}/api/users/find-id`, { email });
+        return res.data;
+    } catch (error) {
+        const messgae = error.response?.data?.message || error.message || '아이디 찾기 실패';
+        throw new Error(messgae);
+    }
+}
+
+//비밀번호찾기 api
+export async function findPassword(userId, email) {
+    try {
+        const res = await axios.post(`${API}/api/users/find-password`, { userId, email });
+        return res.data;
+    } catch (error) {
+        const message = error.response?.data?.message || error.message || '비밀번호 찾기 실패';
+        throw new Error(message);
+    }
+}
+
+//비밀번호 재설정 api
+export async function resetPassword(token, newPassword) {
+    try {
+        const res = await axios.post(`${API}/api/users/reset-password`, { token, newPassword });
+        return res.data;
+    } catch (error) {
+        const message = error.response?.data?.message || error.message || '비밀번호 재설정 실패';
+        throw new Error(message);
+    }
+}

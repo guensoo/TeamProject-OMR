@@ -21,48 +21,69 @@ const Signup = () => {
     const [emailError, setEmailError] = useState('');
 
     useEffect(() => {
-        if(passwordCheck && password !== passwordCheck) {
+        if (passwordCheck && password !== passwordCheck) {
             setPasswordCheckError('비밀번호가 일치하지 않습니다.');
         } else {
             setPasswordCheckError('');
         }
-    },[password, passwordCheck])
+    }, [password, passwordCheck])
 
     const handleSignup = async () => {
         // 회원가입 로직 구현
-        let valid = true;
+        const idRegex = /^[a-z0-9]{4,12}$/;
+        const nickNameRegex = /^[가-힣a-zA-Z0-9]{2,8}$/;
+        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,16}$/;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
         if (!id) {
             setIdError('아이디를 입력해주세요.')
-            valid = false;
+            return;
+        } 
+
+        if (!idRegex.test(id)) {
+            setIdError('아이디는 4~12자 영문 소문자 및 숫자만 가능합니다.');
+            return;
         }
 
-        if(!nickName) {
+        if (!nickName) {
             setNickNameError("닉네임을 입력해주세요.")
-            valid = false;
+            return;
+        } 
+
+        if (!nickNameRegex.test(nickName)) {
+            setNickNameError('닉네임은 2~8자 한글, 영문, 숫자만 가능합니다.');
+            return;
         }
 
         if (!password) {
             setPasswordError("비밀번호를 입력해주세요.")
-            valid = false;
+            return;
+        } 
+
+        if (!passwordRegex.test(password)) {
+            setPasswordError('비밀번호는 8~16자, 영문/숫자/특수문자를 포함해야 합니다.');
+            return;
         }
 
-        if(!passwordCheck) {
+        if (!passwordCheck) {
             setPasswordCheckError("비밀번호를 재입력해주세요.");
-            valid = false;
-        }
+            return;
+        } 
 
         if (password !== passwordCheck) {
             setPasswordCheckError('비밀번호가 일치하지 않습니다.');
-            valid = false;
+            return;
         }
 
         if (!email) {
             setEmailError("이메일을 입력해주세요.")
-            valid = false;
+            return;
         }
 
-        if(!valid) return;
+        if (!emailRegex.test(email)) {
+            setEmailError('유효한 이메일 주소를 입력해주세요.(example@naver.com)');
+            return;
+        }
 
         try {
             const userData = {
@@ -73,7 +94,7 @@ const Signup = () => {
             }
 
             await registerUser(userData);
-            // Alert.alert("완료", "회원가입 성공");
+            Alert.alert("완료", "회원가입 성공");
             navigation.navigate('Login');
         } catch (error) {
             Alert.alert("회원가입 실패", error.message)
@@ -136,7 +157,7 @@ const Signup = () => {
                                     value={password}
                                     onChangeText={(text) => {
                                         setPassword(text);
-                                        if(text) setPasswordError('');
+                                        if (text) setPasswordError('');
                                     }}
                                     secureTextEntry={!isPasswordVisible}
                                     autoCapitalize="none"
