@@ -1,5 +1,7 @@
 package OMR.teamProject.OMR.User.DTO;
 
+import java.time.LocalDateTime;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,4 +17,5 @@ public class UserResponseDto {
     private String nickname;
     private String email;
     private String role;
+    private LocalDateTime createAt;
 }

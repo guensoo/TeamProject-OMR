@@ -1,15 +1,11 @@
-import React from "react";
+import { useContext } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { UserContext } from '../../All/context/UserContext';
 
 const MyPage = () => {
-    const user = {
-        nickname: "홍길동",
-        email: "honggildong@email.com",
-        joined: "2024-01-01",
-    };
-
+    const { user } = useContext(UserContext);
     const menuItems = [
         { icon: "settings-outline", title: "계정 설정", color: "#6C63FF" },
         { icon: "notifications-outline", title: "알림 설정", color: "#FF6B6B" },
@@ -46,7 +42,7 @@ const MyPage = () => {
             <View style={styles.contentContainer}>
                 <View style={styles.infoCard}>
                     <Text style={styles.cardTitle}>내 정보</Text>
-                    
+
                     <View style={styles.infoItem}>
                         <View style={[styles.iconContainer, { backgroundColor: '#FF6B6B20' }]}>
                             <Ionicons name="mail" size={20} color="#FF6B6B" />
@@ -63,7 +59,7 @@ const MyPage = () => {
                         </View>
                         <View style={styles.infoContent}>
                             <Text style={styles.infoLabel}>가입일</Text>
-                            <Text style={styles.infoValue}>{user.joined}</Text>
+                            <Text style={styles.infoValue}>{user.createAt}</Text>
                         </View>
                     </View>
                 </View>

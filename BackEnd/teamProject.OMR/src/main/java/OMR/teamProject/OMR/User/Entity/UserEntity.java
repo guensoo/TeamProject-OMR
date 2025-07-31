@@ -1,5 +1,7 @@
 package OMR.teamProject.OMR.User.Entity;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -33,4 +35,7 @@ public class UserEntity {
 
     @Column(nullable = false)
     private String role;  // 'USER', 'ADMIN' 등
+    
+    @Column(nullable = false)
+    private LocalDateTime createAt;
 }

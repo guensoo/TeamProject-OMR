@@ -1,5 +1,7 @@
 package OMR.teamProject.OMR.User.Service;
 
+import java.time.LocalDateTime;
+
 import org.springframework.stereotype.Service;
 
 import OMR.teamProject.OMR.User.DTO.UserRequestDto;
@@ -22,6 +24,7 @@ public class UserService {
             .nickname(dto.getNickname())
             .email(dto.getEmail())
             .role("USER")
+            .createAt(LocalDateTime.now())
             .build();
         userRepository.save(user);
         return toDto(user);
@@ -45,6 +48,7 @@ public class UserService {
         dto.setNickname(user.getNickname());
         dto.setEmail(user.getEmail());
         dto.setRole(user.getRole());
+        dto.setCreateAt(user.getCreateAt());
         return dto;
     }
 }
