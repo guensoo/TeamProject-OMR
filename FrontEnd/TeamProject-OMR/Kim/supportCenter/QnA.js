@@ -73,6 +73,11 @@ export const QnA = () => {
   const [showNewInquiry, setShowNewInquiry] = useState(false);
   const [inquiryTitle, setInquiryTitle] = useState('');
   const [inquiryContent, setInquiryContent] = useState('');
+  const [inquiryType, setInquiryType] = useState('일반문의');
+  const [titleFocused, setTitleFocused] = useState(false);
+  const [contentFocused, setContentFocused] = useState(false);
+
+  const inquiryTypes = ['일반문의', '기술지원', '결제문의', '계정문의', '신고/건의'];
 
   const toggleExpanded = (itemId) => {
     const newExpanded = new Set(expandedItems);
@@ -91,9 +96,14 @@ export const QnA = () => {
   const handleSubmitInquiry = () => {
     if (inquiryTitle.trim() && inquiryContent.trim()) {
       // 문의 제출 로직
-      console.log('문의 제출:', { title: inquiryTitle, content: inquiryContent });
+      console.log('문의 제출:', { 
+        title: inquiryTitle, 
+        content: inquiryContent,
+        type: inquiryType
+      });
       setInquiryTitle('');
       setInquiryContent('');
+      setInquiryType('일반문의');
       setShowNewInquiry(false);
       alert('문의가 성공적으로 접수되었습니다.');
     } else {
@@ -105,59 +115,228 @@ export const QnA = () => {
     setShowNewInquiry(false);
     setInquiryTitle('');
     setInquiryContent('');
+    setInquiryType('일반문의');
   };
 
+  // 트렌디한 문의 작성 화면
   if (showNewInquiry) {
     return (
       <>
         <Header />
         <SupportNavbar />
-        <ScrollView style={styles.container}>
-          <View style={styles.content}>
-            <Text style={styles.title}>새 문의 작성</Text>
-            
-            <View style={styles.formContainer}>
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>문의 제목</Text>
-                <TextInput
-                  style={styles.titleInput}
-                  placeholder="문의 제목을 입력해주세요"
-                  value={inquiryTitle}
-                  onChangeText={setInquiryTitle}
-                />
-              </View>
-              
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>문의 내용</Text>
-                <TextInput
-                  style={styles.contentInput}
-                  placeholder="문의 내용을 자세히 입력해주세요"
-                  value={inquiryContent}
-                  onChangeText={setInquiryContent}
-                  multiline
-                  numberOfLines={8}
-                  textAlignVertical="top"
-                />
-              </View>
-              
-              <View style={styles.buttonContainer}>
+        <View style={styles.modernContainer}>
+          {/* 헤더 영역 */}
+          <View style={styles.modernHeader}>
+            <View style={styles.headerBackground}>
+              <View style={styles.headerContent}>
                 <TouchableOpacity 
-                  style={[styles.actionButton, styles.secondaryButton]} 
+                  style={styles.backButton}
                   onPress={handleCancel}
                 >
-                  <Text style={styles.secondaryButtonText}>취소</Text>
+                  <Text style={styles.backIcon}>←</Text>
                 </TouchableOpacity>
-                
-                <TouchableOpacity 
-                  style={[styles.actionButton, styles.primaryButton]} 
-                  onPress={handleSubmitInquiry}
-                >
-                  <Text style={styles.primaryButtonText}>문의 제출</Text>
-                </TouchableOpacity>
+                <View style={styles.headerTextContainer}>
+                  <Text style={styles.modernTitle}>1:1 문의하기</Text>
+                  <Text style={styles.modernSubtitle}>궁금한 내용을 자세히 알려주세요</Text>
+                </View>
+                <View style={styles.headerIconContainer}>
+                  <View style={styles.supportIcon}>
+                    <Text style={styles.supportIconText}>💬</Text>
+                  </View>
+                </View>
               </View>
             </View>
           </View>
-        </ScrollView>
+
+          <ScrollView 
+            style={styles.modernScrollView}
+            showsVerticalScrollIndicator={false}
+            bounces={true}
+          >
+            <View style={styles.modernContent}>
+              {/* 진행 표시 */}
+              <View style={styles.progressContainer}>
+                <View style={styles.progressSteps}>
+                  <View style={[styles.step, styles.activeStep]}>
+                    <Text style={styles.stepNumber}>1</Text>
+                  </View>
+                  <View style={styles.progressLine} />
+                  <View style={[styles.step, styles.inactiveStep]}>
+                    <Text style={[styles.stepNumber, styles.inactiveStepText]}>2</Text>
+                  </View>
+                </View>
+                <View style={styles.stepLabels}>
+                  <Text style={styles.activeStepLabel}>문의 작성</Text>
+                  <Text style={styles.inactiveStepLabel}>전송 완료</Text>
+                </View>
+              </View>
+
+              {/* 문의 유형 선택 카드 */}
+              <View style={styles.inputCard}>
+                <View style={styles.cardHeader}>
+                  <View style={styles.cardIcon}>
+                    <Text style={styles.cardIconText}>🏷️</Text>
+                  </View>
+                  <Text style={styles.cardTitle}>문의 유형</Text>
+                  <Text style={styles.requiredMark}>*</Text>
+                </View>
+                <View style={styles.typeContainer}>
+                  {inquiryTypes.map((type) => (
+                    <TouchableOpacity
+                      key={type}
+                      style={[
+                        styles.typeChip,
+                        inquiryType === type && styles.selectedTypeChip
+                      ]}
+                      onPress={() => setInquiryType(type)}
+                    >
+                      <Text style={[
+                        styles.typeChipText,
+                        inquiryType === type && styles.selectedTypeChipText
+                      ]}>
+                        {type}
+                      </Text>
+                      {inquiryType === type && (
+                        <Text style={styles.checkIcon}>✓</Text>
+                      )}
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+
+              {/* 제목 입력 카드 */}
+              <View style={styles.inputCard}>
+                <View style={styles.cardHeader}>
+                  <View style={styles.cardIcon}>
+                    <Text style={styles.cardIconText}>📝</Text>
+                  </View>
+                  <Text style={styles.cardTitle}>문의 제목</Text>
+                  <Text style={styles.requiredMark}>*</Text>
+                </View>
+                <View style={[
+                  styles.modernInputContainer,
+                  titleFocused && styles.focusedInputContainer
+                ]}>
+                  <TextInput
+                    style={styles.modernInput}
+                    placeholder="어떤 내용인지 간단히 적어주세요"
+                    placeholderTextColor="#A0A0A0"
+                    value={inquiryTitle}
+                    onChangeText={setInquiryTitle}
+                    onFocus={() => setTitleFocused(true)}
+                    onBlur={() => setTitleFocused(false)}
+                    maxLength={50}
+                  />
+                  <Text style={styles.charCount}>{inquiryTitle.length}/50</Text>
+                </View>
+              </View>
+
+              {/* 내용 입력 카드 */}
+              <View style={styles.inputCard}>
+                <View style={styles.cardHeader}>
+                  <View style={styles.cardIcon}>
+                    <Text style={styles.cardIconText}>💭</Text>
+                  </View>
+                  <Text style={styles.cardTitle}>상세 내용</Text>
+                  <Text style={styles.requiredMark}>*</Text>
+                </View>
+                <View style={[
+                  styles.modernTextAreaContainer,
+                  contentFocused && styles.focusedInputContainer
+                ]}>
+                  <TextInput
+                    style={styles.modernTextArea}
+                    placeholder="문제 상황이나 궁금한 점을 자세히 설명해주세요&#10;&#10;• 언제 발생했나요?&#10;• 어떤 상황에서 발생했나요?&#10;• 어떤 도움이 필요한가요?&#10;&#10;더 자세히 알려주실수록 정확한 답변을 드릴 수 있어요!"
+                    placeholderTextColor="#A0A0A0"
+                    value={inquiryContent}
+                    onChangeText={setInquiryContent}
+                    onFocus={() => setContentFocused(true)}
+                    onBlur={() => setContentFocused(false)}
+                    multiline
+                    numberOfLines={8}
+                    textAlignVertical="top"
+                    maxLength={1000}
+                  />
+                  <Text style={styles.charCount}>{inquiryContent.length}/1000</Text>
+                </View>
+              </View>
+
+              {/* 빠른 답변 팁 카드 */}
+              <View style={styles.tipCard}>
+                <View style={styles.tipHeader}>
+                  <Text style={styles.tipIcon}>⚡</Text>
+                  <Text style={styles.tipTitle}>빠른 답변을 위한 꿀팁!</Text>
+                </View>
+                <View style={styles.tipContent}>
+                  <View style={styles.tipItem}>
+                    <Text style={styles.tipBullet}>🎯</Text>
+                    <Text style={styles.tipText}>구체적인 상황을 설명해주세요</Text>
+                  </View>
+                  <View style={styles.tipItem}>
+                    <Text style={styles.tipBullet}>📱</Text>
+                    <Text style={styles.tipText}>사용 중인 기기와 앱 버전을 알려주세요</Text>
+                  </View>
+                  <View style={styles.tipItem}>
+                    <Text style={styles.tipBullet}>🖼️</Text>
+                    <Text style={styles.tipText}>스크린샷이 있다면 더욱 좋아요</Text>
+                  </View>
+                  <View style={styles.tipItem}>
+                    <Text style={styles.tipBullet}>⏰</Text>
+                    <Text style={styles.tipText}>평균 답변 시간: 2-4시간 (업무시간 기준)</Text>
+                  </View>
+                </View>
+              </View>
+
+              {/* FAQ 추천 카드 */}
+              <View style={styles.faqCard}>
+                <View style={styles.faqHeader}>
+                  <Text style={styles.faqIcon}>❓</Text>
+                  <Text style={styles.faqTitle}>혹시 이런 문제인가요?</Text>
+                </View>
+                <View style={styles.faqItems}>
+                  <TouchableOpacity style={styles.faqItem}>
+                    <Text style={styles.faqItemText}>로그인이 안 돼요</Text>
+                    <Text style={styles.faqArrow}>→</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.faqItem}>
+                    <Text style={styles.faqItemText}>결제가 안 돼요</Text>
+                    <Text style={styles.faqArrow}>→</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.faqItem}>
+                    <Text style={styles.faqItemText}>앱이 느려요</Text>
+                    <Text style={styles.faqArrow}>→</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              {/* 하단 여백 */}
+              <View style={styles.bottomSpacing} />
+            </View>
+          </ScrollView>
+
+          {/* 하단 고정 버튼 */}
+          <View style={styles.bottomButtonContainer}>
+            <View style={styles.buttonInfo}>
+              <Text style={styles.responseTime}>💌 평균 답변 시간: 2-4시간</Text>
+            </View>
+            <TouchableOpacity 
+              style={[
+                styles.submitButton,
+                (!inquiryTitle.trim() || !inquiryContent.trim()) && styles.disabledButton
+              ]}
+              onPress={handleSubmitInquiry}
+              disabled={!inquiryTitle.trim() || !inquiryContent.trim()}
+            >
+              <Text style={[
+                styles.submitButtonText,
+                (!inquiryTitle.trim() || !inquiryContent.trim()) && styles.disabledButtonText
+              ]}>
+                문의 보내기
+              </Text>
+              <Text style={styles.submitButtonIcon}>✈️</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       </>
     );
   }
@@ -337,74 +516,6 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     marginTop: 8,
   },
-  formContainer: {
-    backgroundColor: '#fff',
-    padding: 20,
-    borderRadius: 8,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  inputGroup: {
-    marginBottom: 20,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 8,
-  },
-  titleInput: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    backgroundColor: '#fff',
-  },
-  contentInput: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    backgroundColor: '#fff',
-    minHeight: 120,
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    gap: 12,
-    marginTop: 10,
-  },
-  actionButton: {
-    flex: 1,
-    paddingVertical: 14,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  primaryButton: {
-    backgroundColor: '#007AFF',
-  },
-  secondaryButton: {
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: '#007AFF',
-  },
-  primaryButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  secondaryButtonText: {
-    color: '#007AFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
   emptyState: {
     alignItems: 'center',
     paddingVertical: 40,
@@ -417,5 +528,396 @@ const styles = StyleSheet.create({
   emptySubtext: {
     fontSize: 14,
     color: '#999',
+  },
+
+  // 새로운 모던 스타일들
+  modernContainer: {
+    flex: 1,
+    backgroundColor: '#F0F9FF',
+  },
+  modernHeader: {
+    backgroundColor: '#FFFFFF',
+    paddingTop: 20,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+    shadowColor: '#0EA5E9',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  headerBackground: {
+    paddingBottom: 24,
+  },
+  headerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 8,
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#F0F9FF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 16,
+  },
+  backIcon: {
+    fontSize: 18,
+    color: '#0EA5E9',
+    fontWeight: '600',
+  },
+  headerTextContainer: {
+    flex: 1,
+  },
+  modernTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#0F172A',
+    marginBottom: 4,
+  },
+  modernSubtitle: {
+    fontSize: 14,
+    color: '#64748B',
+    fontWeight: '400',
+  },
+  headerIconContainer: {
+    alignItems: 'center',
+  },
+  supportIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#0EA5E9',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  supportIconText: {
+    fontSize: 18,
+  },
+  modernScrollView: {
+    flex: 1,
+  },
+  modernContent: {
+    padding: 20,
+  },
+  progressContainer: {
+    marginBottom: 32,
+    alignItems: 'center',
+  },
+  progressSteps: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  step: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  activeStep: {
+    backgroundColor: '#0EA5E9',
+  },
+  inactiveStep: {
+    backgroundColor: '#E2E8F0',
+  },
+  stepNumber: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
+  inactiveStepText: {
+    color: '#94A3B8',
+  },
+  progressLine: {
+    width: 40,
+    height: 2,
+    backgroundColor: '#E2E8F0',
+    marginHorizontal: 8,
+  },
+  stepLabels: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: 120,
+  },
+  activeStepLabel: {
+    fontSize: 12,
+    color: '#0EA5E9',
+    fontWeight: '600',
+  },
+  inactiveStepLabel: {
+    fontSize: 12,
+    color: '#94A3B8',
+    fontWeight: '500',
+  },
+  inputCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 24,
+    marginBottom: 20,
+    shadowColor: '#0EA5E9',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 16,
+    elevation: 4,
+    borderWidth: 1,
+    borderColor: '#F1F5F9',
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  cardIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    backgroundColor: '#F0F9FF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  cardIconText: {
+    fontSize: 16,
+  },
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#0F172A',
+    flex: 1,
+  },
+  requiredMark: {
+    fontSize: 18,
+    color: '#EF4444',
+    fontWeight: '600',
+  },
+  typeContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+  typeChip: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 20,
+    backgroundColor: '#F8FAFC',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  selectedTypeChip: {
+    backgroundColor: '#0EA5E9',
+    borderColor: '#0EA5E9',
+  },
+  typeChipText: {
+    fontSize: 14,
+    color: '#64748B',
+    fontWeight: '500',
+  },
+  selectedTypeChipText: {
+    color: '#FFFFFF',
+    fontWeight: '600',
+  },
+  checkIcon: {
+    fontSize: 12,
+    color: '#FFFFFF',
+    marginLeft: 6,
+    fontWeight: '600',
+  },
+  modernInputContainer: {
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#E5E7EB',
+    backgroundColor: '#FAFBFF',
+    overflow: 'hidden',
+  },
+  focusedInputContainer: {
+    borderColor: '#0EA5E9',
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#0EA5E9',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  modernInput: {
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    fontSize: 16,
+    color: '#0F172A',
+    fontWeight: '400',
+  },
+  modernTextAreaContainer: {
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#E5E7EB',
+    backgroundColor: '#FAFBFF',
+    overflow: 'hidden',
+    minHeight: 140,
+  },
+  modernTextArea: {
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    fontSize: 16,
+    color: '#0F172A',
+    fontWeight: '400',
+    flex: 1,
+    textAlignVertical: 'top',
+  },
+  charCount: {
+    position: 'absolute',
+    bottom: 8,
+    right: 12,
+    fontSize: 12,
+    color: '#9CA3AF',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  tipCard: {
+    backgroundColor: '#FFFBEB',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: '#FDE68A',
+  },
+  tipHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  tipIcon: {
+    fontSize: 20,
+    marginRight: 8,
+  },
+  tipTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#92400E',
+  },
+  tipContent: {
+    gap: 8,
+  },
+  tipItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  tipBullet: {
+    fontSize: 14,
+    marginRight: 8,
+    width: 20,
+  },
+  tipText: {
+    fontSize: 14,
+    color: '#A16207',
+    flex: 1,
+    lineHeight: 20,
+  },
+  faqCard: {
+    backgroundColor: '#F8FAFC',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  faqHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  faqIcon: {
+    fontSize: 20,
+    marginRight: 8,
+  },
+  faqTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#374151',
+  },
+  faqItems: {
+    gap: 8,
+  },
+  faqItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  faqItemText: {
+    fontSize: 14,
+    color: '#374151',
+    fontWeight: '500',
+  },
+  faqArrow: {
+    fontSize: 16,
+    color: '#0EA5E9',
+    fontWeight: '600',
+  },
+  bottomButtonContainer: {
+    padding: 20,
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  buttonInfo: {
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  responseTime: {
+    fontSize: 12,
+    color: '#64748B',
+    fontWeight: '500',
+  },
+  submitButton: {
+    backgroundColor: '#0EA5E9',
+    borderRadius: 16,
+    paddingVertical: 18,
+    paddingHorizontal: 24,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#0EA5E9',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 6,
+  },
+  disabledButton: {
+    backgroundColor: '#D1D5DB',
+    shadowOpacity: 0,
+    elevation: 0,
+  },
+  submitButtonText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    marginRight: 8,
+  },
+  disabledButtonText: {
+    color: '#9CA3AF',
+  },
+  submitButtonIcon: {
+    fontSize: 16,
+    marginLeft: 4,
+  },
+  bottomSpacing: {
+    height: 100,
   },
 });
