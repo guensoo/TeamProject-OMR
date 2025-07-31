@@ -733,7 +733,7 @@ const styles = StyleSheet.create({
   },
   charCount: {
     position: 'absolute',
-    bottom: 8,
+    bottom: 4,
     right: 12,
     fontSize: 12,
     color: '#9CA3AF',
