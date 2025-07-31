@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, ScrollView, Text, TouchableOpacity, StyleSheet, TextInput, Switch } from 'react-native';
 import Header from "../../Heo/components/Header";
 import { SupportNavbar } from "./SupportNavbar";
+import { NoticeItem } from '../component/NoticeItem';
 
 // 공지사항 샘플 데이터
 const noticeData = [
@@ -91,57 +92,78 @@ const noticeData = [
               연휴 후 순차적으로 답변드리겠습니다.`
     }
 ];
+// 예시 json 유저 확정되면 해결예정
+// [
+//   {
+//     "category": "시스템",
+//     "isImportant": true,
+//     "isNew": true,
+//     "title": "서비스 점검 안내",
+//     "content": "안녕하세요. 더 나은 서비스 제공을 위해 시스템 점검을 실시합니다.\n\n점검 일시: 2024년 1월 25일 (목) 02:00 ~ 06:00 (4시간)\n점검 내용:\n- 서버 안정성 개선\n- 새로운 기능 업데이트 준비\n- 보안 강화 작업\n\n점검 시간 동안에는 서비스 이용이 일시적으로 중단될 수 있습니다.\n이용에 불편을 드려 죄송합니다.\n\n감사합니다.",
+//     "createdAt": "2024-01-20T00:00:00",
+//     "updatedAt": "2024-01-20T00:00:00",
+//     "userId": 1
+//   },
+//   {
+//     "category": "업데이트",
+//     "isImportant": false,
+//     "isNew": true,
+//     "title": "새로운 기능 업데이트 소식",
+//     "content": "새로운 기능이 추가되었습니다!\n\n주요 업데이트 내용:\n1. 다크 모드 지원\n2. 알림 설정 세분화\n3. 검색 기능 개선\n4. 사용자 인터페이스 개선\n\n앱 스토어에서 최신 버전으로 업데이트해주세요.\n더 나은 사용 경험을 제공하겠습니다.",
+//     "createdAt": "2024-01-18T00:00:00",
+//     "updatedAt": "2024-01-18T00:00:00",
+//     "userId": 1
+//   },
+//   {
+//     "category": "정책",
+//     "isImportant": true,
+//     "isNew": false,
+//     "title": "개인정보 처리방침 변경 안내",
+//     "content": "개인정보 처리방침이 변경되었습니다.\n\n변경 사항:\n- 개인정보 수집 목적 명시 강화\n- 개인정보 보관 기간 조정\n- 제3자 제공 관련 내용 추가\n\n변경된 개인정보 처리방침은 2024년 1월 20일부터 적용됩니다.\n자세한 내용은 앱 내 '개인정보 처리방침'에서 확인하실 수 있습니다.",
+//     "createdAt": "2024-01-15T00:00:00",
+//     "updatedAt": "2024-01-15T00:00:00",
+//     "userId": 1
+//   },
+//   {
+//     "category": "고객센터",
+//     "isImportant": false,
+//     "isNew": false,
+//     "title": "고객센터 운영시간 변경",
+//     "content": "고객센터 운영시간이 변경되었습니다.\n\n기존: 평일 09:00 ~ 18:00\n변경: 평일 09:00 ~ 19:00, 토요일 10:00 ~ 16:00\n\n더 많은 시간 동안 고객님께 도움을 드릴 수 있게 되었습니다.\n언제든지 문의해주세요!",
+//     "createdAt": "2024-01-12T00:00:00",
+//     "updatedAt": "2024-01-12T00:00:00",
+//     "userId": 1
+//   },
+//   {
+//     "category": "고객센터",
+//     "isImportant": false,
+//     "isNew": false,
+//     "title": "설 연휴 고객센터 운영 안내",
+//     "content": "설 연휴 기간 고객센터 운영 안내드립니다.\n\n휴무 기간: 2024년 2월 9일(금) ~ 2월 12일(월)\n정상 운영: 2024년 2월 13일(화)부터\n\n휴무 기간 중 긴급 문의사항은 앱 내 '문의하기'를 통해 접수해주시면,\n연휴 후 순차적으로 답변드리겠습니다.",
+//     "createdAt": "2024-01-10T00:00:00",
+//     "updatedAt": "2024-01-10T00:00:00",
+//     "userId": 1
+//   }
+// ]
 
-const categoryColors = {
-    '시스템': '#FF6B6B',
-    '업데이트': '#4ECDC4',
-    '정책': '#45B7D1',
-    '고객센터': '#96CEB4',
-    '이벤트': '#FECA57'
-};
 
-const NoticeItem = ({ item, isExpanded, onToggle }) => (
-    <View style={styles.noticeItem}>
-        <TouchableOpacity style={styles.noticeHeader} onPress={onToggle}>
-            <View style={styles.noticeInfo}>
-                <View style={styles.titleRow}>
-                    {item.isImportant && (
-                        <View style={styles.importantBadge}>
-                            <Text style={styles.importantText}>중요</Text>
-                        </View>
-                    )}
-                    {item.isNew && (
-                        <View style={styles.newBadge}>
-                            <Text style={styles.newText}>NEW</Text>
-                        </View>
-                    )}
-                    <View style={[styles.categoryBadge, { backgroundColor: categoryColors[item.category] }]}>
-                        <Text style={styles.categoryText}>{item.category}</Text>
-                    </View>
-                </View>
-                <Text style={styles.noticeTitle}>{item.title}</Text>
-                <Text style={styles.noticeDate}>{item.date}</Text>
-            </View>
-            <Text style={styles.expandIcon}>{isExpanded ? '−' : '+'}</Text>
-        </TouchableOpacity>
-
-        {isExpanded && (
-            <View style={styles.contentContainer}>
-                <Text style={styles.contentText}>{item.content}</Text>
-            </View>
-        )}
-    </View>
-);
 
 export const Notice = () => {
     const [expandedItems, setExpandedItems] = useState(new Set());
+    // 선택된 카테고리 (필터용)
     const [selectedCategory, setSelectedCategory] = useState('전체');
     const [showNewNotice, setShowNewNotice] = useState(false);
-    const [noticeTitle, setNoticeTitle] = useState('');
-    const [noticeContent, setNoticeContent] = useState('');
-    const [selectedNoticeCategory, setSelectedNoticeCategory] = useState('시스템');
-    const [isImportant, setIsImportant] = useState(false);
-    const [isNew, setIsNew] = useState(true);
+
+    const [formData,setFormData] = useState({
+        title:'',content:'',category:'',isImportant:false,isNew:false
+    });
+
+    // const [noticeTitle, setNoticeTitle] = useState('');
+    // const [noticeContent, setNoticeContent] = useState('');
+    // const [selectedNoticeCategory, setSelectedNoticeCategory] = useState('시스템');
+    // const [isImportant, setIsImportant] = useState(false);
+    // const [isNew, setIsNew] = useState(true);
+
     const [titleFocused, setTitleFocused] = useState(false);
     const [contentFocused, setContentFocused] = useState(false);
 
@@ -169,19 +191,19 @@ export const Notice = () => {
     const handleSubmitNotice = () => {
         if (noticeTitle.trim() && noticeContent.trim()) {
             // 공지사항 발행 로직
-            console.log('공지사항 발행:', { 
-                title: noticeTitle, 
-                content: noticeContent,
-                category: selectedNoticeCategory,
-                isImportant,
-                isNew
-            });
-            setNoticeTitle('');
-            setNoticeContent('');
-            setSelectedNoticeCategory('시스템');
-            setIsImportant(false);
-            setIsNew(true);
-            setShowNewNotice(false);
+            // console.log('공지사항 발행:', { 
+            //     title: noticeTitle, 
+            //     content: noticeContent,
+            //     category: selectedNoticeCategory,
+            //     isImportant,
+            //     isNew
+            // });
+            // setNoticeTitle('');
+            // setNoticeContent('');
+            // setSelectedNoticeCategory('시스템');
+            // setIsImportant(false);
+            // setIsNew(true);
+            // setShowNewNotice(false);
             alert('공지사항이 성공적으로 발행되었습니다.');
         } else {
             alert('제목과 내용을 모두 입력해주세요.');
@@ -190,21 +212,29 @@ export const Notice = () => {
 
     const handleCancel = () => {
         setShowNewNotice(false);
-        setNoticeTitle('');
-        setNoticeContent('');
-        setSelectedNoticeCategory('시스템');
-        setIsImportant(false);
-        setIsNew(true);
+        setFormData(prev=>({...prev,title:''}))
+        setFormData(prev=>({...prev,content:''}))
+        setFormData(prev=>({...prev,category:'시스템'}))
+        setFormData(prev=>({...prev,isImportant:false}))
+        setFormData(prev=>({...prev,isNew:true}))
     };
 
-    // 관리자용 공지사항 작성 화면
+    const categoryColors = {
+        '시스템': '#FF6B6B',
+        '업데이트': '#4ECDC4',
+        '정책': '#45B7D1',
+        '고객센터': '#96CEB4',
+        '이벤트': '#FECA57'
+    };
+
+    //[작성] 관리자용 공지사항 작성 화면
     if (showNewNotice) {
         return (
             <>
                 <Header />
                 <SupportNavbar />
                 <View style={styles.adminContainer}>
-                    {/* 관리자 헤더 */}
+                    {/* 공지사항 작성 헤더 */}
                     <View style={styles.adminHeader}>
                         <View style={styles.adminHeaderContent}>
                             <TouchableOpacity 
@@ -215,7 +245,6 @@ export const Notice = () => {
                             </TouchableOpacity>
                             <View style={styles.headerTextContainer}>
                                 <Text style={styles.adminTitle}>공지사항 작성</Text>
-                                <Text style={styles.adminSubtitle}>사용자에게 전달할 중요한 소식을 작성하세요</Text>
                             </View>
                             <View style={styles.adminBadge}>
                                 <Text style={styles.adminBadgeText}>ADMIN</Text>
@@ -250,14 +279,14 @@ export const Notice = () => {
                                                 key={category}
                                                 style={[
                                                     styles.categoryChip,
-                                                    selectedNoticeCategory === category && styles.selectedCategoryChip,
-                                                    { backgroundColor: selectedNoticeCategory === category ? categoryColors[category] : '#F3F4F6' }
+                                                    formData.category === category && styles.selectedCategoryChip,
+                                                    { backgroundColor: formData.category === category ? categoryColors[category] : '#F3F4F6' }
                                                 ]}
-                                                onPress={() => setSelectedNoticeCategory(category)}
+                                                onPress={() => setFormData(prev=>({...prev,category:category}))}
                                             >
                                                 <Text style={[
                                                     styles.categoryChipText,
-                                                    selectedNoticeCategory === category && styles.selectedCategoryChipText
+                                                    formData.category === category && styles.selectedCategoryChipText
                                                 ]}>
                                                     {category}
                                                 </Text>
@@ -287,7 +316,7 @@ export const Notice = () => {
                                     <View style={styles.toggleContainer}>
                                         <View style={styles.toggleInfo}>
                                             <Text style={styles.toggleLabel}>NEW 뱃지</Text>
-                                            <Text style={styles.toggleDescription}>새로운 공지임을 알리는 뱃지를 표시합니다</Text>
+                                            <Text style={styles.toggleDescription}>새로운 공지 뱃지를 표시합니다</Text>
                                         </View>
                                         <Switch
                                             value={isNew}
@@ -341,8 +370,8 @@ export const Notice = () => {
                                         style={styles.adminTextArea}
                                         placeholder="사용자에게 전달할 공지사항의 상세 내용을 작성해주세요.&#10;&#10;• 명확하고 이해하기 쉽게 작성해주세요&#10;• 필요한 경우 일시, 방법, 연락처 등을 포함해주세요&#10;• 사용자에게 도움이 되는 정보를 제공해주세요"
                                         placeholderTextColor="#9CA3AF"
-                                        value={noticeContent}
-                                        onChangeText={setNoticeContent}
+                                        value={formData.content}
+                                        onChangeText={text=>setFormData(prev=>({...prev,content:text}))}
                                         onFocus={() => setContentFocused(true)}
                                         onBlur={() => setContentFocused(false)}
                                         multiline
@@ -376,8 +405,8 @@ export const Notice = () => {
                                                         <Text style={styles.newText}>NEW</Text>
                                                     </View>
                                                 )}
-                                                <View style={[styles.categoryBadge, { backgroundColor: categoryColors[selectedNoticeCategory] }]}>
-                                                    <Text style={styles.categoryText}>{selectedNoticeCategory}</Text>
+                                                <View style={[styles.categoryBadge, { backgroundColor: categoryColors[formData.category] }]}>
+                                                    <Text style={styles.categoryText}>{formData.category}</Text>
                                                 </View>
                                             </View>
                                         </View>
@@ -429,6 +458,7 @@ export const Notice = () => {
             </>
         );
     }
+
 
     return (
         <>
