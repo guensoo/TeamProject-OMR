@@ -321,8 +321,8 @@ export const Notice = () => {
                                         onBlur={() => setTitleFocused(false)}
                                         maxLength={100}
                                     />
-                                    <Text style={styles.charCount}>{noticeTitle.length}/100</Text>
                                 </View>
+                                <Text style={styles.charCountBelow}>{noticeTitle.length}/100</Text>
                             </View>
 
                             {/* 내용 입력 카드 */}
@@ -350,8 +350,8 @@ export const Notice = () => {
                                         textAlignVertical="top"
                                         maxLength={2000}
                                     />
-                                    <Text style={styles.charCount}>{noticeContent.length}/2000</Text>
                                 </View>
+                                <Text style={styles.charCountBelow}>{noticeContent.length}/2000</Text>
                             </View>
 
                             {/* 미리보기 카드 */}
@@ -883,6 +883,13 @@ const styles = StyleSheet.create({
         paddingHorizontal: 6,
         paddingVertical: 2,
         borderRadius: 4,
+    },
+    charCountBelow: {
+        fontSize: 12,
+        color: '#9CA3AF',
+        textAlign: 'right',
+        marginTop: 8,
+        fontWeight: '500',
     },
     previewCard: {
         backgroundColor: '#F8FAFC',

@@ -32,7 +32,7 @@ const FAQItem = ({ question, answer, isExpanded, onToggle }) => {
 
     return (
         <View style={styles.faqItem}>
-            <TouchableOpacity 
+            <TouchableOpacity
                 style={styles.faqQuestion}
                 onPress={onToggle}
                 activeOpacity={0.7}
@@ -47,8 +47,8 @@ const FAQItem = ({ question, answer, isExpanded, onToggle }) => {
                     <Text style={styles.expandIconText}>⌄</Text>
                 </Animated.View>
             </TouchableOpacity>
-            
-            <Animated.View 
+
+            <Animated.View
                 style={[
                     styles.faqAnswerContainer,
                     {
@@ -86,7 +86,7 @@ export const FAQ = () => {
     const categories = ['전체', '계정/로그인', '서비스 이용', '결제/환불', '기술 문제'];
     const faqCategories = ['계정/로그인', '서비스 이용', '결제/환불', '기술 문제'];
 
-    const {setSupportData} = useContext(SupportContext);
+    const { setSupportData } = useContext(SupportContext);
 
     const [faqData, setFaqData] = useState([
         {
@@ -152,7 +152,7 @@ export const FAQ = () => {
     const filteredFAQs = faqData.filter(item => {
         const matchesCategory = selectedCategory === '전체' || item.category === selectedCategory;
         const matchesSearch = item.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                            item.answer.toLowerCase().includes(searchQuery.toLowerCase());
+            item.answer.toLowerCase().includes(searchQuery.toLowerCase());
         return matchesCategory && matchesSearch;
     });
 
@@ -169,7 +169,7 @@ export const FAQ = () => {
                 answer: faqAnswer,
                 isPopular: isPopular
             };
-            
+
             setFaqData(prev => [newFAQItem, ...prev]);
             setFaqQuestion('');
             setFaqAnswer('');
@@ -200,7 +200,7 @@ export const FAQ = () => {
                     {/* 관리자 헤더 */}
                     <View style={styles.adminHeader}>
                         <View style={styles.adminHeaderContent}>
-                            <TouchableOpacity 
+                            <TouchableOpacity
                                 style={styles.backButton}
                                 onPress={handleCancel}
                             >
@@ -216,7 +216,7 @@ export const FAQ = () => {
                         </View>
                     </View>
 
-                    <ScrollView 
+                    <ScrollView
                         style={styles.adminScrollView}
                         showsVerticalScrollIndicator={false}
                     >
@@ -243,8 +243,8 @@ export const FAQ = () => {
                                         onBlur={() => setQuestionFocused(false)}
                                         maxLength={100}
                                     />
-                                    <Text style={styles.charCount}>{faqQuestion.length}/100</Text>
                                 </View>
+                                <Text style={styles.charCountBelow}>{faqQuestion.length}/100</Text>
                             </View>
 
                             {/* 답변 입력 카드 */}
@@ -272,8 +272,8 @@ export const FAQ = () => {
                                         textAlignVertical="top"
                                         maxLength={1000}
                                     />
-                                    <Text style={styles.charCount}>{faqAnswer.length}/1000</Text>
                                 </View>
+                                <Text style={styles.charCountBelow}>{faqAnswer.length}/1000</Text>
                             </View>
 
                             {/* 작성 가이드 카드 */}
@@ -344,13 +344,13 @@ export const FAQ = () => {
 
                     {/* 하단 버튼 */}
                     <View style={styles.bottomButtonContainer}>
-                        <TouchableOpacity 
+                        <TouchableOpacity
                             style={styles.previewButton}
                             onPress={() => alert('미리보기 기능')}
                         >
                             <Text style={styles.previewButtonText}>미리보기</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity 
+                        <TouchableOpacity
                             style={[
                                 styles.publishButton,
                                 (!faqQuestion.trim() || !faqAnswer.trim()) && styles.disabledButton
@@ -375,14 +375,14 @@ export const FAQ = () => {
     return (
         <>
             <Header />
-            <SupportNavbar/>
+            <SupportNavbar />
             <View style={styles.container}>
                 {/* 헤더 섹션 */}
                 <View style={styles.headerSection}>
                     <View style={styles.titleContainer}>
                         <Text style={styles.pageTitle}>자주 묻는 질문</Text>
-                        <TouchableOpacity 
-                            style={styles.newFAQButton} 
+                        <TouchableOpacity
+                            style={styles.newFAQButton}
                             onPress={handleNewFAQ}
                         >
                             <Text style={styles.newFAQButtonText}>+ 새 FAQ</Text>
@@ -394,7 +394,7 @@ export const FAQ = () => {
                 </View>
 
                 {/* FAQ 리스트 */}
-                <ScrollView 
+                <ScrollView
                     style={styles.faqList}
                     showsVerticalScrollIndicator={false}
                 >
@@ -429,7 +429,7 @@ export const FAQ = () => {
                         <Text style={styles.helpDescription}>
                             1:1 문의를 통해 개별 상담을 받아보세요
                         </Text>
-                        <TouchableOpacity style={styles.helpButton} 
+                        <TouchableOpacity style={styles.helpButton}
                             onPress={() => setSupportData('QnA')} >
                             <Text style={styles.helpButtonText}>1:1 문의하기</Text>
                         </TouchableOpacity>
@@ -860,6 +860,13 @@ const styles = StyleSheet.create({
         paddingHorizontal: 6,
         paddingVertical: 2,
         borderRadius: 4,
+    },
+    charCountBelow: {
+        fontSize: 12,
+        color: '#9CA3AF',
+        textAlign: 'right',
+        marginTop: 8,
+        fontWeight: '500',
     },
     guideCard: {
         backgroundColor: '#F0FDF4',
