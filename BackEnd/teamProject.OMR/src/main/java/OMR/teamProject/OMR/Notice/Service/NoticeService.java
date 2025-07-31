@@ -21,23 +21,23 @@ public class NoticeService {
 
     //C
     public List<NoticeDto> write(NoticeDto dto){
+    	System.out.println("dto :: "+dto.getId());
+    	System.out.println("dto :: "+dto.getCategory());
+    	System.out.println("dto :: "+dto.getTitle());
+    	System.out.println("dto :: "+dto.getContent());
+    	System.out.println("dto :: "+dto.getUserName());
+    	System.out.println("dto :: "+dto.getId());
+    	System.out.println("dto :: "+dto.getUserId());
+    	System.out.println("dto :: "+dto.getUserData());
     	
-    	if(noticeRepository.existsById(dto.getId())) {
-    		throw new RuntimeException("[write]이미 존재 id입니다.");
-    	}
+//    	if(noticeRepository.existsById(dto.getId())) {
+//    		throw new RuntimeException("[write]이미 존재 id입니다.");
+//    	}
     	
-    	UserEntity userEntity = userRepository.findById(dto.getId())
+    	UserEntity userEntity = userRepository.findById(dto.getUserId())
     			.orElseThrow(() -> new RuntimeException("사용자 정보가 없습니다."));
     	
-    	NoticeEntity entity = dto.toEntity(UserResponseDto
-				.builder()
-		            .id(userEntity.getId())
-		            .nickname(userEntity.getNickname())
-		            .email(userEntity.getEmail())
-			.build());
-    	System.out.println("[(wrte)notice 들어온 값] :: "+entity);
-    	
-    	noticeRepository.save(entity);
+    	NoticeEntity entity = noticeRepository.save(dto.toEntity(userEntity));
     	
     	return findAll();
     }

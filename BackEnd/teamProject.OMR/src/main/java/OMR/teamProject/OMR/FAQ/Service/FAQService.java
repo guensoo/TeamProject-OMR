@@ -22,9 +22,9 @@ public class FAQService {
     //C
     public List<FAQDto> write(FAQDto dto){
     	
-    	if(faqRepository.existsById(dto.getId())) {
-    		throw new RuntimeException("[write]이미 존재 id입니다.");
-    	}
+//    	if(faqRepository.existsById(dto.getId())) {
+//    		throw new RuntimeException("[write]이미 존재 id입니다.");
+//    	}
     	
     	UserEntity userEntity =userRepository.findById(dto.getId()).orElse(null);
     	

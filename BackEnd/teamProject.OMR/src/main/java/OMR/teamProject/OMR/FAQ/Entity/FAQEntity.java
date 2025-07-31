@@ -31,6 +31,7 @@ public class FAQEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     //카테고리
+    //[전체,, 계정/로그인, 서비스 이용, 결제/환불, 기술문제]
     private String category;
     //질문
     @Column(columnDefinition = "LONGTEXT")
@@ -72,7 +73,7 @@ public class FAQEntity {
     				.answer(answer)
     				.createdAt(createdAt)
     				.updatedAt(updatedAt)
-    				.userId(dto.getUserId())
+    				.userId(dto.getId())
     				.userData(dto)
     				.sortOrder(sortOrder)
     			.build();

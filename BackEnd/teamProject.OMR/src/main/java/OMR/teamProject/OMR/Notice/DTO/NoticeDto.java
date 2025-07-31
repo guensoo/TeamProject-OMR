@@ -18,6 +18,7 @@ public class NoticeDto {
 	//고유 아이디
     private Long id;
     //공지 카테고리
+    //[시스템, 업데이트, 정책, 고객센터, 이벤트]
     private String category;
     //중요 표시
     private boolean isImportant;
@@ -33,12 +34,13 @@ public class NoticeDto {
     
     
     //유저 정보들
-    private String userId;
+    private Long userId;
     private String userName;
     private UserResponseDto userData;
     
     
-    public NoticeEntity toEntity(UserResponseDto dto) {
+    
+    public NoticeEntity toEntity(UserEntity entity) {
     	return NoticeEntity.builder()
     							.id(id)
     							.category(category)
@@ -48,13 +50,7 @@ public class NoticeDto {
     							.content(content)
     							.createdAt(createdAt)
     							.updatedAt(updatedAt)
-    							.userId(UserEntity.
-    									builder()
-    										.userId(dto.getUserId())
-    										.id(dto.getId())
-    										.nickname(dto.getNickname())
-    										.email(dto.getEmail())
-    									.build())
+    							.userId(entity)
     						.build();
     }
 }

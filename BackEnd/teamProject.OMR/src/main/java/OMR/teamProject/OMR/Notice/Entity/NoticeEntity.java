@@ -28,6 +28,7 @@ public class NoticeEntity {
     private Long id;
     
     //공지 카테고리
+    //[시스템, 업데이트, 정책, 고객센터, 이벤트]
     private String category;
     //중요 표시
     private boolean isImportant;
@@ -74,7 +75,7 @@ public class NoticeEntity {
     				.content(content)
     				.createdAt(createdAt)
     				.updatedAt(updatedAt)
-    				.userId(entity.getUserId())
+    				.userId(entity.getId())
     				.userName(entity.getNickname())
     				.userData(UserResponseDto
     						.builder()

@@ -24,19 +24,15 @@ public class QnAService {
   //C
     public List<QnADto> write(QnADto dto){
     	
-    	if(qnaRepository.existsById(dto.getId())) {
-    		throw new RuntimeException("[write]이미 존재 id입니다.");
-    	}
-    	
+//    	if(qnaRepository.existsById(dto.getId())) {
+//    		throw new RuntimeException("[write]이미 존재 id입니다.");
+//    	}
+//    	
     	UserEntity userEntity = userRepository.findById(dto.getUserData().getId())
     								.orElseThrow(() -> new RuntimeException("사용자 정보가 없습니다."));
     	
-    	QnAEntity entity = dto.toEntity(UserResponseDto
-    										.builder()
-	    							            .id(userEntity.getId())
-	    							            .nickname(userEntity.getNickname())
-	    							            .email(userEntity.getEmail())
-    										.build());
+    	QnAEntity entity = dto.toEntity(userEntity);
+    	
     	System.out.println("[(wrte)notice 들어온 값] :: "+entity);
     	
     	qnaRepository.save(entity);
