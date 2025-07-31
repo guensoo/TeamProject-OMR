@@ -1,17 +1,18 @@
-import { useState } from 'react';
-import { Text, View, StyleSheet, TextInput, TouchableOpacity, SafeAreaView, KeyboardAvoidingView, Platform, Dimensions, Alert } from "react-native";
+import { useContext, useState } from 'react';
+import { Text, View, StyleSheet, TextInput, TouchableOpacity, SafeAreaView, KeyboardAvoidingView, Platform, Alert } from "react-native";
 import { useNavigation } from '@react-navigation/native';
-
-const { width } = Dimensions.get('window');
+import { loginUser } from '../../All/api/UserApi';
+import { UserContext } from '../../All/context/UserContext';
 
 const Login = () => {
     const navigation = useNavigation();
+    const { loginUserInfo } = useContext(UserContext);
 
     const [id, setId] = useState('');
     const [password, setPassword] = useState('');
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
-    const handleLogin = () => {
+    const handleLogin = async () => {
         // 로그인 로직 구현
         if(!id){
             Alert.alert("아이디 미입력","아이디를 입력해주세요.");
@@ -23,9 +24,19 @@ const Login = () => {
             return;
         }
 
-        if (id && password) {
-            Alert.alert("완료", "로그인 성공");
+        const userData = {
+            userId: id,
+            password: password,
+        }
+
+        try {
+            const res = await loginUser(userData);
+            loginUserInfo(res);
+            console.log("user정보: ", res)
+            // Alert.alert("로그인 완료", "로그인 성공");
             navigation.navigate("BottomTabMenu",{Screen: 'Home'});
+        } catch (error) {
+            Alert.alert("로그인 실패", error.message);
         }
     };
 

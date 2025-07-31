@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import OMR.teamProject.OMR.User.DTO.UserRequestDto;
 import OMR.teamProject.OMR.User.DTO.UserResponseDto;
 import OMR.teamProject.OMR.User.Entity.UserEntity;
+import OMR.teamProject.OMR.User.Exception.PasswordMisMatchException;
+import OMR.teamProject.OMR.User.Exception.UserNotFoundException;
 import OMR.teamProject.OMR.User.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -23,6 +25,17 @@ public class UserService {
             .build();
         userRepository.save(user);
         return toDto(user);
+    }
+    
+    public UserResponseDto login(UserRequestDto dto) {
+    	UserEntity user = userRepository.findByUserId(dto.getUserId())
+    			.orElseThrow(() -> new UserNotFoundException("존재하지 않는 사용자입니다."));
+    	
+    	if(!user.getPassword().equals(dto.getPassword())) {
+    		throw new PasswordMisMatchException("비밀번호가 일치하지 않습니다.");
+    	}
+    	
+    	return toDto(user);
     }
 
     private UserResponseDto toDto(UserEntity user) {

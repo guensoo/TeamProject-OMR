@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { Text, View, StyleSheet, TextInput, TouchableOpacity, SafeAreaView, KeyboardAvoidingView, Platform, Dimensions, Alert, ScrollView } from "react-native";
+import { Text, View, StyleSheet, TextInput, TouchableOpacity, SafeAreaView, KeyboardAvoidingView, Platform, Alert, ScrollView } from "react-native";
 import { useNavigation } from '@react-navigation/native';
+import { registerUser } from "../../All/api/UserApi";
 
 const Signup = () => {
     const navigation = useNavigation();
@@ -27,7 +28,7 @@ const Signup = () => {
         }
     },[password, passwordCheck])
 
-    const handleSignup = () => {
+    const handleSignup = async () => {
         // 회원가입 로직 구현
         let valid = true;
 
@@ -61,12 +62,24 @@ const Signup = () => {
             valid = false;
         }
 
-        if (valid) {
-            Alert.alert("완료", "회원가입 성공");
-            navigation.navigate('Login');
-        }
-    };
+        if(!valid) return;
 
+        try {
+            const userData = {
+                userId: id,
+                nickname: nickName,
+                password: password,
+                email: email,
+            }
+
+            await registerUser(userData);
+            // Alert.alert("완료", "회원가입 성공");
+            navigation.navigate('Login');
+        } catch (error) {
+            Alert.alert("회원가입 실패", error.message)
+        }
+
+    };
 
     return (
         <SafeAreaView style={styles.container}>

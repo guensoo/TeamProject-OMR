@@ -1,8 +1,12 @@
-import { Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Modal from 'react-native-modal'
 import { Ionicons } from '@expo/vector-icons'
+import { UserContext } from './context/UserContext';
+import { useContext } from 'react';
 
 const BottomAllMenuButton = ({ isVisible, onClose, navigation }) => {
+    const { user, logoutUserInfo } = useContext(UserContext);
+
     const tabScreens = ['ReviewList', 'OTTScreen', 'MovieScreen'];
 
     const handleNavigate = (screenName) => {
@@ -13,6 +17,13 @@ const BottomAllMenuButton = ({ isVisible, onClose, navigation }) => {
         }
         onClose(); // 모달 닫기
     };
+
+    const handleLogout = () => {
+        Alert.alert("로그아웃", "로그아웃 하시겠습니까?", [
+            {text: '취소', style: 'cancel'},
+            {text: '확인', onPress: () => logoutUserInfo()}
+        ])
+    }
 
     return (
         <Modal
@@ -35,13 +46,32 @@ const BottomAllMenuButton = ({ isVisible, onClose, navigation }) => {
                 <Text style={styles.title}>메뉴</Text>
 
                 <View style={styles.menuList}>
-                    <TouchableOpacity
-                        style={styles.menuItem}
-                        onPress={() => handleNavigate('Login')}
-                    >
-                        <Ionicons name="person-outline" size={24} color="#333" />
-                        <Text style={styles.menuText}>로그인</Text>
-                    </TouchableOpacity>
+                    {user ? (
+                        <>
+                            <TouchableOpacity 
+                                style={styles.menuItem}
+                                onPress={() => navigation.navigate("MyPage")}
+                            >
+                                <Ionicons name="person-circle-outline" size={24} color="#333" />
+                                <Text style={styles.menuText}>{user.nickname} 님</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={styles.menuItem}
+                                onPress={() => handleLogout()}
+                            >
+                                <Ionicons name="log-out-outline" size={24} color="#333" />
+                                <Text style={styles.menuText}>로그아웃</Text>
+                            </TouchableOpacity>
+                        </>
+                    ) : (
+                        <TouchableOpacity
+                            style={styles.menuItem}
+                            onPress={() => handleNavigate('Login')}
+                        >
+                            <Ionicons name="person-outline" size={24} color="#333" />
+                            <Text style={styles.menuText}>로그인</Text>
+                        </TouchableOpacity>
+                    )}
 
                     <TouchableOpacity
                         style={styles.menuItem}
