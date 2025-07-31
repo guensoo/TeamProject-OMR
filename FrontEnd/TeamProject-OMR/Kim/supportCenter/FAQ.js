@@ -221,60 +221,6 @@ export const FAQ = () => {
                         showsVerticalScrollIndicator={false}
                     >
                         <View style={styles.adminContent}>
-                            {/* FAQ 설정 카드 */}
-                            <View style={styles.settingsCard}>
-                                <View style={styles.cardHeader}>
-                                    <View style={styles.cardIcon}>
-                                        <Text style={styles.cardIconText}>⚙️</Text>
-                                    </View>
-                                    <Text style={styles.cardTitle}>FAQ 설정</Text>
-                                </View>
-                                
-                                {/* 카테고리 선택 */}
-                                <View style={styles.settingRow}>
-                                    <Text style={styles.settingLabel}>카테고리</Text>
-                                    <ScrollView 
-                                        horizontal 
-                                        showsHorizontalScrollIndicator={false}
-                                        style={styles.categorySelector}
-                                    >
-                                        {faqCategories.map((category) => (
-                                            <TouchableOpacity
-                                                key={category}
-                                                style={[
-                                                    styles.categoryChip,
-                                                    faqCategory === category && styles.selectedCategoryChip
-                                                ]}
-                                                onPress={() => setFaqCategory(category)}
-                                            >
-                                                <Text style={[
-                                                    styles.categoryChipText,
-                                                    faqCategory === category && styles.selectedCategoryChipText
-                                                ]}>
-                                                    {category}
-                                                </Text>
-                                            </TouchableOpacity>
-                                        ))}
-                                    </ScrollView>
-                                </View>
-
-                                {/* 인기 FAQ 토글 */}
-                                <View style={styles.settingRow}>
-                                    <View style={styles.toggleContainer}>
-                                        <View style={styles.toggleInfo}>
-                                            <Text style={styles.toggleLabel}>인기 FAQ</Text>
-                                            <Text style={styles.toggleDescription}>상단에 우선 표시되며 추천 FAQ로 분류됩니다</Text>
-                                        </View>
-                                        <Switch
-                                            value={isPopular}
-                                            onValueChange={setIsPopular}
-                                            trackColor={{ false: '#D1D5DB', true: '#F59E0B' }}
-                                            thumbColor={isPopular ? '#FFFFFF' : '#F3F4F6'}
-                                        />
-                                    </View>
-                                </View>
-                            </View>
-
                             {/* 질문 입력 카드 */}
                             <View style={styles.inputCard}>
                                 <View style={styles.cardHeader}>
