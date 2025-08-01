@@ -14,46 +14,32 @@ const ReviewComponent = ({ review, onPress }) => {
         commentCount,
     } = review;
 
-    // 대표 이미지 추출 (img src 파싱)
-    let thumbnail = null;
-    const imgMatch = content && content.match(/<img[^>]+src="([^">]+)"/);
-    if (imgMatch && imgMatch[1]) thumbnail = imgMatch[1];
+    // TMDB 포스터 우선, 없으면 content img src
+    let posterUrl = null;
+    if (selectMovie && selectMovie.poster_path) {
+        posterUrl = `https://image.tmdb.org/t/p/w500${selectMovie.poster_path}`;
+    } else {
+        const imgMatch = content && content.match(/<img[^>]+src="([^">]+)"/);
+        if (imgMatch && imgMatch[1]) posterUrl = imgMatch[1];
+    }
+
+    // 확인용 로그
+    // console.log('포스터:', posterUrl);
 
     return (
-        <TouchableOpacity
-            style={styles.card}
-            activeOpacity={0.85}
-            onPress={onPress}
-        >
-            {thumbnail && <Image source={{ uri: thumbnail }} style={styles.thumbnail} />}
-            
-            {/* 🔥 제목 텍스트에 말줄임표 적용 */}
-            <Text 
-                style={styles.title}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-            >
-                {title}
-            </Text>
-            
-            {/* 🔥 영화 제목에도 말줄임표 적용 */}
-            <Text 
-                style={styles.movieTitle}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-            >
+        <TouchableOpacity style={styles.card} activeOpacity={0.85} onPress={onPress}>
+            {posterUrl && <Image source={{ uri: posterUrl }} style={styles.thumbnail} />}
+            <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">{title}</Text>
+            <Text style={styles.movieTitle} numberOfLines={1} ellipsizeMode="tail">
                 {selectMovie?.title ? `[${selectMovie.title}]` : ""}
             </Text>
-            
             <View style={styles.row}>
                 <Text style={styles.author}>{userData?.nickname || "익명"}</Text>
                 <Text style={styles.date}>{createdAt?.slice(0, 10)}</Text>
             </View>
-            
             <Text style={styles.contentPreview} numberOfLines={2}>
                 {content?.replace(/<[^>]*>/g, "").replace(/&nbsp;/g, " ")}
             </Text>
-            
             <View style={styles.row}>
                 <Text style={styles.rating}>⭐ {rating}</Text>
                 <Text style={styles.counts}>👍 {liked}</Text>
