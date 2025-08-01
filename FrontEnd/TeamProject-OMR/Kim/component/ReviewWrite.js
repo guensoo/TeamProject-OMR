@@ -85,8 +85,8 @@ export const ReviewWrite = ({ navigation }) => {
                     views: 0, // 조회 수
                     liked: 0, // 좋아요 수
                     commentCount: 0, // 댓글 수
-
-                    userId: 1, // 유저 통합 데이터
+                    
+                    userId: 5, // 유저 통합 데이터
                 }),
             });
 

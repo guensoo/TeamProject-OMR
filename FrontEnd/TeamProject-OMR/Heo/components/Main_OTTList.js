@@ -9,7 +9,9 @@ const Main_OTTList = ({ data }) => {
             data={data}
             horizontal
             showsHorizontalScrollIndicator={false}
-            keyExtractor={(item) => `${item.provider}_${item.id}`}
+            keyExtractor={(item, index) =>
+                `${item.type}_${item.provider || 'unknown'}_${item.id}_${index}`
+            }
             renderItem={({ item }) => (
                 <View style={styles.itemContainer}>
                     <Image
@@ -17,7 +19,7 @@ const Main_OTTList = ({ data }) => {
                         style={styles.poster}
                         resizeMode="cover"
                     />
-                    <Text 
+                    <Text
                         style={styles.title}
                         numberOfLines={2}
                         ellipsizeMode="tail"

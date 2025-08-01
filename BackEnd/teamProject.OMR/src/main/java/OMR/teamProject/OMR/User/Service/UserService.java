@@ -1,6 +1,8 @@
 package OMR.teamProject.OMR.User.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
@@ -35,7 +37,7 @@ public class UserService {
     }
     
     //로그인
-    public UserResponseDto login(UserRequestDto dto) {
+    public Map<String, Object> login(UserRequestDto dto) {
     	UserEntity user = userRepository.findByUserId(dto.getUserId())
     			.orElseThrow(() -> new UserNotFoundException("존재하지 않는 사용자입니다."));
     	
@@ -43,7 +45,14 @@ public class UserService {
     		throw new PasswordMisMatchException("비밀번호가 일치하지 않습니다.");
     	}
     	
-    	return toDto(user);
+    	UserResponseDto userDto = toDto(user);
+    	String token = jwtTokenProvider.createToken(user.getUserId());
+    	
+    	Map<String, Object> response = new HashMap<>();
+    	response.put("user", userDto);
+    	response.put("token", token);
+    	
+    	return response;
     }
     
     //아이디찾기 (이메일로 찾기)

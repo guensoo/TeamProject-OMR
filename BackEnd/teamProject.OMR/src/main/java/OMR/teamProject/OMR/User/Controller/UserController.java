@@ -36,9 +36,9 @@ public class UserController {
     
     //로그인
     @PostMapping("/login")
-    public ResponseEntity<UserResponseDto> login(@RequestBody UserRequestDto dto){
-    	UserResponseDto userDto = userService.login(dto);
-    	return ResponseEntity.ok(userDto);
+    public ResponseEntity<Map<String, Object>> login(@RequestBody UserRequestDto dto){
+    	Map<String, Object> result = userService.login(dto);
+    	return ResponseEntity.ok(result);
     }
     
     //아이디찾기 (이메일로 찾기)

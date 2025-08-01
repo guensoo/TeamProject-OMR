@@ -159,9 +159,9 @@ const Home = () => {
 
             const combined = [...allOTT, ...allMovies];
 
-            console.log("OTT sample data:", allOTT.slice(0, 10));
-            console.log("Movie sample data:", allMovies.slice(0, 10));
-            console.log("Combined sample data:", combined.slice(0, 10));
+            // console.log("OTT sample data:", allOTT.slice(0, 10));
+            // console.log("Movie sample data:", allMovies.slice(0, 10));
+            // console.log("Combined sample data:", combined.slice(0, 10));
 
             // 🔽 정렬: TMDB 인기순(popularity), 또는 rank 기반 정렬
             const sorted = combined.sort((a, b) => {
@@ -180,9 +180,9 @@ const Home = () => {
         fetchAllPopular();
     }, []);
 
-    useEffect(() => {
-  console.log("allPosters 상태 변경됨:", allPosters.slice(0, 20));
-}, [allPosters]);
+//     useEffect(() => {
+//   console.log("allPosters 상태 변경됨:", allPosters.slice(0, 20));
+// }, [allPosters]);
 
     const handlePlay = (trailerKey) => {
         setSelectedTrailer(trailerKey);
@@ -243,7 +243,7 @@ const Home = () => {
                             provider={selectedProvider}
                         />
 
-                        <View style={styles.popularHeader}>
+                        {/* <View style={styles.popularHeader}>
                             <Text style={styles.popularTitle}>리뷰 인기순</Text>
                             <TouchableOpacity onPress={() => navigation.navigate("ReviewList")}>
                                 <Text style={styles.seeAllText}>전체보기</Text>
@@ -252,7 +252,7 @@ const Home = () => {
                         <Main_OTTList
                             data={allPosters}
                             provider={selectedProvider}
-                        />
+                        /> */}
                     </>
                 )}
 
