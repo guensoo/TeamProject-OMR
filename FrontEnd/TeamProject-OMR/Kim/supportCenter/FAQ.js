@@ -1,9 +1,14 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Animated, Switch } from "react-native";
-import React, { useState, useRef, useContext } from "react";
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Animated, Switch, Alert } from "react-native";
+import React, { useState, useRef, useContext, useCallback } from "react";
 import Header from "../../Heo/components/Header";
 import { SupportNavbar } from "./SupportNavbar";
 import { SupportContext } from "../context/SupportContext";
+<<<<<<< Updated upstream
 import { SafeAreaView } from "react-native-safe-area-context";
+=======
+import { useFocusEffect } from "@react-navigation/native";
+import { UserContext } from "../../All/context/UserContext";
+>>>>>>> Stashed changes
 
 // FAQ 아이템 컴포넌트
 const FAQItem = ({ question, answer, isExpanded, onToggle }) => {
@@ -75,19 +80,23 @@ const FAQItem = ({ question, answer, isExpanded, onToggle }) => {
 export const FAQ = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [expandedItems, setExpandedItems] = useState(new Set());
+
     const [selectedCategory, setSelectedCategory] = useState('전체');
     const [showNewFAQ, setShowNewFAQ] = useState(false);
     const [faqQuestion, setFaqQuestion] = useState('');
     const [faqAnswer, setFaqAnswer] = useState('');
     const [faqCategory, setFaqCategory] = useState('계정/로그인');
-    const [isPopular, setIsPopular] = useState(false);
+
     const [questionFocused, setQuestionFocused] = useState(false);
     const [answerFocused, setAnswerFocused] = useState(false);
 
     const categories = ['전체', '계정/로그인', '서비스 이용', '결제/환불', '기술 문제'];
     const faqCategories = ['계정/로그인', '서비스 이용', '결제/환불', '기술 문제'];
 
+    // 고객센터 
     const { setSupportData } = useContext(SupportContext);
+    // 유저 데이터
+    const {user} = useContext(UserContext);
 
     const [faqData, setFaqData] = useState([
         {
@@ -140,6 +149,26 @@ export const FAQ = () => {
         }
     ]);
 
+    //페이지 로드시 데이터 보여주기.
+    useFocusEffect(
+        useCallback(()=>{
+            const findAll = async () => {
+            try {
+                const connect = await fetch(`${API}/api/faq`)
+                const result = await connect.json() ;
+                setFaqData(result)
+                console.log(result)
+
+            } catch (error) {
+                Alert.alert("에러","자주 묻는 질문 불러오기에 실패했습니다")
+                console.log(error);
+            }
+        }
+
+        findAll();            
+        },[])
+    )
+
     const toggleExpanded = (id) => {
         const newExpanded = new Set(expandedItems);
         if (newExpanded.has(id)) {
@@ -161,25 +190,44 @@ export const FAQ = () => {
         setShowNewFAQ(true);
     };
 
-    const handleSubmitFAQ = () => {
-        if (faqQuestion.trim() && faqAnswer.trim()) {
+    //FAQ 데이터 작성하기.
+    const handleSubmitFAQ = async () => {
+        try {
+            if (faqQuestion.trim() && faqAnswer.trim()) {
             const newFAQItem = {
-                id: Math.max(...faqData.map(item => item.id)) + 1,
                 category: faqCategory,
                 question: faqQuestion,
                 answer: faqAnswer,
-                isPopular: isPopular
+                createdAt : new Date(),
+                updatedAt : new Date(),
+                userId:user.id
             };
 
-            setFaqData(prev => [newFAQItem, ...prev]);
+            const connect = await fetch(`${API}/api/faq`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(newFAQItem)
+            });
+
+            const response = await connect.json();
+
+            console.log("서버 응답:", response);   
+
+            setFaqData(response);
             setFaqQuestion('');
             setFaqAnswer('');
             setFaqCategory('계정/로그인');
-            setIsPopular(false);
             setShowNewFAQ(false);
+            console.log(newFAQItem)
             alert('FAQ가 성공적으로 등록되었습니다.');
-        } else {
-            alert('질문과 답변을 모두 입력해주세요.');
+            } else {
+                alert('질문과 답변을 모두 입력해주세요.');
+            }
+        } catch (error) {
+            Alert.alert("에러","질문 작성에 실패 했습니다.")
+            console.log(error)
         }
     };
 
@@ -188,7 +236,6 @@ export const FAQ = () => {
         setFaqQuestion('');
         setFaqAnswer('');
         setFaqCategory('계정/로그인');
-        setIsPopular(false);
     };
 
     // 관리자용 FAQ 작성 화면
@@ -288,6 +335,7 @@ export const FAQ = () => {
                                             <Text style={styles.guideBullet}>🎯</Text>
                                             <Text style={styles.guideText}>실제 사용자가 문의한 내용을 기반으로 작성</Text>
                                         </View>
+<<<<<<< Updated upstream
                                         <View style={styles.guideItem}>
                                             <Text style={styles.guideBullet}>🔍</Text>
                                             <Text style={styles.guideText}>검색하기 쉬운 키워드 포함</Text>
@@ -299,6 +347,10 @@ export const FAQ = () => {
                                         <View style={styles.guideItem}>
                                             <Text style={styles.guideBullet}>🔄</Text>
                                             <Text style={styles.guideText}>정기적으로 업데이트하여 최신성 유지</Text>
+=======
+                                        <View style={styles.previewInfo}>
+                                            <Text style={styles.previewCategory}>카테고리: {faqCategory}</Text>
+>>>>>>> Stashed changes
                                         </View>
                                     </View>
                                 </View>

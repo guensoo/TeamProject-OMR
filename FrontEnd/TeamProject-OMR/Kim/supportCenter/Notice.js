@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
-import { View, ScrollView, Text, TouchableOpacity, StyleSheet, TextInput, Switch } from 'react-native';
+import { useCallback, useContext, useEffect, useState } from 'react';
+import { View, ScrollView, Text, TouchableOpacity, StyleSheet, TextInput, Switch, Alert } from 'react-native';
 import Header from "../../Heo/components/Header";
 import { SupportNavbar } from "./SupportNavbar";
 import { NoticeItem } from '../component/NoticeItem';
+<<<<<<< Updated upstream
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 // 공지사항 샘플 데이터
@@ -148,22 +149,28 @@ const noticeData = [
 // ]
 
 
+=======
+import { UserContext } from '../../All/context/UserContext';
+import { API } from "../../All/api/API";
+import { useFocusEffect } from '@react-navigation/native';
+>>>>>>> Stashed changes
 
 export const Notice = () => {
+    // 로그인된 유저 정보
+    const {user} = useContext(UserContext);
+
+    const [noticeData,setNoticeData] = useState([]);
     const [expandedItems, setExpandedItems] = useState(new Set());
     // 선택된 카테고리 (필터용)
     const [selectedCategory, setSelectedCategory] = useState('전체');
     const [showNewNotice, setShowNewNotice] = useState(false);
 
-    const [formData,setFormData] = useState({
-        title:'',content:'',category:'',isImportant:false,isNew:false
-    });
-
-    // const [noticeTitle, setNoticeTitle] = useState('');
-    // const [noticeContent, setNoticeContent] = useState('');
-    // const [selectedNoticeCategory, setSelectedNoticeCategory] = useState('시스템');
-    // const [isImportant, setIsImportant] = useState(false);
-    // const [isNew, setIsNew] = useState(true);
+    // 유저 입력 필드
+    const [noticeTitle, setNoticeTitle] = useState('');
+    const [noticeContent, setNoticeContent] = useState('');
+    const [selectedNoticeCategory, setSelectedNoticeCategory] = useState('시스템');
+    const [isImportant, setIsImportant] = useState(false);
+    const [isNew, setIsNew] = useState(true);
 
     const [titleFocused, setTitleFocused] = useState(false);
     const [contentFocused, setContentFocused] = useState(false);
@@ -189,35 +196,86 @@ export const Notice = () => {
         setShowNewNotice(true);
     };
 
-    const handleSubmitNotice = () => {
-        if (noticeTitle.trim() && noticeContent.trim()) {
-            // 공지사항 발행 로직
-            // console.log('공지사항 발행:', { 
-            //     title: noticeTitle, 
-            //     content: noticeContent,
-            //     category: selectedNoticeCategory,
-            //     isImportant,
-            //     isNew
-            // });
-            // setNoticeTitle('');
-            // setNoticeContent('');
-            // setSelectedNoticeCategory('시스템');
-            // setIsImportant(false);
-            // setIsNew(true);
-            // setShowNewNotice(false);
+    useFocusEffect(
+        useCallback(()=>{
+            const findAll = async () => {
+            try {
+                const connect = await fetch(`${API}/api/notice`)
+                const result = await connect.json() ;
+                setNoticeData(result)
+                console.log(result)
+
+            } catch (error) {
+                Alert.alert("에러","공지사항 불러오기에 실패했습니다")
+                console.log(error);
+            }
+        }
+
+        findAll();            
+        },[])
+    )
+
+    //[공지 사항 POST]
+    const handleSubmitNotice = async () => {
+        try {
+            if (noticeTitle.trim() && noticeContent.trim() && selectedCategory!=='전체') {
+
+            console.log(user)
+
+            //공지사항 발행 로직
+            const data = { 
+                userId : user.id,
+                title: noticeTitle, 
+                content: noticeContent,
+                category: selectedNoticeCategory,
+                createdAt: new Date(),
+                updatedAt : new Date(),
+                isImportant,
+                isNew
+            }
+
+            console.log('공지사항 발행 시작 :: ',data );
+
+            const createNotice = await fetch(`${API}/api/notice`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            });
+
+            const response = await createNotice.json();
+
+            console.log("서버 응답:", response);         
+            
+
+            // 성공 후 입력 필드 초기화
+            setNoticeTitle('');
+            setNoticeContent('');
+            setSelectedNoticeCategory(selectedCategory);
+            setIsImportant(false);
+            setIsNew(true);
+            setShowNewNotice(false);
+
+            setShowNewNotice(false);
             alert('공지사항이 성공적으로 발행되었습니다.');
         } else {
-            alert('제목과 내용을 모두 입력해주세요.');
+            alert('제목과 내용과 카테고리를 모두 입력해주세요.');
+        }
+        } catch (error) {
+            Alert.alert("에러","공지사항 작성에 실패 했습니다.")
+            console.log(error)
         }
     };
 
     const handleCancel = () => {
         setShowNewNotice(false);
-        setFormData(prev=>({...prev,title:''}))
-        setFormData(prev=>({...prev,content:''}))
-        setFormData(prev=>({...prev,category:'시스템'}))
-        setFormData(prev=>({...prev,isImportant:false}))
-        setFormData(prev=>({...prev,isNew:true}))
+        
+        setNoticeTitle("")
+        setNoticeContent("")
+        setSelectedNoticeCategory("")
+        setIsImportant(false)
+        setIsNew(false)
     };
 
     const categoryColors = {
@@ -230,6 +288,7 @@ export const Notice = () => {
 
     //[작성] 관리자용 공지사항 작성 화면
     if (showNewNotice) {
+        setSelectedCategory("시스템")
         return (
                 <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
             <>
@@ -280,14 +339,14 @@ export const Notice = () => {
                                                 key={category}
                                                 style={[
                                                     styles.categoryChip,
-                                                    formData.category === category && styles.selectedCategoryChip,
-                                                    { backgroundColor: formData.category === category ? categoryColors[category] : '#F3F4F6' }
+                                                    selectedCategory === category && styles.selectedCategoryChip,
+                                                    { backgroundColor: selectedCategory === category ? categoryColors[category] : '#F3F4F6' }
                                                 ]}
-                                                onPress={() => setFormData(prev=>({...prev,category:category}))}
+                                                onPress={() => setSelectedCategory(category)}
                                             >
                                                 <Text style={[
                                                     styles.categoryChipText,
-                                                    formData.category === category && styles.selectedCategoryChipText
+                                                    selectedCategory === category && styles.selectedCategoryChipText
                                                 ]}>
                                                     {category}
                                                 </Text>
@@ -371,8 +430,8 @@ export const Notice = () => {
                                         style={styles.adminTextArea}
                                         placeholder="사용자에게 전달할 공지사항의 상세 내용을 작성해주세요.&#10;&#10;• 명확하고 이해하기 쉽게 작성해주세요&#10;• 필요한 경우 일시, 방법, 연락처 등을 포함해주세요&#10;• 사용자에게 도움이 되는 정보를 제공해주세요"
                                         placeholderTextColor="#9CA3AF"
-                                        value={formData.content}
-                                        onChangeText={text=>setFormData(prev=>({...prev,content:text}))}
+                                        value={noticeContent}
+                                        onChangeText={text=>setNoticeContent(text)}
                                         onFocus={() => setContentFocused(true)}
                                         onBlur={() => setContentFocused(false)}
                                         multiline
@@ -406,8 +465,8 @@ export const Notice = () => {
                                                         <Text style={styles.newText}>NEW</Text>
                                                     </View>
                                                 )}
-                                                <View style={[styles.categoryBadge, { backgroundColor: categoryColors[formData.category] }]}>
-                                                    <Text style={styles.categoryText}>{formData.category}</Text>
+                                                <View style={[styles.categoryBadge, { backgroundColor: categoryColors[selectedCategory] }]}>
+                                                    <Text style={styles.categoryText}>{selectedCategory}</Text>
                                                 </View>
                                             </View>
                                         </View>
