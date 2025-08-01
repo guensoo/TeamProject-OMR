@@ -3,157 +3,10 @@ import { View, ScrollView, Text, TouchableOpacity, StyleSheet, TextInput, Switch
 import Header from "../../Heo/components/Header";
 import { SupportNavbar } from "./SupportNavbar";
 import { NoticeItem } from '../component/NoticeItem';
-<<<<<<< Updated upstream
-import { SafeAreaView } from 'react-native-safe-area-context';
-
-// 공지사항 샘플 데이터
-const noticeData = [
-    {
-        id: 1,
-        title: "[중요] 서비스 점검 안내",
-        date: "2024-01-20",
-        category: "시스템",
-        isImportant: true,
-        isNew: true,
-        content: `안녕하세요. 더 나은 서비스 제공을 위해 시스템 점검을 실시합니다.
-
-              점검 일시: 2024년 1월 25일 (목) 02:00 ~ 06:00 (4시간)
-              점검 내용: 
-              - 서버 안정성 개선
-              - 새로운 기능 업데이트 준비
-              - 보안 강화 작업
-
-              점검 시간 동안에는 서비스 이용이 일시적으로 중단될 수 있습니다.
-              이용에 불편을 드려 죄송합니다.
-
-              감사합니다.`
-    },
-    {
-        id: 2,
-        title: "새로운 기능 업데이트 소식",
-        date: "2024-01-18",
-        category: "업데이트",
-        isImportant: false,
-        isNew: true,
-        content: `새로운 기능이 추가되었습니다!
-
-              주요 업데이트 내용:
-              1. 다크 모드 지원
-              2. 알림 설정 세분화
-              3. 검색 기능 개선
-              4. 사용자 인터페이스 개선
-
-              앱 스토어에서 최신 버전으로 업데이트해주세요.
-              더 나은 사용 경험을 제공하겠습니다.`
-    },
-    {
-        id: 3,
-        title: "개인정보 처리방침 변경 안내",
-        date: "2024-01-15",
-        category: "정책",
-        isImportant: true,
-        isNew: false,
-        content: `개인정보 처리방침이 변경되었습니다.
-
-              변경 사항:
-              - 개인정보 수집 목적 명시 강화
-              - 개인정보 보관 기간 조정
-              - 제3자 제공 관련 내용 추가
-
-              변경된 개인정보 처리방침은 2024년 1월 20일부터 적용됩니다.
-              자세한 내용은 앱 내 '개인정보 처리방침'에서 확인하실 수 있습니다.`
-    },
-    {
-        id: 4,
-        title: "고객센터 운영시간 변경",
-        date: "2024-01-12",
-        category: "고객센터",
-        isImportant: false,
-        isNew: false,
-        content: `고객센터 운영시간이 변경되었습니다.
-
-              기존: 평일 09:00 ~ 18:00
-              변경: 평일 09:00 ~ 19:00, 토요일 10:00 ~ 16:00
-
-              더 많은 시간 동안 고객님께 도움을 드릴 수 있게 되었습니다.
-              언제든지 문의해주세요!`
-    },
-    {
-        id: 5,
-        title: "설 연휴 고객센터 운영 안내",
-        date: "2024-01-10",
-        category: "고객센터",
-        isImportant: false,
-        isNew: false,
-        content: `설 연휴 기간 고객센터 운영 안내드립니다.
-
-              휴무 기간: 2024년 2월 9일(금) ~ 2월 12일(월)
-              정상 운영: 2024년 2월 13일(화)부터
-
-              휴무 기간 중 긴급 문의사항은 앱 내 '문의하기'를 통해 접수해주시면,
-              연휴 후 순차적으로 답변드리겠습니다.`
-    }
-];
-// 예시 json 유저 확정되면 해결예정
-// [
-//   {
-//     "category": "시스템",
-//     "isImportant": true,
-//     "isNew": true,
-//     "title": "서비스 점검 안내",
-//     "content": "안녕하세요. 더 나은 서비스 제공을 위해 시스템 점검을 실시합니다.\n\n점검 일시: 2024년 1월 25일 (목) 02:00 ~ 06:00 (4시간)\n점검 내용:\n- 서버 안정성 개선\n- 새로운 기능 업데이트 준비\n- 보안 강화 작업\n\n점검 시간 동안에는 서비스 이용이 일시적으로 중단될 수 있습니다.\n이용에 불편을 드려 죄송합니다.\n\n감사합니다.",
-//     "createdAt": "2024-01-20T00:00:00",
-//     "updatedAt": "2024-01-20T00:00:00",
-//     "userId": 1
-//   },
-//   {
-//     "category": "업데이트",
-//     "isImportant": false,
-//     "isNew": true,
-//     "title": "새로운 기능 업데이트 소식",
-//     "content": "새로운 기능이 추가되었습니다!\n\n주요 업데이트 내용:\n1. 다크 모드 지원\n2. 알림 설정 세분화\n3. 검색 기능 개선\n4. 사용자 인터페이스 개선\n\n앱 스토어에서 최신 버전으로 업데이트해주세요.\n더 나은 사용 경험을 제공하겠습니다.",
-//     "createdAt": "2024-01-18T00:00:00",
-//     "updatedAt": "2024-01-18T00:00:00",
-//     "userId": 1
-//   },
-//   {
-//     "category": "정책",
-//     "isImportant": true,
-//     "isNew": false,
-//     "title": "개인정보 처리방침 변경 안내",
-//     "content": "개인정보 처리방침이 변경되었습니다.\n\n변경 사항:\n- 개인정보 수집 목적 명시 강화\n- 개인정보 보관 기간 조정\n- 제3자 제공 관련 내용 추가\n\n변경된 개인정보 처리방침은 2024년 1월 20일부터 적용됩니다.\n자세한 내용은 앱 내 '개인정보 처리방침'에서 확인하실 수 있습니다.",
-//     "createdAt": "2024-01-15T00:00:00",
-//     "updatedAt": "2024-01-15T00:00:00",
-//     "userId": 1
-//   },
-//   {
-//     "category": "고객센터",
-//     "isImportant": false,
-//     "isNew": false,
-//     "title": "고객센터 운영시간 변경",
-//     "content": "고객센터 운영시간이 변경되었습니다.\n\n기존: 평일 09:00 ~ 18:00\n변경: 평일 09:00 ~ 19:00, 토요일 10:00 ~ 16:00\n\n더 많은 시간 동안 고객님께 도움을 드릴 수 있게 되었습니다.\n언제든지 문의해주세요!",
-//     "createdAt": "2024-01-12T00:00:00",
-//     "updatedAt": "2024-01-12T00:00:00",
-//     "userId": 1
-//   },
-//   {
-//     "category": "고객센터",
-//     "isImportant": false,
-//     "isNew": false,
-//     "title": "설 연휴 고객센터 운영 안내",
-//     "content": "설 연휴 기간 고객센터 운영 안내드립니다.\n\n휴무 기간: 2024년 2월 9일(금) ~ 2월 12일(월)\n정상 운영: 2024년 2월 13일(화)부터\n\n휴무 기간 중 긴급 문의사항은 앱 내 '문의하기'를 통해 접수해주시면,\n연휴 후 순차적으로 답변드리겠습니다.",
-//     "createdAt": "2024-01-10T00:00:00",
-//     "updatedAt": "2024-01-10T00:00:00",
-//     "userId": 1
-//   }
-// ]
-
-
-=======
 import { UserContext } from '../../All/context/UserContext';
 import { API } from "../../All/api/API";
 import { useFocusEffect } from '@react-navigation/native';
->>>>>>> Stashed changes
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export const Notice = () => {
     // 로그인된 유저 정보
@@ -195,6 +48,13 @@ export const Notice = () => {
     const handleNewNotice = () => {
         setShowNewNotice(true);
     };
+
+    useEffect(() => {
+        if(showNewNotice) {
+            setSelectedCategory("시스템");
+        }
+    }, [showNewNotice]);
+
 
     useFocusEffect(
         useCallback(()=>{
@@ -255,7 +115,6 @@ export const Notice = () => {
             setSelectedNoticeCategory(selectedCategory);
             setIsImportant(false);
             setIsNew(true);
-            setShowNewNotice(false);
 
             setShowNewNotice(false);
             alert('공지사항이 성공적으로 발행되었습니다.');
@@ -288,7 +147,6 @@ export const Notice = () => {
 
     //[작성] 관리자용 공지사항 작성 화면
     if (showNewNotice) {
-        setSelectedCategory("시스템")
         return (
                 <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
             <>

@@ -26,10 +26,18 @@ public class FAQService {
 //    		throw new RuntimeException("[write]이미 존재 id입니다.");
 //    	}
     	
-    	UserEntity userEntity =userRepository.findById(dto.getId()).orElse(null);
+    	System.out.println("[(id) 들어온 값] :: "+dto.getId());
+    	System.out.println("[(userid) 들어온 값] :: "+dto.getUserId());
+    	System.out.println("[(category) 들어온 값] :: "+dto.getCategory());
+    	System.out.println("[(question) 들어온 값] :: "+dto.getQuestion());
+    	System.out.println("[(answer) 들어온 값] :: "+dto.getAnswer());
+    	System.out.println("[(createat) 들어온 값] :: "+dto.getCreatedAt());
+    	System.out.println("[(updateat) 들어온 값] :: "+dto.getUpdatedAt());
+    	
+    	UserEntity userEntity =userRepository.findById(dto.getUserId()).orElse(null);
     	
     	FAQEntity faq = dto.toEntity(userEntity);
-    	System.out.println("[(wrte)faq 들어온 값] :: "+faq);
+    	
     	
     	faqRepository.save(faq);
     	

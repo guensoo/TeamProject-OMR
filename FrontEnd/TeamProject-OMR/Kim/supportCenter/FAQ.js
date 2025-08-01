@@ -3,12 +3,10 @@ import React, { useState, useRef, useContext, useCallback } from "react";
 import Header from "../../Heo/components/Header";
 import { SupportNavbar } from "./SupportNavbar";
 import { SupportContext } from "../context/SupportContext";
-<<<<<<< Updated upstream
 import { SafeAreaView } from "react-native-safe-area-context";
-=======
 import { useFocusEffect } from "@react-navigation/native";
 import { UserContext } from "../../All/context/UserContext";
->>>>>>> Stashed changes
+import { API } from "../../All/api/API";
 
 // FAQ 아이템 컴포넌트
 const FAQItem = ({ question, answer, isExpanded, onToggle }) => {
@@ -78,11 +76,12 @@ const FAQItem = ({ question, answer, isExpanded, onToggle }) => {
 };
 
 export const FAQ = () => {
-    const [searchQuery, setSearchQuery] = useState('');
     const [expandedItems, setExpandedItems] = useState(new Set());
 
-    const [selectedCategory, setSelectedCategory] = useState('전체');
+    // 작성 페이지 열기
     const [showNewFAQ, setShowNewFAQ] = useState(false);
+
+    // 유저 입력 필드    
     const [faqQuestion, setFaqQuestion] = useState('');
     const [faqAnswer, setFaqAnswer] = useState('');
     const [faqCategory, setFaqCategory] = useState('계정/로그인');
@@ -90,64 +89,13 @@ export const FAQ = () => {
     const [questionFocused, setQuestionFocused] = useState(false);
     const [answerFocused, setAnswerFocused] = useState(false);
 
-    const categories = ['전체', '계정/로그인', '서비스 이용', '결제/환불', '기술 문제'];
-    const faqCategories = ['계정/로그인', '서비스 이용', '결제/환불', '기술 문제'];
-
     // 고객센터 
     const { setSupportData } = useContext(SupportContext);
     // 유저 데이터
     const {user} = useContext(UserContext);
+    // console.log(user)
 
-    const [faqData, setFaqData] = useState([
-        {
-            id: 1,
-            category: '계정/로그인',
-            question: '비밀번호를 잊어버렸어요. 어떻게 재설정하나요?',
-            answer: '로그인 화면에서 "비밀번호 찾기"를 클릭하신 후, 가입 시 등록한 이메일 주소를 입력해주세요. 해당 이메일로 비밀번호 재설정 링크를 보내드립니다.'
-        },
-        {
-            id: 2,
-            category: '계정/로그인',
-            question: '계정을 삭제하고 싶어요.',
-            answer: '계정 삭제는 고객센터(1588-0000)로 연락주시거나, 1:1 문의를 통해 신청하실 수 있습니다. 계정 삭제 시 모든 데이터가 영구적으로 삭제되므로 신중히 결정해주세요.'
-        },
-        {
-            id: 3,
-            category: '서비스 이용',
-            question: '리뷰 작성은 어떻게 하나요?',
-            answer: '작품 상세 페이지에서 "리뷰 작성" 버튼을 클릭하시면 됩니다. 별점과 함께 솔직한 감상평을 작성해주세요. 스포일러가 포함된 내용은 피해주시기 바랍니다.'
-        },
-        {
-            id: 4,
-            category: '서비스 이용',
-            question: '내가 작성한 리뷰를 수정하거나 삭제할 수 있나요?',
-            answer: '네, 가능합니다. 마이페이지 > 내 리뷰에서 작성한 리뷰를 확인하고 수정하거나 삭제하실 수 있습니다. 다른 사용자들이 이미 반응한 리뷰의 경우 수정에 제한이 있을 수 있습니다.'
-        },
-        {
-            id: 5,
-            category: '결제/환불',
-            question: '프리미엄 구독료는 얼마인가요?',
-            answer: '프리미엄 구독료는 월 9,900원입니다. 연간 구독 시 99,000원으로 2개월 무료 혜택을 받으실 수 있습니다. 첫 7일은 무료 체험이 가능합니다.'
-        },
-        {
-            id: 6,
-            category: '결제/환불',
-            question: '환불은 어떻게 신청하나요?',
-            answer: '구독 후 7일 이내에는 100% 환불이 가능합니다. 마이페이지 > 구독 관리에서 환불 신청을 하시거나, 고객센터로 연락주시면 처리해드립니다.'
-        },
-        {
-            id: 7,
-            category: '기술 문제',
-            question: '앱이 자꾸 종료되거나 느려요.',
-            answer: '앱을 완전히 종료 후 재시작해보시고, 최신 버전으로 업데이트해주세요. 문제가 지속되면 기기 재시작을 해보시고, 그래도 해결되지 않으면 고객센터로 연락주세요.'
-        },
-        {
-            id: 8,
-            category: '기술 문제',
-            question: '알림이 오지 않아요.',
-            answer: '기기 설정 > 알림에서 앱 알림이 허용되어 있는지 확인해주세요. 앱 내 설정에서도 원하는 알림 유형을 선택할 수 있습니다.'
-        }
-    ]);
+    const [faqData, setFaqData] = useState([]);
 
     //페이지 로드시 데이터 보여주기.
     useFocusEffect(
@@ -157,7 +105,7 @@ export const FAQ = () => {
                 const connect = await fetch(`${API}/api/faq`)
                 const result = await connect.json() ;
                 setFaqData(result)
-                console.log(result)
+                // console.log(result)
 
             } catch (error) {
                 Alert.alert("에러","자주 묻는 질문 불러오기에 실패했습니다")
@@ -179,12 +127,6 @@ export const FAQ = () => {
         setExpandedItems(newExpanded);
     };
 
-    const filteredFAQs = faqData.filter(item => {
-        const matchesCategory = selectedCategory === '전체' || item.category === selectedCategory;
-        const matchesSearch = item.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            item.answer.toLowerCase().includes(searchQuery.toLowerCase());
-        return matchesCategory && matchesSearch;
-    });
 
     const handleNewFAQ = () => {
         setShowNewFAQ(true);
@@ -200,7 +142,7 @@ export const FAQ = () => {
                 answer: faqAnswer,
                 createdAt : new Date(),
                 updatedAt : new Date(),
-                userId:user.id
+                userId:user.Id
             };
 
             const connect = await fetch(`${API}/api/faq`, {
@@ -215,7 +157,7 @@ export const FAQ = () => {
 
             console.log("서버 응답:", response);   
 
-            setFaqData(response);
+            // setFaqData(response);
             setFaqQuestion('');
             setFaqAnswer('');
             setFaqCategory('계정/로그인');
@@ -335,7 +277,7 @@ export const FAQ = () => {
                                             <Text style={styles.guideBullet}>🎯</Text>
                                             <Text style={styles.guideText}>실제 사용자가 문의한 내용을 기반으로 작성</Text>
                                         </View>
-<<<<<<< Updated upstream
+
                                         <View style={styles.guideItem}>
                                             <Text style={styles.guideBullet}>🔍</Text>
                                             <Text style={styles.guideText}>검색하기 쉬운 키워드 포함</Text>
@@ -347,11 +289,12 @@ export const FAQ = () => {
                                         <View style={styles.guideItem}>
                                             <Text style={styles.guideBullet}>🔄</Text>
                                             <Text style={styles.guideText}>정기적으로 업데이트하여 최신성 유지</Text>
-=======
+
                                         <View style={styles.previewInfo}>
                                             <Text style={styles.previewCategory}>카테고리: {faqCategory}</Text>
->>>>>>> Stashed changes
+
                                         </View>
+                                    </View>
                                     </View>
                                 </View>
 
@@ -383,9 +326,6 @@ export const FAQ = () => {
                                             </View>
                                             <View style={styles.previewInfo}>
                                                 <Text style={styles.previewCategory}>카테고리: {faqCategory}</Text>
-                                                {isPopular && (
-                                                    <Text style={styles.previewPopular}>⭐ 인기 FAQ</Text>
-                                                )}
                                             </View>
                                         </View>
                                     </View>
@@ -452,12 +392,12 @@ export const FAQ = () => {
                         style={styles.faqList}
                         showsVerticalScrollIndicator={false}
                     >
-                        {filteredFAQs.length > 0 ? (
+                        {faqData.length > 0 ? (
                             <>
                                 <Text style={styles.resultCount}>
-                                    총 {filteredFAQs.length}개의 질문이 있습니다
+                                    총 {faqData.length}개의 질문이 있습니다
                                 </Text>
-                                {filteredFAQs.map((item) => (
+                                {faqData.map((item) => (
                                     <FAQItem
                                         key={item.id}
                                         question={item.question}
