@@ -1,10 +1,9 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Animated, Switch, Alert } from "react-native";
-import React, { useState, useRef, useContext, useCallback } from "react";
-import Header from "../../Heo/components/Header";
+import React, { useState, useRef, useContext, useCallback, useEffect } from "react";
 import { SupportNavbar } from "./SupportNavbar";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SupportContext } from "../context/SupportContext";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useFocusEffect } from "@react-navigation/native";
 import { UserContext } from "../../All/context/UserContext";
 import { API } from "../../All/api/API";
 
@@ -98,9 +97,8 @@ export const FAQ = () => {
     const [faqData, setFaqData] = useState([]);
 
     //페이지 로드시 데이터 보여주기.
-    useFocusEffect(
-        useCallback(()=>{
-            const findAll = async () => {
+    useEffect(()=>{
+        const findAll = async () => {
             try {
                 const connect = await fetch(`${API}/api/faq`)
                 const result = await connect.json() ;
@@ -112,10 +110,8 @@ export const FAQ = () => {
                 console.log(error);
             }
         }
-
-        findAll();            
-        },[])
-    )
+        findAll()
+    },[showNewFAQ])
 
     const toggleExpanded = (id) => {
         const newExpanded = new Set(expandedItems);
@@ -142,7 +138,7 @@ export const FAQ = () => {
                 answer: faqAnswer,
                 createdAt : new Date(),
                 updatedAt : new Date(),
-                userId:user.Id
+                userId:user.id
             };
 
             const connect = await fetch(`${API}/api/faq`, {
@@ -155,14 +151,12 @@ export const FAQ = () => {
 
             const response = await connect.json();
 
-            console.log("서버 응답:", response);   
-
             // setFaqData(response);
             setFaqQuestion('');
             setFaqAnswer('');
             setFaqCategory('계정/로그인');
             setShowNewFAQ(false);
-            console.log(newFAQItem)
+            console.log('요청 데이터 :: ',newFAQItem)
             alert('FAQ가 성공적으로 등록되었습니다.');
             } else {
                 alert('질문과 답변을 모두 입력해주세요.');
@@ -375,12 +369,12 @@ export const FAQ = () => {
                     <View style={styles.headerSection}>
                         <View style={styles.titleContainer}>
                             <Text style={styles.pageTitle}>자주 묻는 질문</Text>
-                            <TouchableOpacity
+                            {user?.id===1&&<TouchableOpacity
                                 style={styles.newFAQButton}
                                 onPress={handleNewFAQ}
                             >
                                 <Text style={styles.newFAQButtonText}>+ 새 FAQ</Text>
-                            </TouchableOpacity>
+                            </TouchableOpacity>}
                         </View>
                         <Text style={styles.pageSubtitle}>
                             궁금한 내용을 빠르게 찾아보세요
@@ -405,7 +399,7 @@ export const FAQ = () => {
                                         isExpanded={expandedItems.has(item.id)}
                                         onToggle={() => toggleExpanded(item.id)}
                                     />
-                                ))}
+                                )).reverse()}
                             </>
                         ) : (
                             <View style={styles.noResults}>

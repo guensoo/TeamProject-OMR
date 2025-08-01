@@ -17,14 +17,15 @@ import lombok.Setter;
 public class QnADto {
 	//고유 아이디
 	private long id;
-	//답변 상태
-	private boolean status;
+	//답변 타입
+	private String types;
 	//질문 제목
     private String title;
     //질문 내용
     private String content;
     //관리자 답변
     private String answer;
+    
     
     
     private LocalDateTime createdAt;
@@ -37,8 +38,8 @@ public class QnADto {
     public QnAEntity toEntity(UserEntity entity) {
     	return QnAEntity
     			.builder()
-    				.id(id)
-    				.status(status)
+//    				.id(id)
+    				.types(types)
     				.title(title)
     				.content(content)
     				.answer(answer)

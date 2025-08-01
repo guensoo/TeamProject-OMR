@@ -1,11 +1,10 @@
-import { useCallback, useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { View, ScrollView, Text, TouchableOpacity, StyleSheet, TextInput, Switch, Alert } from 'react-native';
-import Header from "../../Heo/components/Header";
 import { SupportNavbar } from "./SupportNavbar";
 import { NoticeItem } from '../component/NoticeItem';
 import { UserContext } from '../../All/context/UserContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API } from "../../All/api/API";
-import { useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export const Notice = () => {
@@ -56,31 +55,28 @@ export const Notice = () => {
     }, [showNewNotice]);
 
 
-    useFocusEffect(
-        useCallback(()=>{
-            const findAll = async () => {
+    useEffect(()=>{
+        const findAll = async () => {
             try {
                 const connect = await fetch(`${API}/api/notice`)
                 const result = await connect.json() ;
                 setNoticeData(result)
-                console.log(result)
+                // console.log(result)
 
             } catch (error) {
                 Alert.alert("에러","공지사항 불러오기에 실패했습니다")
                 console.log(error);
             }
         }
-
-        findAll();            
-        },[])
-    )
+        findAll()
+    },[showNewNotice])
 
     //[공지 사항 POST]
     const handleSubmitNotice = async () => {
         try {
             if (noticeTitle.trim() && noticeContent.trim() && selectedCategory!=='전체') {
 
-            console.log(user)
+            // console.log(user)
 
             //공지사항 발행 로직
             const data = { 
@@ -106,7 +102,7 @@ export const Notice = () => {
 
             const response = await createNotice.json();
 
-            console.log("서버 응답:", response);         
+            // console.log("서버 응답:", response);         
             
 
             // 성공 후 입력 필드 초기화
@@ -387,12 +383,12 @@ export const Notice = () => {
                 <View style={styles.content}>
                     <View style={styles.headerSection}>
                         <Text style={styles.title}>공지사항</Text>
-                        <TouchableOpacity
+                        {user!==null&&user?.id===1&&<TouchableOpacity
                             style={styles.newInquiryButton}
                             onPress={handleNewNotice}
                         >
                             <Text style={styles.newInquiryButtonText}>+ 새 공지사항</Text>
-                        </TouchableOpacity>
+                        </TouchableOpacity>}
                     </View>
                     <Text style={styles.subtitle}>
                         서비스 관련 중요한 소식을 확인하세요.
@@ -432,7 +428,7 @@ export const Notice = () => {
                                 isExpanded={expandedItems.has(item.id)}
                                 onToggle={() => toggleExpanded(item.id)}
                             />
-                        ))}
+                        )).reverse()}
                     </View>
 
                     {filteredNotices.length === 0 && (

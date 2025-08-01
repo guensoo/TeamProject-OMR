@@ -1,53 +1,40 @@
-import React, { useState } from 'react';
-import { View, ScrollView, Text, TouchableOpacity, StyleSheet, TextInput } from 'react-native';
-import Header from "../../Heo/components/Header";
+import { useContext, useEffect, useState } from 'react';
+import { View, ScrollView, Text, TouchableOpacity, StyleSheet, TextInput, Alert } from 'react-native';
 import { SupportNavbar } from "./SupportNavbar";
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { UserContext } from '../../All/context/UserContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API } from "../../All/api/API";
 
-// 이전 문의 내역 샘플 데이터
-const inquiryHistory = [
-    {
-        id: 1,
-        title: "결제 오류 문의",
-        date: "2024-01-15",
-        status: "답변완료",
-        preview: "결제 진행 중 오류가 발생했습니다...",
-        answer: "안녕하세요. 문의해주신 결제 오류 건에 대해 답변드립니다. 결제 시스템 점검으로 인한 일시적 오류였으며, 현재는 정상 처리되고 있습니다."
-    },
-    {
-        id: 2,
-        title: "계정 로그인 문제",
-        date: "2024-01-12",
-        status: "처리중",
-        preview: "로그인이 되지 않아서 문의드립니다...",
-        answer: null
-    },
-    {
-        id: 3,
-        title: "앱 사용법 문의",
-        date: "2024-01-10",
-        status: "답변완료",
-        preview: "새로운 기능 사용 방법을 알고 싶습니다...",
-        answer: "문의하신 기능은 메인 화면 하단의 '더보기' 메뉴에서 찾으실 수 있습니다. 자세한 사용법은 앱 내 도움말을 참고해주세요."
-    }
-];
 
-const InquiryItem = ({ item, isExpanded, onToggle }) => (
+// 한개의 문의사항 보여주는 카드
+const InquiryItem = ({ item, isExpanded, onToggle }) => {
+
+  const [showNewAnswer,setShowNewAnser] = useState(false);
+  const [newAnswer,setNewAnswer] = useState('');
+
+  const {user} = useContext(UserContext);
+
+  const handleNewAnswer = () => {
+    
+  }
+  
+  return(
     <View style={styles.inquiryItem}>
         <TouchableOpacity style={styles.inquiryHeader} onPress={onToggle}>
             <View style={styles.inquiryInfo}>
                 <Text style={styles.inquiryTitle}>{item.title}</Text>
-                <Text style={styles.inquiryDate}>{item.date}</Text>
-                <Text style={styles.inquiryPreview}>{item.preview}</Text>
+                <Text style={styles.inquiryDate}>{item.createdAt}</Text>
+                <Text style={styles.inquiryPreview}>{item.content}</Text>
             </View>
             <View style={styles.inquiryRight}>
                 <View style={[styles.statusBadge,
-                item.status === '답변완료' ? styles.completedBadge : styles.pendingBadge
+                item.answer !== null ? styles.completedBadge : styles.pendingBadge
                 ]}>
                     <Text style={[styles.statusText,
-                    item.status === '답변완료' ? styles.completedText : styles.pendingText
+                    item.answer !== null ? styles.completedText : styles.pendingText
                     ]}>
-                        {item.status}
+                        {item.answer!==null?'답변완료':'처리중'}
                     </Text>
                 </View>
                 <Text style={styles.expandIcon}>{isExpanded ? '−' : '+'}</Text>
@@ -61,22 +48,71 @@ const InquiryItem = ({ item, isExpanded, onToggle }) => (
             </View>
         )}
 
-        {isExpanded && !item.answer && (
+        {!showNewAnswer?
+        isExpanded && !item.answer && (
             <View style={styles.answerContainer}>
                 <Text style={styles.pendingAnswer}>답변 준비 중입니다. 조금만 기다려주세요.</Text>
+
+              {user?.id===1&&<TouchableOpacity
+                  style={styles.newInquiryButton}
+                  onPress={()=>setShowNewAnser(true)}
+              >
+                  <Text style={styles.newInquiryButtonText}>답변 작성하기</Text>
+              </TouchableOpacity>}
             </View>
-        )}
+        )
+        :
+        isExpanded && !item.answer && (
+            <View style={[styles.modernInputContainer,styles.newAnswerbutton]}>
+              <TextInput
+                multiline
+                style={styles.modernAnswerInput}
+                placeholder="어떤 내용인지 간단히 적어주세요"
+                placeholderTextColor="#A0A0A0"
+                value={newAnswer}
+                onChangeText={setNewAnswer}
+                // onFocus={() => setTitleFocused(true)}
+                // onBlur={() => setTitleFocused(false)}
+                maxLength={50}
+            />
+            <View style={{gap:5}}>
+              <TouchableOpacity
+                      style={styles.newInquiryButton}
+                      onPress={handleNewAnswer}
+              >
+                <Text style={styles.newInquiryButtonText}>완료</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                      style={styles.newInquiryButton}
+                      onPress={()=>{
+                        setNewAnswer('')
+                        setShowNewAnser(false)
+                      }}
+              >
+                <Text style={styles.newInquiryButtonText}>취소</Text>
+              </TouchableOpacity>
+            </View>
+            </View>
+          )
+        }
     </View>
-);
+)};
 
 export const QnA = () => {
     const [expandedItems, setExpandedItems] = useState(new Set());
+    // 새로 작성하기 상태
     const [showNewInquiry, setShowNewInquiry] = useState(false);
+    // 유저 입력 필드
     const [inquiryTitle, setInquiryTitle] = useState('');
     const [inquiryContent, setInquiryContent] = useState('');
     const [inquiryType, setInquiryType] = useState('일반문의');
+
     const [titleFocused, setTitleFocused] = useState(false);
     const [contentFocused, setContentFocused] = useState(false);
+    //받아온 데이터
+    const [inquiryHistory,setInquiryHistory] = useState([]);
+    //유저 데이터
+    const {user} = useContext(UserContext);
 
     const inquiryTypes = ['일반문의', '기술지원', '결제문의', '계정문의', '신고/건의'];
 
@@ -91,17 +127,66 @@ export const QnA = () => {
     };
 
     const handleNewInquiry = () => {
-        setShowNewInquiry(true);
+        // AsyncStorage.getItem('authToken')
+        //     .then(token => {
+        //         alert("로그인이 필요합니다")
+        //     if (token === null) return;
+        //     setShowNewInquiry(true);
+        // });
+
+        if(user==null){
+            alert("로그인이 필요합니다")
+            }
+        else{setShowNewInquiry(true);}
     };
 
-    const handleSubmitInquiry = () => {
+
+    //컴포넌트 연결시 보여주기
+    useEffect(()=>{
+        const findAll = async () => {
+            try {
+                const connect = await fetch(`${API}/api/qna`)
+                const result = await connect.json() ;
+                setInquiryHistory(result)
+                // console.log(result)
+
+            } catch (error) {
+                Alert.alert("에러","문의사항 불러오기에 실패했습니다")
+                console.log(error);
+            }
+        }
+        findAll()
+    },[showNewInquiry])
+
+    // 새로운 문의글 작성(POST)
+    const handleSubmitInquiry = async () => {
+      try {
         if (inquiryTitle.trim() && inquiryContent.trim()) {
             // 문의 제출 로직
-            console.log('문의 제출:', {
+            const data = {
                 title: inquiryTitle,
                 content: inquiryContent,
-                type: inquiryType
+                answer: null,
+                types: inquiryType,
+                userId:user.id,
+                createdAt: new Date(),
+                updatedAt: new Date()
+            }
+            console.log('문의 제출:', data);
+
+            const updateQna = await fetch(`${API}/api/qna`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
             });
+
+            const response = await updateQna.json();
+
+            // console.log("서버 응답:", response);         
+
+            //입력 필드 초기화
             setInquiryTitle('');
             setInquiryContent('');
             setInquiryType('일반문의');
@@ -110,6 +195,10 @@ export const QnA = () => {
         } else {
             alert('제목과 내용을 모두 입력해주세요.');
         }
+      } catch (error) {
+        Alert.alert("오류","문의 작성에 실패했습니다.")
+        console.log(error)
+      }
     };
 
     const handleCancel = () => {
@@ -119,7 +208,7 @@ export const QnA = () => {
         setInquiryType('일반문의');
     };
 
-    // 트렌디한 문의 작성 화면
+    // 문의 작성 화면
     if (showNewInquiry) {
         return (
             <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
@@ -333,7 +422,7 @@ export const QnA = () => {
                                     isExpanded={expandedItems.has(item.id)}
                                     onToggle={() => toggleExpanded(item.id)}
                                 />
-                            ))}
+                            )).reverse()}
                         </View>
 
                         {inquiryHistory.length === 0 && (
@@ -373,11 +462,12 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         paddingVertical: 8,
         borderRadius: 6,
+        marginRight:10
     },
     newInquiryButtonText: {
         color: '#fff',
         fontSize: 14,
-        fontWeight: '600',
+        fontWeight: '600',     
     },
     subtitle: {
         fontSize: 16,
@@ -391,7 +481,7 @@ const styles = StyleSheet.create({
     inquiryItem: {
         backgroundColor: '#fff',
         marginBottom: 12,
-        borderRadius: 8,
+        borderRadius: 12,
         shadowColor: '#000',
         shadowOffset: {
             width: 0,
@@ -885,4 +975,17 @@ const styles = StyleSheet.create({
     bottomSpacing: {
         height: 100,
     },
+    newAnswerbutton : {
+      flexDirection: 'row',
+      alignItems:'center'
+    },
+    modernAnswerInput: {
+      paddingHorizontal: 16,
+      paddingVertical: 16,
+      fontSize: 16,
+      height:120,
+      color: '#0F172A',
+      fontWeight: '400',
+      flex :1
+  },
 });

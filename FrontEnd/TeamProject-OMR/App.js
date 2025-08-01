@@ -31,10 +31,6 @@ import SearchList from './Choi/SearchList';
 
 import AIRecommend from './Park/AIRecommend';
 import { ReviewWrite } from './Kim/component/ReviewWrite';
-import { SupportMain } from './Kim/supportCenter/SupportMain';
-import { FAQ } from './Kim/supportCenter/FAQ';
-import { QnA } from './Kim/supportCenter/QnA';
-import { Notice } from './Kim/supportCenter/Notice';
 import { SupportWrapper } from './Kim/supportCenter/SupportWrapper';
 
 const Stack = createNativeStackNavigator();
@@ -71,7 +67,21 @@ export default function App() {
 
                         <Stack.Screen name="ReviewDetail" component={ReviewDetail} />
                         <Stack.Screen name="ReviewWrite" component={ReviewWrite} options={{ headerShown: false }} />
-                        <Stack.Screen name="Support" component={SupportWrapper} options={{ headerShown: false }} />
+                        <Stack.Screen
+                            name="Support"
+                            component={SupportWrapper}
+                            options={({ navigation }) => ({
+                                title: "고객센터",
+                                headerTitleAlign: 'center',
+                                headerRight: () => (
+                                    <TouchableOpacity
+                                        onPress={() => navigation.navigate("BottomTabMenu", { screen: 'Home' })}
+                                    >
+                                        <Ionicons name="home-outline" size={24} color="black" />
+                                    </TouchableOpacity>
+                                ),
+
+                            })} />
 
                         <Stack.Screen name="InfoDetail" component={InfoDetail} options={{ headerShown: false }} />
 

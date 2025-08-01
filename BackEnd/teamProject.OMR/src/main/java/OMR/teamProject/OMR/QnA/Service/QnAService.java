@@ -19,7 +19,6 @@ import lombok.RequiredArgsConstructor;
 public class QnAService {
     private final QnARepository qnaRepository;
     private final UserRepository userRepository;
-    private final UserService userService;
     
   //C
     public List<QnADto> write(QnADto dto){
@@ -28,7 +27,7 @@ public class QnAService {
 //    		throw new RuntimeException("[write]이미 존재 id입니다.");
 //    	}
 //    	
-    	UserEntity userEntity = userRepository.findById(dto.getUserData().getId())
+    	UserEntity userEntity = userRepository.findById(dto.getUserId())
     								.orElseThrow(() -> new RuntimeException("사용자 정보가 없습니다."));
     	
     	QnAEntity entity = dto.toEntity(userEntity);
@@ -61,7 +60,7 @@ public class QnAService {
     	result.setAnswer(dto.getAnswer());
     	result.setTitle(dto.getTitle());
     	result.setContent(dto.getContent());
-    	result.setStatus(dto.isStatus());
+    	result.setTypes(dto.getTypes());
     	
     	return true;
     }

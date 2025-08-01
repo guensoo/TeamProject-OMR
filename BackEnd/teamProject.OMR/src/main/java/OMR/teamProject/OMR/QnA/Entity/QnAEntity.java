@@ -27,8 +27,8 @@ public class QnAEntity {
 	//고유 아이디
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    //답변 상태
-    private boolean status;
+    //답변 타입
+    private String types;
     //질문 제목
     @Column(columnDefinition = "LONGTEXT")
     private String title;
@@ -52,7 +52,7 @@ public class QnAEntity {
     	return QnADto
     			.builder()
     				.id(id)
-    				.status(status)
+    				.types(types)
     				.title(title)
     				.content(content)
     				.answer(answer)
