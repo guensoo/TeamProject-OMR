@@ -51,8 +51,9 @@ function OTTSection({ title, data, activeCard, onToggle, providerKey }) {
                         isActive={activeCard === item.id}
                         onToggle={() => onToggle(item.id)}
                         onReviewPress={() => {
-                            console.log(`${item.title} 리뷰보기 클릭`)
-                            navigation.navigate("ReviewDetail", { reviewId: item.id.toString() })
+                            navigation.navigate("ReviewList", {
+                                initialKeyword: item.title || item.name // ★ 이 부분이 핵심!
+                            });
                         }}
                         onDetailPress={() => handleDetailPress(item)}
                     />

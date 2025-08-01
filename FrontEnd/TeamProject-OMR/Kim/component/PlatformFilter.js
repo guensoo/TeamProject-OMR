@@ -1,7 +1,7 @@
 import { View, Text, ScrollView, TouchableOpacity } from "react-native";
 import styles from './ReviewListStyle';
 
-const PLATFORMS = ['Netflix', 'Disney+', 'Coupang Play', 'Wavve', 'Tving'];
+const PLATFORMS = ['Netflix', 'Disney+', '웨이브', '왓챠', 'PrimeVideo'];
 
 export const PlatformFilter = ({ selectedPlatforms, onToggle }) => (
     <View style={styles.filterSection}>

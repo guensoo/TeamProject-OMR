@@ -28,7 +28,7 @@ public class ReviewController {
     
     @PostMapping
     public ReviewResponseDto reviewCreate(@RequestBody ReviewRequestDto dto) {
-    	System.out.println("너 생성인데 들어오니?");
+    	System.out.println("너 생성인데 들어오니?"+dto);
         return reviewService.reviewCreate(dto);
     }
 }

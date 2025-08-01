@@ -3,6 +3,7 @@ import { View, ScrollView, Text, TouchableOpacity, StyleSheet, TextInput, Switch
 import Header from "../../Heo/components/Header";
 import { SupportNavbar } from "./SupportNavbar";
 import { NoticeItem } from '../component/NoticeItem';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 // 공지사항 샘플 데이터
 const noticeData = [
@@ -230,8 +231,8 @@ export const Notice = () => {
     //[작성] 관리자용 공지사항 작성 화면
     if (showNewNotice) {
         return (
+                <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
             <>
-                <Header />
                 <SupportNavbar />
                 <View style={styles.adminContainer}>
                     {/* 공지사항 작성 헤더 */}
@@ -456,13 +457,14 @@ export const Notice = () => {
                     </View>
                 </View>
             </>
+            </SafeAreaView>
         );
     }
 
 
     return (
+            <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
         <>
-            <Header />
             <SupportNavbar />
             <ScrollView style={styles.container}>
                 <View style={styles.content}>
@@ -524,6 +526,7 @@ export const Notice = () => {
                 </View>
             </ScrollView>
         </>
+        </SafeAreaView>
     );
 };
 

@@ -59,7 +59,9 @@ export default function MovieSection({
                                 activeCard.id === item.id
                             }
                             onReviewPress={() => {
-                                navigation.navigate("ReviewDetail", { reviewId: item.id });
+                                navigation.navigate("ReviewList", {
+                                    initialKeyword: item.title || item.name
+                                });
                             }}
                             onDetailPress={() => handleDetailPress(item)}
                             onToggle={() => onToggle(sectionKey, item.id)}

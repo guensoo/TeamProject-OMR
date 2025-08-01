@@ -1,108 +1,67 @@
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
-    // 향상된 헤더 스타일
-    header: {
-        backgroundColor: '#FFFFFF',
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
-        elevation: 5,
-        zIndex: 1000,
-    },
-    headerContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingHorizontal: 20,
-        paddingVertical: 16,
-        minHeight: 60,
-    },
-    backButton: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        backgroundColor: '#F8F9FA',
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderWidth: 1,
-        borderColor: '#E9ECEF',
-    },
-    backIcon: {
-        fontSize: 20,
-        color: '#495057',
-        fontWeight: 'bold',
-    },
-    titleContainer: {
-        flex: 1,
-        alignItems: 'center',
-        marginHorizontal: 20,
-    },
-    headerTitle: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: '#212529',
-        letterSpacing: -0.5,
-    },
-    titleUnderline: {
-        width: 30,
-        height: 3,
-        backgroundColor: '#007AFF',
-        borderRadius: 2,
-        marginTop: 4,
-    },
-    actionButtons: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 8,
-    },
-    actionButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 12,
-        paddingVertical: 8,
-        borderRadius: 20,
-        backgroundColor: '#F8F9FA',
-        borderWidth: 1,
-        borderColor: '#DEE2E6',
-        minWidth: 80,
-        justifyContent: 'center',
-    },
-    writeButton: {
-        backgroundColor: '#007AFF',
-        borderColor: '#007AFF',
-    },
-    actionIcon: {
-        fontSize: 14,
-        marginRight: 4,
-    },
-    actionText: {
-        fontSize: 12,
-        color: '#6C757D',
-        fontWeight: '600',
-    },
-    writeIcon: {
-        fontSize: 14,
-        marginRight: 4,
-    },
-    writeText: {
-        fontSize: 12,
-        color: '#FFFFFF',
-        fontWeight: '600',
-    },
-    headerGradient: {
-        height: 1,
-        backgroundColor: '#E9ECEF',
-    },
-    // 기존 스타일들 유지
+    // 컨테이너 스타일 수정 (헤더 제거로 인한 조정)
     container: {
         flex: 1,
         backgroundColor: '#FFFFFF',
+        paddingTop: 0, // 헤더가 없으므로 상단 패딩 제거
     },
+    
+    // 검색창 스타일 (상단 여백 추가)
+    searchContainer: {
+        backgroundColor: '#FFFFFF',
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+        paddingTop: 20, // 상단 여백 추가
+        borderBottomWidth: 1,
+        borderBottomColor: '#F1F3F4',
+    },
+    searchInputContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#F8F9FA',
+        borderRadius: 25,
+        borderWidth: 1,
+        borderColor: '#E1E8ED',
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 1,
+        },
+        shadowOpacity: 0.05,
+        shadowRadius: 2,
+        elevation: 2,
+    },
+    searchIcon: {
+        fontSize: 16,
+        color: '#657786',
+        marginRight: 10,
+    },
+    searchInput: {
+        flex: 1,
+        fontSize: 16,
+        color: '#2C3E50',
+        paddingVertical: 0,
+    },
+    clearButton: {
+        width: 24,
+        height: 24,
+        borderRadius: 12,
+        backgroundColor: '#E1E8ED',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginLeft: 8,
+    },
+    clearIcon: {
+        fontSize: 12,
+        color: '#657786',
+        fontWeight: 'bold',
+    },
+    
+    // 필터 컨테이너
     filterContainer: {
         backgroundColor: '#FFFFFF',
         paddingHorizontal: 16,
@@ -226,8 +185,34 @@ const styles = StyleSheet.create({
         flexWrap: 'wrap',
         justifyContent: 'space-between',
         paddingHorizontal: 16,
-        paddingBottom: 20,
-    }
-})
+        paddingBottom: 100, // 플로팅 버튼을 위한 하단 여백 추가
+    },
+    
+    // 플로팅 버튼 스타일 추가
+    floatingButton: {
+        position: 'absolute',
+        bottom: 30,
+        right: 20,
+        width: 56,
+        height: 56,
+        borderRadius: 28,
+        backgroundColor: '#f0eed8ff',
+        justifyContent: 'center',
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 4,
+        },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+        elevation: 8,
+        zIndex: 1000,
+    },
+    floatingButtonIcon: {
+        fontSize: 24,
+        color: '#FFFFFF',
+    },
+});
 
 export default styles;

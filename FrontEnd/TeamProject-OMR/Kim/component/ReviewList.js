@@ -1,13 +1,14 @@
-import { useCallback, useRef, useState } from "react";
-import { View, Text, ScrollView, TouchableOpacity, Animated, Easing, ActivityIndicator } from "react-native";
+import { useCallback, useRef, useState, useEffect } from "react";
+import { View, Text, ScrollView, TouchableOpacity, Animated, Easing, ActivityIndicator, TextInput } from "react-native";
 import { Picker } from '@react-native-picker/picker';
 import { useFocusEffect } from "@react-navigation/native";
 import { GenreFilter } from "./GenreFilter";
 import { PlatformFilter } from "./PlatformFilter";
 import ReviewComponent from "./ReviewComponent";
 import styles from './ReviewListStyle';
+import { SafeAreaView } from "react-native-safe-area-context";
 
-const ReviewList = ({ navigation }) => {
+const ReviewList = ({ navigation, route }) => {
     // 상태 선언
     const [sort, setSort] = useState('latest');
     const [reviews, setReviews] = useState([]);
@@ -15,6 +16,13 @@ const ReviewList = ({ navigation }) => {
     const [selectedGenres, setSelectedGenres] = useState(new Set());
     const [selectedPlatforms, setSelectedPlatforms] = useState(new Set());
     const [show, setShow] = useState(true);
+    const [searchText, setSearchText] = useState('');
+
+    useEffect(() => {
+        if (route?.params?.initialKeyword) {
+            setSearchText(route.params.initialKeyword);
+        }
+    }, [route?.params?.initialKeyword]);
 
     // 필터 애니메이션
     const Anim = useRef(new Animated.Value(1)).current;
@@ -57,6 +65,19 @@ const ReviewList = ({ navigation }) => {
         setSelectedPlatforms(newSelected);
     };
 
+    // 검색어에 따른 리뷰 필터링
+    const filteredReviews = reviews.filter(review => {
+        if (!searchText.trim()) return true;
+
+        const searchLower = searchText.toLowerCase();
+        return (
+            review.title?.toLowerCase().includes(searchLower) ||
+            review.content?.toLowerCase().includes(searchLower) ||
+            review.gameName?.toLowerCase().includes(searchLower) ||
+            review.author?.toLowerCase().includes(searchLower)
+        );
+    });
+
     // 리뷰 데이터 fetch (페이지 접근시 or focus시마다)
     useFocusEffect(
         useCallback(() => {
@@ -82,35 +103,32 @@ const ReviewList = ({ navigation }) => {
     );
 
     return (
-        <>
-            {/* 헤더 */}
-            <View style={styles.header}>
-                <View style={styles.headerContainer}>
-                    {/* 뒤로가기 */}
-                    <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()} activeOpacity={0.7}>
-                        <Text style={styles.backIcon}>◀</Text>
-                    </TouchableOpacity>
-                    {/* 제목 */}
-                    <View style={styles.titleContainer}>
-                        <Text style={styles.headerTitle}>리뷰</Text>
-                        <View style={styles.titleUnderline} />
-                    </View>
-                    {/* 액션버튼 */}
-                    <View style={styles.actionButtons}>
-                        <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate('Support')} activeOpacity={0.7}>
-                            <Text style={styles.actionIcon}>🛠</Text>
-                            <Text style={styles.actionText}>고객센터</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={[styles.actionButton, styles.writeButton]} onPress={() => navigation.navigate('ReviewWrite')} activeOpacity={0.7}>
-                            <Text style={styles.writeIcon}>✏️</Text>
-                            <Text style={styles.writeText}>리뷰쓰기</Text>
-                        </TouchableOpacity>
+        <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+            <View style={styles.container}>
+                {/* 검색창 */}
+                <View style={styles.searchContainer}>
+                    <View style={styles.searchInputContainer}>
+                        <Text style={styles.searchIcon}>🔍</Text>
+                        <TextInput
+                            style={styles.searchInput}
+                            placeholder="작품명 검색하기"
+                            placeholderTextColor="#999"
+                            value={searchText}
+                            onChangeText={setSearchText}
+                            returnKeyType="search"
+                        />
+                        {searchText.length > 0 && (
+                            <TouchableOpacity
+                                style={styles.clearButton}
+                                onPress={() => setSearchText('')}
+                                activeOpacity={0.7}
+                            >
+                                <Text style={styles.clearIcon}>✕</Text>
+                            </TouchableOpacity>
+                        )}
                     </View>
                 </View>
-                <View style={styles.headerGradient} />
-            </View>
 
-            <View style={styles.container}>
                 {/* 필터 (장르/플랫폼) */}
                 <Animated.View style={[styles.filterContainer, { height: AnimHeight, opacity: Anim }]}>
                     <GenreFilter selectedGenres={selectedGenres} onToggle={toggleGenre} />
@@ -119,7 +137,9 @@ const ReviewList = ({ navigation }) => {
 
                 {/* 총개수 및 정렬 */}
                 <View style={styles.infoContainer}>
-                    <Text style={styles.totalCountText}>전체 {reviews.length}개</Text>
+                    <Text style={styles.totalCountText}>
+                        {searchText.trim() ? `검색결과 ${filteredReviews.length}개` : `전체 ${reviews.length}개`}
+                    </Text>
                     {/* 필터 토글 버튼 */}
                     <View style={styles.toggleContainer}>
                         <TouchableOpacity
@@ -183,12 +203,14 @@ const ReviewList = ({ navigation }) => {
                             }
                         }}
                     >
-                        {reviews.length === 0 ? (
+                        {filteredReviews.length === 0 ? (
                             <View style={{ alignItems: 'center', padding: 40 }}>
-                                <Text style={{ color: '#888', fontSize: 16 }}>등록된 리뷰가 없습니다.</Text>
+                                <Text style={{ color: '#888', fontSize: 16 }}>
+                                    {searchText.trim() ? '검색 결과가 없습니다.' : '등록된 리뷰가 없습니다.'}
+                                </Text>
                             </View>
                         ) : (
-                            reviews.map((item) => (
+                            filteredReviews.map((item) => (
                                 <ReviewComponent
                                     key={item.reviewId}
                                     review={item}
@@ -199,8 +221,17 @@ const ReviewList = ({ navigation }) => {
                         )}
                     </ScrollView>
                 )}
+
+                {/* 플로팅 리뷰쓰기 버튼 */}
+                <TouchableOpacity
+                    style={styles.floatingButton}
+                    onPress={() => navigation.navigate('ReviewWrite')}
+                    activeOpacity={0.8}
+                >
+                    <Text style={styles.floatingButtonIcon}>✏️</Text>
+                </TouchableOpacity>
             </View>
-        </>
+        </SafeAreaView>
     );
 };
 

@@ -91,6 +91,7 @@ export const ReviewWrite = ({ navigation }) => {
             });
 
             if (!response.ok) {
+                console.log(error)
                 throw new Error('리뷰 생성 실패');
             }
 

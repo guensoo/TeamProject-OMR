@@ -3,6 +3,7 @@ import React, { useState, useRef, useContext } from "react";
 import Header from "../../Heo/components/Header";
 import { SupportNavbar } from "./SupportNavbar";
 import { SupportContext } from "../context/SupportContext";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 // FAQ 아이템 컴포넌트
 const FAQItem = ({ question, answer, isExpanded, onToggle }) => {
@@ -193,252 +194,254 @@ export const FAQ = () => {
     // 관리자용 FAQ 작성 화면
     if (showNewFAQ) {
         return (
-            <>
-                <Header />
-                <SupportNavbar />
-                <View style={styles.adminContainer}>
-                    {/* 관리자 헤더 */}
-                    <View style={styles.adminHeader}>
-                        <View style={styles.adminHeaderContent}>
-                            <TouchableOpacity
-                                style={styles.backButton}
-                                onPress={handleCancel}
-                            >
-                                <Text style={styles.backIcon}>←</Text>
-                            </TouchableOpacity>
-                            <View style={styles.headerTextContainer}>
-                                <Text style={styles.adminTitle}>FAQ 추가</Text>
-                                <Text style={styles.adminSubtitle}>사용자들이 자주 묻는 질문과 답변을 작성하세요</Text>
-                            </View>
-                            <View style={styles.adminBadge}>
-                                <Text style={styles.adminBadgeText}>ADMIN</Text>
+            <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+                <>
+                    <SupportNavbar />
+                    <View style={styles.adminContainer}>
+                        {/* 관리자 헤더 */}
+                        <View style={styles.adminHeader}>
+                            <View style={styles.adminHeaderContent}>
+                                <TouchableOpacity
+                                    style={styles.backButton}
+                                    onPress={handleCancel}
+                                >
+                                    <Text style={styles.backIcon}>←</Text>
+                                </TouchableOpacity>
+                                <View style={styles.headerTextContainer}>
+                                    <Text style={styles.adminTitle}>FAQ 추가</Text>
+                                    <Text style={styles.adminSubtitle}>사용자들이 자주 묻는 질문과 답변을 작성하세요</Text>
+                                </View>
+                                <View style={styles.adminBadge}>
+                                    <Text style={styles.adminBadgeText}>ADMIN</Text>
+                                </View>
                             </View>
                         </View>
-                    </View>
 
-                    <ScrollView
-                        style={styles.adminScrollView}
-                        showsVerticalScrollIndicator={false}
-                    >
-                        <View style={styles.adminContent}>
-                            {/* 질문 입력 카드 */}
-                            <View style={styles.inputCard}>
-                                <View style={styles.cardHeader}>
-                                    <View style={styles.cardIcon}>
-                                        <Text style={styles.cardIconText}>❓</Text>
-                                    </View>
-                                    <Text style={styles.cardTitle}>질문</Text>
-                                </View>
-                                <View style={[
-                                    styles.adminInputContainer,
-                                    questionFocused && styles.focusedInputContainer
-                                ]}>
-                                    <TextInput
-                                        style={styles.adminInput}
-                                        placeholder="사용자가 자주 묻는 질문을 입력하세요 (예: 비밀번호를 잊어버렸어요)"
-                                        placeholderTextColor="#9CA3AF"
-                                        value={faqQuestion}
-                                        onChangeText={setFaqQuestion}
-                                        onFocus={() => setQuestionFocused(true)}
-                                        onBlur={() => setQuestionFocused(false)}
-                                        maxLength={100}
-                                    />
-                                </View>
-                                <Text style={styles.charCountBelow}>{faqQuestion.length}/100</Text>
-                            </View>
-
-                            {/* 답변 입력 카드 */}
-                            <View style={styles.inputCard}>
-                                <View style={styles.cardHeader}>
-                                    <View style={styles.cardIcon}>
-                                        <Text style={styles.cardIconText}>💡</Text>
-                                    </View>
-                                    <Text style={styles.cardTitle}>답변</Text>
-                                </View>
-                                <View style={[
-                                    styles.adminTextAreaContainer,
-                                    answerFocused && styles.focusedInputContainer
-                                ]}>
-                                    <TextInput
-                                        style={styles.adminTextArea}
-                                        placeholder="질문에 대한 명확하고 도움이 되는 답변을 작성해주세요.&#10;&#10;• 단계별로 설명해주세요&#10;• 구체적인 방법을 제시해주세요&#10;• 추가 문의처가 있다면 안내해주세요&#10;&#10;사용자가 쉽게 이해할 수 있도록 친절하게 작성해주세요!"
-                                        placeholderTextColor="#9CA3AF"
-                                        value={faqAnswer}
-                                        onChangeText={setFaqAnswer}
-                                        onFocus={() => setAnswerFocused(true)}
-                                        onBlur={() => setAnswerFocused(false)}
-                                        multiline
-                                        numberOfLines={10}
-                                        textAlignVertical="top"
-                                        maxLength={1000}
-                                    />
-                                </View>
-                                <Text style={styles.charCountBelow}>{faqAnswer.length}/1000</Text>
-                            </View>
-
-                            {/* 작성 가이드 카드 */}
-                            <View style={styles.guideCard}>
-                                <View style={styles.guideHeader}>
-                                    <Text style={styles.guideIcon}>📋</Text>
-                                    <Text style={styles.guideTitle}>FAQ 작성 가이드</Text>
-                                </View>
-                                <View style={styles.guideContent}>
-                                    <View style={styles.guideItem}>
-                                        <Text style={styles.guideBullet}>🎯</Text>
-                                        <Text style={styles.guideText}>실제 사용자가 문의한 내용을 기반으로 작성</Text>
-                                    </View>
-                                    <View style={styles.guideItem}>
-                                        <Text style={styles.guideBullet}>🔍</Text>
-                                        <Text style={styles.guideText}>검색하기 쉬운 키워드 포함</Text>
-                                    </View>
-                                    <View style={styles.guideItem}>
-                                        <Text style={styles.guideBullet}>📝</Text>
-                                        <Text style={styles.guideText}>간결하고 이해하기 쉬운 답변</Text>
-                                    </View>
-                                    <View style={styles.guideItem}>
-                                        <Text style={styles.guideBullet}>🔄</Text>
-                                        <Text style={styles.guideText}>정기적으로 업데이트하여 최신성 유지</Text>
-                                    </View>
-                                </View>
-                            </View>
-
-                            {/* 미리보기 카드 */}
-                            {(faqQuestion || faqAnswer) && (
-                                <View style={styles.previewCard}>
+                        <ScrollView
+                            style={styles.adminScrollView}
+                            showsVerticalScrollIndicator={false}
+                        >
+                            <View style={styles.adminContent}>
+                                {/* 질문 입력 카드 */}
+                                <View style={styles.inputCard}>
                                     <View style={styles.cardHeader}>
                                         <View style={styles.cardIcon}>
-                                            <Text style={styles.cardIconText}>👀</Text>
+                                            <Text style={styles.cardIconText}>❓</Text>
                                         </View>
-                                        <Text style={styles.cardTitle}>미리보기</Text>
+                                        <Text style={styles.cardTitle}>질문</Text>
                                     </View>
-                                    <View style={styles.previewFAQ}>
-                                        <View style={styles.previewQuestion}>
-                                            <View style={styles.questionIcon}>
-                                                <Text style={styles.questionIconText}>Q</Text>
-                                            </View>
-                                            <Text style={styles.questionText}>
-                                                {faqQuestion || '질문이 여기에 표시됩니다'}
-                                            </Text>
+                                    <View style={[
+                                        styles.adminInputContainer,
+                                        questionFocused && styles.focusedInputContainer
+                                    ]}>
+                                        <TextInput
+                                            style={styles.adminInput}
+                                            placeholder="사용자가 자주 묻는 질문을 입력하세요 (예: 비밀번호를 잊어버렸어요)"
+                                            placeholderTextColor="#9CA3AF"
+                                            value={faqQuestion}
+                                            onChangeText={setFaqQuestion}
+                                            onFocus={() => setQuestionFocused(true)}
+                                            onBlur={() => setQuestionFocused(false)}
+                                            maxLength={100}
+                                        />
+                                    </View>
+                                    <Text style={styles.charCountBelow}>{faqQuestion.length}/100</Text>
+                                </View>
+
+                                {/* 답변 입력 카드 */}
+                                <View style={styles.inputCard}>
+                                    <View style={styles.cardHeader}>
+                                        <View style={styles.cardIcon}>
+                                            <Text style={styles.cardIconText}>💡</Text>
                                         </View>
-                                        <View style={styles.previewAnswer}>
-                                            <View style={styles.answerIcon}>
-                                                <Text style={styles.answerIconText}>A</Text>
-                                            </View>
-                                            <Text style={styles.answerText}>
-                                                {faqAnswer || '답변이 여기에 표시됩니다'}
-                                            </Text>
+                                        <Text style={styles.cardTitle}>답변</Text>
+                                    </View>
+                                    <View style={[
+                                        styles.adminTextAreaContainer,
+                                        answerFocused && styles.focusedInputContainer
+                                    ]}>
+                                        <TextInput
+                                            style={styles.adminTextArea}
+                                            placeholder="질문에 대한 명확하고 도움이 되는 답변을 작성해주세요.&#10;&#10;• 단계별로 설명해주세요&#10;• 구체적인 방법을 제시해주세요&#10;• 추가 문의처가 있다면 안내해주세요&#10;&#10;사용자가 쉽게 이해할 수 있도록 친절하게 작성해주세요!"
+                                            placeholderTextColor="#9CA3AF"
+                                            value={faqAnswer}
+                                            onChangeText={setFaqAnswer}
+                                            onFocus={() => setAnswerFocused(true)}
+                                            onBlur={() => setAnswerFocused(false)}
+                                            multiline
+                                            numberOfLines={10}
+                                            textAlignVertical="top"
+                                            maxLength={1000}
+                                        />
+                                    </View>
+                                    <Text style={styles.charCountBelow}>{faqAnswer.length}/1000</Text>
+                                </View>
+
+                                {/* 작성 가이드 카드 */}
+                                <View style={styles.guideCard}>
+                                    <View style={styles.guideHeader}>
+                                        <Text style={styles.guideIcon}>📋</Text>
+                                        <Text style={styles.guideTitle}>FAQ 작성 가이드</Text>
+                                    </View>
+                                    <View style={styles.guideContent}>
+                                        <View style={styles.guideItem}>
+                                            <Text style={styles.guideBullet}>🎯</Text>
+                                            <Text style={styles.guideText}>실제 사용자가 문의한 내용을 기반으로 작성</Text>
                                         </View>
-                                        <View style={styles.previewInfo}>
-                                            <Text style={styles.previewCategory}>카테고리: {faqCategory}</Text>
-                                            {isPopular && (
-                                                <Text style={styles.previewPopular}>⭐ 인기 FAQ</Text>
-                                            )}
+                                        <View style={styles.guideItem}>
+                                            <Text style={styles.guideBullet}>🔍</Text>
+                                            <Text style={styles.guideText}>검색하기 쉬운 키워드 포함</Text>
+                                        </View>
+                                        <View style={styles.guideItem}>
+                                            <Text style={styles.guideBullet}>📝</Text>
+                                            <Text style={styles.guideText}>간결하고 이해하기 쉬운 답변</Text>
+                                        </View>
+                                        <View style={styles.guideItem}>
+                                            <Text style={styles.guideBullet}>🔄</Text>
+                                            <Text style={styles.guideText}>정기적으로 업데이트하여 최신성 유지</Text>
                                         </View>
                                     </View>
                                 </View>
-                            )}
 
-                            <View style={styles.bottomSpacing} />
+                                {/* 미리보기 카드 */}
+                                {(faqQuestion || faqAnswer) && (
+                                    <View style={styles.previewCard}>
+                                        <View style={styles.cardHeader}>
+                                            <View style={styles.cardIcon}>
+                                                <Text style={styles.cardIconText}>👀</Text>
+                                            </View>
+                                            <Text style={styles.cardTitle}>미리보기</Text>
+                                        </View>
+                                        <View style={styles.previewFAQ}>
+                                            <View style={styles.previewQuestion}>
+                                                <View style={styles.questionIcon}>
+                                                    <Text style={styles.questionIconText}>Q</Text>
+                                                </View>
+                                                <Text style={styles.questionText}>
+                                                    {faqQuestion || '질문이 여기에 표시됩니다'}
+                                                </Text>
+                                            </View>
+                                            <View style={styles.previewAnswer}>
+                                                <View style={styles.answerIcon}>
+                                                    <Text style={styles.answerIconText}>A</Text>
+                                                </View>
+                                                <Text style={styles.answerText}>
+                                                    {faqAnswer || '답변이 여기에 표시됩니다'}
+                                                </Text>
+                                            </View>
+                                            <View style={styles.previewInfo}>
+                                                <Text style={styles.previewCategory}>카테고리: {faqCategory}</Text>
+                                                {isPopular && (
+                                                    <Text style={styles.previewPopular}>⭐ 인기 FAQ</Text>
+                                                )}
+                                            </View>
+                                        </View>
+                                    </View>
+                                )}
+
+                                <View style={styles.bottomSpacing} />
+                            </View>
+                        </ScrollView>
+
+                        {/* 하단 버튼 */}
+                        <View style={styles.bottomButtonContainer}>
+                            <TouchableOpacity
+                                style={styles.previewButton}
+                                onPress={() => alert('미리보기 기능')}
+                            >
+                                <Text style={styles.previewButtonText}>미리보기</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={[
+                                    styles.publishButton,
+                                    (!faqQuestion.trim() || !faqAnswer.trim()) && styles.disabledButton
+                                ]}
+                                onPress={handleSubmitFAQ}
+                                disabled={!faqQuestion.trim() || !faqAnswer.trim()}
+                            >
+                                <Text style={[
+                                    styles.publishButtonText,
+                                    (!faqQuestion.trim() || !faqAnswer.trim()) && styles.disabledButtonText
+                                ]}>
+                                    FAQ 등록
+                                </Text>
+                                <Text style={styles.publishButtonIcon}>❓</Text>
+                            </TouchableOpacity>
                         </View>
-                    </ScrollView>
-
-                    {/* 하단 버튼 */}
-                    <View style={styles.bottomButtonContainer}>
-                        <TouchableOpacity
-                            style={styles.previewButton}
-                            onPress={() => alert('미리보기 기능')}
-                        >
-                            <Text style={styles.previewButtonText}>미리보기</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={[
-                                styles.publishButton,
-                                (!faqQuestion.trim() || !faqAnswer.trim()) && styles.disabledButton
-                            ]}
-                            onPress={handleSubmitFAQ}
-                            disabled={!faqQuestion.trim() || !faqAnswer.trim()}
-                        >
-                            <Text style={[
-                                styles.publishButtonText,
-                                (!faqQuestion.trim() || !faqAnswer.trim()) && styles.disabledButtonText
-                            ]}>
-                                FAQ 등록
-                            </Text>
-                            <Text style={styles.publishButtonIcon}>❓</Text>
-                        </TouchableOpacity>
                     </View>
-                </View>
-            </>
+                </>
+            </SafeAreaView>
         );
     }
 
     return (
-        <>
-            <Header />
-            <SupportNavbar />
-            <View style={styles.container}>
-                {/* 헤더 섹션 */}
-                <View style={styles.headerSection}>
-                    <View style={styles.titleContainer}>
-                        <Text style={styles.pageTitle}>자주 묻는 질문</Text>
-                        <TouchableOpacity
-                            style={styles.newFAQButton}
-                            onPress={handleNewFAQ}
-                        >
-                            <Text style={styles.newFAQButtonText}>+ 새 FAQ</Text>
-                        </TouchableOpacity>
-                    </View>
-                    <Text style={styles.pageSubtitle}>
-                        궁금한 내용을 빠르게 찾아보세요
-                    </Text>
-                </View>
-
-                {/* FAQ 리스트 */}
-                <ScrollView
-                    style={styles.faqList}
-                    showsVerticalScrollIndicator={false}
-                >
-                    {filteredFAQs.length > 0 ? (
-                        <>
-                            <Text style={styles.resultCount}>
-                                총 {filteredFAQs.length}개의 질문이 있습니다
-                            </Text>
-                            {filteredFAQs.map((item) => (
-                                <FAQItem
-                                    key={item.id}
-                                    question={item.question}
-                                    answer={item.answer}
-                                    isExpanded={expandedItems.has(item.id)}
-                                    onToggle={() => toggleExpanded(item.id)}
-                                />
-                            ))}
-                        </>
-                    ) : (
-                        <View style={styles.noResults}>
-                            <Text style={styles.noResultsIcon}>🔍</Text>
-                            <Text style={styles.noResultsTitle}>검색 결과가 없습니다</Text>
-                            <Text style={styles.noResultsSubtitle}>
-                                다른 키워드로 검색해보시거나{'\n'}1:1 문의를 이용해주세요
-                            </Text>
+        <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+            <>
+                <SupportNavbar />
+                <View style={styles.container}>
+                    {/* 헤더 섹션 */}
+                    <View style={styles.headerSection}>
+                        <View style={styles.titleContainer}>
+                            <Text style={styles.pageTitle}>자주 묻는 질문</Text>
+                            <TouchableOpacity
+                                style={styles.newFAQButton}
+                                onPress={handleNewFAQ}
+                            >
+                                <Text style={styles.newFAQButtonText}>+ 새 FAQ</Text>
+                            </TouchableOpacity>
                         </View>
-                    )}
-
-                    {/* 추가 도움말 */}
-                    <View style={styles.helpSection}>
-                        <Text style={styles.helpTitle}>원하는 답변을 찾지 못하셨나요?</Text>
-                        <Text style={styles.helpDescription}>
-                            1:1 문의를 통해 개별 상담을 받아보세요
+                        <Text style={styles.pageSubtitle}>
+                            궁금한 내용을 빠르게 찾아보세요
                         </Text>
-                        <TouchableOpacity style={styles.helpButton}
-                            onPress={() => setSupportData('QnA')} >
-                            <Text style={styles.helpButtonText}>1:1 문의하기</Text>
-                        </TouchableOpacity>
                     </View>
 
-                    <View style={styles.bottomSpacing} />
-                </ScrollView>
-            </View>
-        </>
+                    {/* FAQ 리스트 */}
+                    <ScrollView
+                        style={styles.faqList}
+                        showsVerticalScrollIndicator={false}
+                    >
+                        {filteredFAQs.length > 0 ? (
+                            <>
+                                <Text style={styles.resultCount}>
+                                    총 {filteredFAQs.length}개의 질문이 있습니다
+                                </Text>
+                                {filteredFAQs.map((item) => (
+                                    <FAQItem
+                                        key={item.id}
+                                        question={item.question}
+                                        answer={item.answer}
+                                        isExpanded={expandedItems.has(item.id)}
+                                        onToggle={() => toggleExpanded(item.id)}
+                                    />
+                                ))}
+                            </>
+                        ) : (
+                            <View style={styles.noResults}>
+                                <Text style={styles.noResultsIcon}>🔍</Text>
+                                <Text style={styles.noResultsTitle}>검색 결과가 없습니다</Text>
+                                <Text style={styles.noResultsSubtitle}>
+                                    다른 키워드로 검색해보시거나{'\n'}1:1 문의를 이용해주세요
+                                </Text>
+                            </View>
+                        )}
+
+                        {/* 추가 도움말 */}
+                        <View style={styles.helpSection}>
+                            <Text style={styles.helpTitle}>원하는 답변을 찾지 못하셨나요?</Text>
+                            <Text style={styles.helpDescription}>
+                                1:1 문의를 통해 개별 상담을 받아보세요
+                            </Text>
+                            <TouchableOpacity style={styles.helpButton}
+                                onPress={() => setSupportData('QnA')} >
+                                <Text style={styles.helpButtonText}>1:1 문의하기</Text>
+                            </TouchableOpacity>
+                        </View>
+
+                        <View style={styles.bottomSpacing} />
+                    </ScrollView>
+                </View>
+            </>
+        </SafeAreaView>
     );
 };
 

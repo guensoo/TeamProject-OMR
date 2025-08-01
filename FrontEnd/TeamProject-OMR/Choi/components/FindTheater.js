@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
 import cinemaData from "../../Parse/cinema_grouped.json";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const BRANDS = ["전체", "CGV", "메가박스", "롯데시네마", "씨네큐", "작은영화관", "기타"];
 const REGIONS = ["서울", "경기", "인천", "부산", "대구", "광주", "대전", "울산", "강원", "충북", "충남", "전북", "전남", "경북", "경남", "제주"];
@@ -66,58 +67,60 @@ export default function FindTheater({ navigation }) {
     }, []);
 
     return (
-        <View style={styles.container}>
-            {/* 브랜드 선택 */}
-            <ScrollView horizontal style={styles.brandRow}>
-                {BRANDS.map(b => (
-                    <TouchableOpacity
-                        key={b}
-                        style={[styles.brandBtn, brand === b && styles.brandActive]}
-                        onPress={() => setBrand(b)}
-                    >
-                        <Text style={brand === b ? styles.brandActiveText : styles.brandText}>{b}</Text>
-                    </TouchableOpacity>
-                ))}
-            </ScrollView>
-
-            <View style={{ flex: 1, flexDirection: 'row', marginTop: 15 }}>
-                {/* 지역(시도) 리스트 */}
-                <ScrollView style={{ width: 0, backgroundColor: "#1a1a2e" }}>
-                    {REGIONS.map(r => (
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#181825' }} edges={['top', 'left', 'right']}>
+            <View style={styles.container}>
+                {/* 브랜드 선택 */}
+                <ScrollView horizontal style={styles.brandRow}>
+                    {BRANDS.map(b => (
                         <TouchableOpacity
-                            key={r}
-                            style={[styles.regionBtn, region === r && styles.regionActive]}
-                            onPress={() => setRegion(r)}
+                            key={b}
+                            style={[styles.brandBtn, brand === b && styles.brandActive]}
+                            onPress={() => setBrand(b)}
                         >
-                            <Text style={region === r ? styles.regionActiveText : styles.regionText}>{r}</Text>
+                            <Text style={brand === b ? styles.brandActiveText : styles.brandText}>{b}</Text>
                         </TouchableOpacity>
                     ))}
                 </ScrollView>
 
-                {/* 시군구 리스트 */}
-                <ScrollView style={{ flex: 1, padding: 12, backgroundColor: "#232346" }}>
-                    {districtData.length === 0 ? (
-                        <Text style={{ color: "#bbb", marginTop: 24 }}>영화관 없음</Text>
-                    ) : (
-                        districtData.map(({ city, district, brand }) => (
+                <View style={{ flex: 1, flexDirection: 'row', marginTop: 15 }}>
+                    {/* 지역(시도) 리스트 */}
+                    <ScrollView style={{ width: 0, backgroundColor: "#1a1a2e" }}>
+                        {REGIONS.map(r => (
                             <TouchableOpacity
-                                key={`${city}-${district}`}
-                                style={styles.districtBtn}
-                                onPress={() => {
-                                    navigation.navigate('MapScreen', {
-                                        region: city,
-                                        district: district,
-                                        brand: brand
-                                    });
-                                }}
+                                key={r}
+                                style={[styles.regionBtn, region === r && styles.regionActive]}
+                                onPress={() => setRegion(r)}
                             >
-                                <Text style={styles.districtText}>{district}</Text>
+                                <Text style={region === r ? styles.regionActiveText : styles.regionText}>{r}</Text>
                             </TouchableOpacity>
-                        ))
-                    )}
-                </ScrollView>
+                        ))}
+                    </ScrollView>
+
+                    {/* 시군구 리스트 */}
+                    <ScrollView style={{ flex: 1, padding: 12, backgroundColor: "#232346" }}>
+                        {districtData.length === 0 ? (
+                            <Text style={{ color: "#bbb", marginTop: 24 }}>영화관 없음</Text>
+                        ) : (
+                            districtData.map(({ city, district, brand }) => (
+                                <TouchableOpacity
+                                    key={`${city}-${district}`}
+                                    style={styles.districtBtn}
+                                    onPress={() => {
+                                        navigation.navigate('MapScreen', {
+                                            region: city,
+                                            district: district,
+                                            brand: brand
+                                        });
+                                    }}
+                                >
+                                    <Text style={styles.districtText}>{district}</Text>
+                                </TouchableOpacity>
+                            ))
+                        )}
+                    </ScrollView>
+                </View>
             </View>
-        </View>
+        </SafeAreaView>
     );
 }
 

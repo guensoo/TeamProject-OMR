@@ -10,6 +10,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import OTTSection from './components/OTTSection';
 import { getAllOTTPopular } from '../All/api/tmdb';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function OTTScreen() {
     const [loading, setLoading] = useState(true);
@@ -72,33 +73,35 @@ export default function OTTScreen() {
     ];
 
     return (
-        <View style={styles.container}>
-            <StatusBar barStyle="light-content" backgroundColor="#0f0f23" />
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#0f0f23' }} edges={['top', 'left', 'right']}>
+            <View style={styles.container}>
+                <StatusBar barStyle="light-content" backgroundColor="#0f0f23" />
 
-            <Animated.ScrollView
-                style={[styles.scrollContainer, { opacity: fadeAnim }]}
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={styles.scrollContent}
-            >
-                {ottServices.map((service) => (
-                    <Animated.View key={service.key} style={styles.sectionWrapper}>
-                        <View
-                            style={[styles.sectionHeader, { borderLeftColor: service.color }]}
-                        >
-                            <Text style={styles.sectionIcon}>{service.icon}</Text>
-                            <Text style={styles.sectionTitle}>{service.title}</Text>
-                        </View>
-                        <OTTSection
-                            title=""
-                            data={ottData[service.key] || []}
-                            activeCard={activeCard}
-                            onToggle={handleToggle}
-							providerKey={service.key}
-                        />
-                    </Animated.View>
-                ))}
-            </Animated.ScrollView>
-        </View>
+                <Animated.ScrollView
+                    style={[styles.scrollContainer, { opacity: fadeAnim }]}
+                    showsVerticalScrollIndicator={false}
+                    contentContainerStyle={styles.scrollContent}
+                >
+                    {ottServices.map((service) => (
+                        <Animated.View key={service.key} style={styles.sectionWrapper}>
+                            <View
+                                style={[styles.sectionHeader, { borderLeftColor: service.color }]}
+                            >
+                                <Text style={styles.sectionIcon}>{service.icon}</Text>
+                                <Text style={styles.sectionTitle}>{service.title}</Text>
+                            </View>
+                            <OTTSection
+                                title=""
+                                data={ottData[service.key] || []}
+                                activeCard={activeCard}
+                                onToggle={handleToggle}
+                                providerKey={service.key}
+                            />
+                        </Animated.View>
+                    ))}
+                </Animated.ScrollView>
+            </View>
+        </SafeAreaView>
     );
 }
 

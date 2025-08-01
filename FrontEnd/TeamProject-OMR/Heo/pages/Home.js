@@ -212,7 +212,7 @@ const Home = () => {
     }
 
     return (
-        <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+        <SafeAreaView style={styles.container} edges={['left', 'right']}>
             <StatusBar
                 backgroundColor="transparent"
                 translucent

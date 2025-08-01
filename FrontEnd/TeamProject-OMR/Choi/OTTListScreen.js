@@ -4,6 +4,7 @@ import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import { getOTTPopularMovie, OTT_PROVIDERS, getMovieDetail, getTVDetail } from '../All/api/tmdb'; // ⭐ 상세 fetch import!
 import OTTListCard from './components/card/OTTListCard';
 import { useNavigation } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const initialLayout = { width: Dimensions.get('window').width };
 
@@ -101,6 +102,8 @@ function OTTTabContent({providerKey, sortBy }) {
     };
 
     return (
+                        
+            
         <View style={styles.tabContainer}>
             {(loading && page === 1) || fetchingDetail ? (
                 <ActivityIndicator size="large" />
@@ -133,6 +136,7 @@ function OTTTabContent({providerKey, sortBy }) {
                     )}
                 />
             )}
+            
         </View>
     );
 }
@@ -157,6 +161,7 @@ export default function OTTListScreen({ route }) {
     };
 
     return (
+            <SafeAreaView style={{ flex: 1, backgroundColor: '#0f0f23' }} edges={['top', 'left', 'right']}>
         <TabView
             navigationState={{ index, routes }}
             renderScene={renderScene}
@@ -174,6 +179,7 @@ export default function OTTListScreen({ route }) {
             }
             style={{ backgroundColor: '#0f0f23' }}
         />
+        </SafeAreaView>
     );
 }
 

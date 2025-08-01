@@ -10,6 +10,7 @@ import {
 import { getBoxOfficeWithPostersAndTrailer } from '../All/api/kofic';
 import { getMovieDetail } from '../All/api/tmdb'; // 상세 fetch 추가!
 import MovieListCard from './components/card/MovieListCard';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const DEFAULT_SORT_BY = {
     all: 'rank',
@@ -110,6 +111,7 @@ export default function MovieListScreen({ route, navigation }) {
 
     return (
         <View style={styles.container}>
+            <SafeAreaView style={{ flex: 1 }}>
             <View style={styles.sortContainer}>
                 <TouchableOpacity onPress={() => setSortBy('rank')}>
                     <Text style={[styles.sortButton, sortBy === 'rank' && styles.active]}>
@@ -150,6 +152,7 @@ export default function MovieListScreen({ route, navigation }) {
                     )}
                 />
             )}
+            </SafeAreaView>
         </View>
     );
 }

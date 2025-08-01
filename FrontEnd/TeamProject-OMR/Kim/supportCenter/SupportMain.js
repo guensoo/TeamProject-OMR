@@ -3,15 +3,16 @@ import { useNavigation } from '@react-navigation/native';
 import Header from "../../Heo/components/Header";
 import { SupportNavbar } from "./SupportNavbar";
 import { useContext } from "react";
-import {SupportContext} from '../context/SupportContext'
+import { SupportContext } from '../context/SupportContext'
 import { QnA } from "./QnA";
 import { Notice } from "./Notice";
 import { FAQ } from "./FAQ";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export const SupportMain = () => {
     const navigation = useNavigation();
 
-    const {supportData,setSupportData} = useContext(SupportContext);
+    const { supportData, setSupportData } = useContext(SupportContext);
 
     const supportMenus = [
         {
@@ -50,7 +51,7 @@ export const SupportMain = () => {
             description: '고객센터 전화번호',
             value: '1588-0000',
             icon: '📞',
-            action: () => {}
+            action: () => { }
         },
         {
             id: 'email',
@@ -58,7 +59,7 @@ export const SupportMain = () => {
             description: '문의 이메일 주소',
             value: 'support@example.com',
             icon: '📧',
-            action: () => {}
+            action: () => { }
         },
         {
             id: 'hours',
@@ -66,7 +67,7 @@ export const SupportMain = () => {
             description: '고객센터 운영시간',
             value: '평일 09:00-18:00',
             icon: '🕒',
-            action: () => {}
+            action: () => { }
         }
     ];
 
@@ -74,102 +75,103 @@ export const SupportMain = () => {
         navigation.navigate(route);
     };
 
-    if(supportData==='QnA'){
-        return <QnA/>
+    if (supportData === 'QnA') {
+        return <QnA />
     }
 
-    if(supportData==='Notice'){
-        return <Notice/>
+    if (supportData === 'Notice') {
+        return <Notice />
     }
 
-    if(supportData==='FAQ'){
-        return <FAQ/>
+    if (supportData === 'FAQ') {
+        return <FAQ />
     }
 
     return (
-        <>
-            <Header />
-            <SupportNavbar />
-            
-            <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-                {/* 환영 메시지 */}
-                <View style={styles.welcomeSection}>
-                    <Text style={styles.welcomeTitle}>고객지원센터</Text>
-                    <Text style={styles.welcomeSubtitle}>
-                        무엇을 도와드릴까요?
-                    </Text>
-                </View>
+        <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+            <>
+                <SupportNavbar />
 
-                {/* 메인 메뉴 카드들 */}
-                <View style={styles.menuSection}>
-                    {supportMenus.map((menu) => (
-                        <TouchableOpacity
-                            key={menu.id}
-                            style={[styles.menuCard, { borderLeftColor: menu.color }]}
-                            onPress={() => handleMenuPress(menu.route)}
-                            activeOpacity={0.7}
-                        >
-                            <View style={styles.menuCardContent}>
-                                <View style={styles.menuCardHeader}>
-                                    <View style={[styles.menuIcon, { backgroundColor: menu.color + '20' }]}>
-                                        <Text style={styles.menuIconText}>{menu.icon}</Text>
-                                    </View>
-                                    <View style={styles.menuCardInfo}>
-                                        <Text style={styles.menuTitle}>{menu.title}</Text>
-                                        <Text style={styles.menuSubtitle}>{menu.subtitle}</Text>
-                                    </View>
-                                    <View style={styles.menuArrow}>
-                                        <Text style={styles.menuArrowText}>›</Text>
-                                    </View>
-                                </View>
-                                <Text style={styles.menuDescription}>{menu.description}</Text>
-                            </View>
-                        </TouchableOpacity>
-                    ))}
-                </View>
+                <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+                    {/* 환영 메시지 */}
+                    <View style={styles.welcomeSection}>
+                        <Text style={styles.welcomeTitle}>고객지원센터</Text>
+                        <Text style={styles.welcomeSubtitle}>
+                            무엇을 도와드릴까요?
+                        </Text>
+                    </View>
 
-                {/* 빠른 정보 섹션 */}
-                <View style={styles.quickSection}>
-                    <Text style={styles.sectionTitle}>빠른 정보</Text>
-                    <View style={styles.quickGrid}>
-                        {quickActions.map((action) => (
+                    {/* 메인 메뉴 카드들 */}
+                    <View style={styles.menuSection}>
+                        {supportMenus.map((menu) => (
                             <TouchableOpacity
-                                key={action.id}
-                                style={styles.quickCard}
-                                onPress={action.action}
+                                key={menu.id}
+                                style={[styles.menuCard, { borderLeftColor: menu.color }]}
+                                onPress={() => handleMenuPress(menu.route)}
                                 activeOpacity={0.7}
                             >
-                                <View style={styles.quickIcon}>
-                                    <Text style={styles.quickIconText}>{action.icon}</Text>
+                                <View style={styles.menuCardContent}>
+                                    <View style={styles.menuCardHeader}>
+                                        <View style={[styles.menuIcon, { backgroundColor: menu.color + '20' }]}>
+                                            <Text style={styles.menuIconText}>{menu.icon}</Text>
+                                        </View>
+                                        <View style={styles.menuCardInfo}>
+                                            <Text style={styles.menuTitle}>{menu.title}</Text>
+                                            <Text style={styles.menuSubtitle}>{menu.subtitle}</Text>
+                                        </View>
+                                        <View style={styles.menuArrow}>
+                                            <Text style={styles.menuArrowText}>›</Text>
+                                        </View>
+                                    </View>
+                                    <Text style={styles.menuDescription}>{menu.description}</Text>
                                 </View>
-                                <Text style={styles.quickTitle}>{action.title}</Text>
-                                <Text style={styles.quickDescription}>{action.description}</Text>
-                                <Text style={styles.quickValue}>{action.value}</Text>
                             </TouchableOpacity>
                         ))}
                     </View>
-                </View>
 
-                {/* 도움말 섹션 */}
-                <View style={styles.helpSection}>
-                    <View style={styles.helpCard}>
-                        <View style={styles.helpIcon}>
-                            <Text style={styles.helpIconText}>💡</Text>
-                        </View>
-                        <View style={styles.helpContent}>
-                            <Text style={styles.helpTitle}>도움이 필요하신가요?</Text>
-                            <Text style={styles.helpDescription}>
-                                FAQ를 먼저 확인해보시고, 원하는 답변을 찾지 못하셨다면 
-                                1:1 문의를 통해 언제든지 연락주세요.
-                            </Text>
+                    {/* 빠른 정보 섹션 */}
+                    <View style={styles.quickSection}>
+                        <Text style={styles.sectionTitle}>빠른 정보</Text>
+                        <View style={styles.quickGrid}>
+                            {quickActions.map((action) => (
+                                <TouchableOpacity
+                                    key={action.id}
+                                    style={styles.quickCard}
+                                    onPress={action.action}
+                                    activeOpacity={0.7}
+                                >
+                                    <View style={styles.quickIcon}>
+                                        <Text style={styles.quickIconText}>{action.icon}</Text>
+                                    </View>
+                                    <Text style={styles.quickTitle}>{action.title}</Text>
+                                    <Text style={styles.quickDescription}>{action.description}</Text>
+                                    <Text style={styles.quickValue}>{action.value}</Text>
+                                </TouchableOpacity>
+                            ))}
                         </View>
                     </View>
-                </View>
 
-                {/* 하단 여백 */}
-                <View style={styles.bottomSpacing} />
-            </ScrollView>
-        </>
+                    {/* 도움말 섹션 */}
+                    <View style={styles.helpSection}>
+                        <View style={styles.helpCard}>
+                            <View style={styles.helpIcon}>
+                                <Text style={styles.helpIconText}>💡</Text>
+                            </View>
+                            <View style={styles.helpContent}>
+                                <Text style={styles.helpTitle}>도움이 필요하신가요?</Text>
+                                <Text style={styles.helpDescription}>
+                                    FAQ를 먼저 확인해보시고, 원하는 답변을 찾지 못하셨다면
+                                    1:1 문의를 통해 언제든지 연락주세요.
+                                </Text>
+                            </View>
+                        </View>
+                    </View>
+
+                    {/* 하단 여백 */}
+                    <View style={styles.bottomSpacing} />
+                </ScrollView>
+            </>
+        </SafeAreaView>
     );
 };
 
