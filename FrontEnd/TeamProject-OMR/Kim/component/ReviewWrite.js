@@ -69,6 +69,10 @@ export const ReviewWrite = ({ navigation }) => {
 
     const handleSubmit = async () => {
         console.log("selectedMovie ::", selectedMovie);
+        console.log("title ::", selectedMovie.title);
+        if (!selectedMovie.title) {
+            selectedMovie.title = selectedMovie.original_name;
+        }
         if (!title.trim()) {
             Alert.alert('알림', '제목을 입력해주세요.');
             return;

@@ -11,6 +11,7 @@ function OTTSection({ title, data, activeCard, onToggle, providerKey }) {
     const handleDetailPress = async (item) => {
         try {
             let detail = null;
+            console.log("OTTITEM:" , item)
             if (item.media_type === 'movie' || item.title) {
                 detail = await getMovieDetail(item.id);
             } else {
@@ -66,12 +67,20 @@ function OTTSection({ title, data, activeCard, onToggle, providerKey }) {
 export default memo(OTTSection);
 
 const styles = StyleSheet.create({
-    section: { marginBottom: 20 },
+    section: { 
+        marginBottom: 20 
+    },
     header: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center'
     },
-    title: { fontSize: 18, fontWeight: 'bold' },
-    seeAll: { color: '#007BFF', fontSize: 14 },
+    title: { 
+        fontSize: 18, 
+        fontWeight: 'bold' 
+    },
+    seeAll: { 
+        color: '#007BFF', 
+        fontSize: 14 
+    },
 });

@@ -89,6 +89,7 @@ const ReviewList = ({ navigation, route }) => {
                         method: 'GET',
                         headers: { 'Content-Type': 'application/json' }
                     });
+
                     if (!response.ok) throw new Error('네트워크 오류 또는 서버 오류');
                     const data = await response.json();
                     // console.log('리뷰 데이터:', data);

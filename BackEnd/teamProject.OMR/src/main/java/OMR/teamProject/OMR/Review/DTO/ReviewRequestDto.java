@@ -1,6 +1,5 @@
 package OMR.teamProject.OMR.Review.DTO;
 
-import OMR.teamProject.OMR.User.Entity.UserEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

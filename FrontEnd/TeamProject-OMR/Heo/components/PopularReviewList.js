@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from "react";
-import { View, Text, ScrollView, Image, TouchableOpacity, ActivityIndicator, StyleSheet, Dimensions } from "react-native";
+import { View, Text, Image, TouchableOpacity, ActivityIndicator, StyleSheet, Dimensions, FlatList } from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { getMovieDetail, getTVDetail } from "../../All/api/tmdb";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
@@ -16,10 +17,36 @@ const EmptyView = () => (
     </View>
 );
 
+const PosterCard = ({ image, title, isActive, onToggle, onReviewPress, onDetailPress }) => (
+    <TouchableOpacity style={styles.card} onPress={onToggle} activeOpacity={0.9}>
+        {image ? (
+            <Image source={{ uri: image }} style={styles.image} />
+        ) : (
+            <View style={styles.noImage}><Text>이미지 없음</Text></View>
+        )}
+
+        {isActive && <View style={styles.overlay} />}
+
+        {isActive && (
+            <View style={styles.buttonContainer}>
+                <TouchableOpacity style={styles.reviewButton} onPress={onReviewPress}>
+                    <Text style={styles.reviewText}>리뷰보기</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.detailButton} onPress={onDetailPress}>
+                    <Text style={styles.detailText}>상세정보</Text>
+                </TouchableOpacity>
+            </View>
+        )}
+        <Text style={styles.title} numberOfLines={1}>{title}</Text>
+    </TouchableOpacity>
+);
+
 const PopularReviewList = () => {
-    const [reviews, setReviews] = useState([]);
-    const [loading, setLoading] = useState(true);
     const navigation = useNavigation();
+    const [data, setData] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    const [activeCard, setActiveCard] = useState(null);
 
     useFocusEffect(
         useCallback(() => {
@@ -32,90 +59,157 @@ const PopularReviewList = () => {
                     });
                     if (!response.ok) throw new Error('네트워크 오류 또는 서버 오류');
                     const data = await response.json();
+                    console.log("data", data)
+                    const countMap = new Map();
 
-                    // 인기순 정렬 (popularity 필드 기준)
-                    const sortedData = data.sort((a, b) => b.popularity - a.popularity);
+                    // 먼저 title별로 개수 세기
+                    for (const review of data) {
+                        const title = review.selectMovie.title;
+                        const count = countMap.get(title) || { count: 0, review };
+                        countMap.set(title, { count: count.count + 1, review }); // review는 마지막 걸 대표로 씀
+                    }
 
-                    setReviews(sortedData);
+                    // Map → 배열로 변환
+                    const countedList = Array.from(countMap.entries())
+                        .map(([title, { count, review }]) => ({
+                            id: review.selectMovie.id,
+                            title,
+                            media_type: review.selectMovie.media_type,
+                            poster_path: review.selectMovie.poster_path,
+                            count
+                        }))
+                        .sort((a, b) => b.count - a.count); // 많이 나온 순 정렬
+                    
+                    setData(countedList.slice(0, 10));
                 } catch (error) {
                     console.log('리뷰 불러오기 실패:', error);
                 } finally {
                     setLoading(false);
                 }
             })();
-        }, [navigation])
+        }, [])
     );
 
     if (loading) return <LoadingView />;
-    if (reviews.length === 0) return <EmptyView />;
+    if (data.length === 0) return <EmptyView />;
 
-    // console.log("reviews", reviews)
-    
+    // 상세 fetch → navigation
+    const handleDetailPress = async (item) => {
+        try {
+            let detail = null;
+            console.log("item ::" , item)
+            if (item.media_type === 'movie' || item.title) {
+                detail = await getMovieDetail(item.id);
+            } else {
+                detail = await getTVDetail(item.id);
+            }
+            if (detail) {
+                navigation.navigate("InfoDetail");
+            } else {
+                alert('상세 정보를 불러올 수 없습니다.');
+            }
+        } catch (e) {
+            console.log("item ::" , item)
+            alert('상세 정보를 불러오는 중 오류가 발생했습니다.');
+        }
+    };
+
+    const onToggle = (id) => {
+        setActiveCard((prev) => (prev === id ? null : id));
+    };
 
     return (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.scrollView}>
-            {reviews.map((review) => {
-                const posterPath = review?.selectMovie?.poster_path;
-                const posterUrl = posterPath
-                    ? `https://image.tmdb.org/t/p/w500${posterPath}`
-                    : null;
-
-                return (
-                    <TouchableOpacity
-                        key={review.reviewId}
-                        style={styles.posterContainer}
-                        onPress={() => navigation.navigate('ReviewDetail', { review })}
-                    >
-                        {posterUrl ? (
-                            <Image source={{ uri: posterUrl }} style={styles.posterImage} />
-                        ) : (
-                            <View style={styles.noImage}>
-                                <Text>이미지 없음</Text>
-                            </View>
-                        )}
-                        <Text style={styles.title} numberOfLines={1}>{review.selectMovie.title}</Text>
-                    </TouchableOpacity>
-                );
-            })}
-        </ScrollView>
+        <FlatList
+            horizontal
+            data={data}
+            keyExtractor={(item) => item.id.toString()}
+            contentContainerStyle={{ paddingHorizontal: 12 }}
+            showsHorizontalScrollIndicator={false}
+            extraData={activeCard}
+            renderItem={({ item }) => (
+                <PosterCard
+                    image={
+                        item.poster_path
+                            ? `https://image.tmdb.org/t/p/w500${item.poster_path}`
+                            : null
+                    }
+                    title={item.title}
+                    isActive={activeCard === item.id}
+                    onToggle={() => onToggle(item.id)}
+                    onReviewPress={() => {
+                        navigation.navigate("ReviewList", {
+                            initialKeyword: item.title || item.name
+                        });
+                    }}
+                    onDetailPress={() => handleDetailPress(item)}
+                />
+            )}
+        />
     );
 };
 
 const styles = StyleSheet.create({
-    scrollView: {
-        marginVertical: 10,
-    },
-    posterContainer: {
-        marginLeft: 12,
-        marginRight: 8,
+    card: {
+        alignItems: 'center',
+        marginRight: 12,
         width: SCREEN_WIDTH * 0.33,
     },
-    posterImage: {
+    image: {
         width: SCREEN_WIDTH * 0.33,
         height: SCREEN_WIDTH * 0.33 * 1.5,
         borderRadius: 8,
     },
     noImage: {
-        width: 120,
-        height: 180,
+        width: SCREEN_WIDTH * 0.33,
+        height: SCREEN_WIDTH * 0.33 * 1.5,
         borderRadius: 8,
         backgroundColor: "#ccc",
         justifyContent: "center",
         alignItems: "center",
     },
+    buttonContainer: {
+        position: 'absolute',
+        top: '35%',
+        left: 0,
+        right: 0,
+        alignItems: 'center',
+    },
+    overlay: {
+        ...StyleSheet.absoluteFillObject,
+        height: '90%',
+        backgroundColor: 'rgba(0, 0, 0, 0.4)',
+        borderRadius: 8,
+    },
+    reviewButton: {
+        backgroundColor: '#fff',
+        paddingHorizontal: 10,
+        paddingVertical: 5,
+        borderRadius: 5,
+        marginBottom: 5,
+        width: 80,
+        alignItems: 'center',
+    },
+    reviewText: { 
+        color: '#000', 
+        fontSize: 12, 
+        fontWeight: 'bold' 
+    },
+    detailButton: {
+        backgroundColor: '#e50914',
+        paddingHorizontal: 10,
+        paddingVertical: 5,
+        borderRadius: 5,
+        width: 80,
+        alignItems: 'center',
+    },
+    detailText: { 
+        color: '#fff', 
+        fontSize: 12, 
+        fontWeight: 'bold' 
+    },
     title: {
-        marginTop: 6,
-        fontSize: 14,
-        fontWeight: "600",
-    },
-    centeredContainer: {
-        height: 200,
-        justifyContent: "center",
-        alignItems: "center",
-    },
-    emptyText: {
         fontSize: 16,
-        color: "#999",
+        fontWeight: "bold",
     },
 });
 
