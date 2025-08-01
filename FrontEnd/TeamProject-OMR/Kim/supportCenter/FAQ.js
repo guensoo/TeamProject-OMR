@@ -8,10 +8,11 @@ import { UserContext } from "../../All/context/UserContext";
 import { API } from "../../All/api/API";
 
 // FAQ 아이템 컴포넌트
-const FAQItem = ({ question, answer, isExpanded, onToggle }) => {
+const FAQItem = ({id,question, answer, isExpanded, onToggle }) => {
 
     const animatedHeight = useRef(new Animated.Value(0)).current;
     const rotation = useRef(new Animated.Value(0)).current;
+    const {user} = useContext(UserContext);
 
     React.useEffect(() => {
         Animated.parallel([
@@ -32,6 +33,33 @@ const FAQItem = ({ question, answer, isExpanded, onToggle }) => {
         inputRange: [0, 1],
         outputRange: ['0deg', '180deg'],
     });
+    
+    // 수정하기
+    const handleUpdate = () => {
+        try {
+            // const conncet = await fetch(`${API}/api/faq/${id}`)
+            // const result = await conncet.json()
+            // console.log('삭제하기 :: ',result)
+        } catch (error) {
+            console.log(error)
+            Alert.alert("오류","수정하기 오류")
+        }
+    }
+
+    // 삭제하기
+    const handleDelete = async () => {
+        try {
+            const conncet = await fetch(`${API}/api/faq/${id}`,{
+                method:"DELETE"
+            })
+            const result = await conncet.json()
+            alert("삭제하기 성공")
+            console.log('삭제하기 :: ',result)
+        } catch (error) {
+            console.log(error)
+            Alert.alert("오류","삭제하기 오류")
+        }
+    }
 
     return (
         <View style={styles.faqItem}>
@@ -69,6 +97,22 @@ const FAQItem = ({ question, answer, isExpanded, onToggle }) => {
                     </View>
                     <Text style={styles.answerText}>{answer}</Text>
                 </View>
+
+                {user?.id===1&&<View style={styles.editButtonContainer}>
+                    <TouchableOpacity 
+                        style={styles.newFAQButton}
+                        onPress={handleUpdate}
+                        >
+                        <Text style={styles.newFAQButtonText}>수정</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity 
+                        style={styles.newFAQButton}
+                        onPress={handleDelete}
+                        >
+                        <Text style={styles.newFAQButtonText}>삭제</Text>
+                    </TouchableOpacity>
+                </View>}
+
             </Animated.View>
         </View>
     );
@@ -394,6 +438,7 @@ export const FAQ = () => {
                                 {faqData.map((item) => (
                                     <FAQItem
                                         key={item.id}
+                                        id={item.id}
                                         question={item.question}
                                         answer={item.answer}
                                         isExpanded={expandedItems.has(item.id)}
@@ -1002,5 +1047,12 @@ const styles = StyleSheet.create({
     publishButtonIcon: {
         fontSize: 16,
         marginLeft: 4,
+    },
+    editButtonContainer:{
+        gap:5, 
+        flexDirection:'row', 
+        alignItems:'center', 
+        justifyContent:'space-evenly',
+        padding:5
     },
 });

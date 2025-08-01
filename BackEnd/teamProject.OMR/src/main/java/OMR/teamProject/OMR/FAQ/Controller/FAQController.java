@@ -45,8 +45,8 @@ public class FAQController {
     }
     
     //D
-    @DeleteMapping("/id")
-    public ResponseEntity<?> delete(@PathVariable long id){
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable("id") long id){
     	boolean result =faqService.delete(id);
     	return ResponseEntity.ok().body(Map.of("Result",result));
     }
