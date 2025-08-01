@@ -44,42 +44,56 @@ export default function App() {
         <UserProvider>
             <SafeAreaProvider>
                 <NavigationContainer linking={linking} fallback={<Text>Loading...</Text>}>
-                        <Stack.Navigator initialRouteName="BottomTabMenu">
-                            <Stack.Screen name="BottomTabMenu" component={BottomTabMenu} options={{ headerShown: false }} />
-                            <Stack.Screen
-                                name="Login"
-                                component={Login}
-                                options={({ navigation }) => ({
-                                    title: "로그인",
-                                    headerTitleAlign: 'center',
-                                    headerRight: () => (
-                                        <TouchableOpacity
-                                            onPress={() => navigation.navigate("BottomTabMenu", { screen: 'Home' })}
-                                        >
-                                            <Ionicons name="home-outline" size={24} color="black" />
-                                        </TouchableOpacity>
-                                    ),
+                    <Stack.Navigator initialRouteName="BottomTabMenu">
+                        <Stack.Screen name="BottomTabMenu" component={BottomTabMenu} options={{ headerShown: false }} />
+                        <Stack.Screen
+                            name="Login"
+                            component={Login}
+                            options={({ navigation }) => ({
+                                title: "로그인",
+                                headerTitleAlign: 'center',
+                                headerRight: () => (
+                                    <TouchableOpacity
+                                        onPress={() => navigation.navigate("BottomTabMenu", { screen: 'Home' })}
+                                    >
+                                        <Ionicons name="home-outline" size={24} color="black" />
+                                    </TouchableOpacity>
+                                ),
 
-                                })} />
-                            <Stack.Screen name="Signup" component={Signup} options={{ title: '회원가입' }} />
-                            <Stack.Screen name="OTTListScreen" component={OTTListScreen} options={{ headerShown: false }} />
-                            <Stack.Screen name="MovieListScreen" component={MovieListScreen} options={{ headerShown: false }} />
-                            <Stack.Screen name="FindTheater" component={FindTheater} options={{ headerShown: false }} />
-                            <Stack.Screen name="MapScreen" component={MapScreen} options={{ headerShown: false }} />
-                            <Stack.Screen name="AIRecommend" component={AIRecommend} options={{ headerShown: false }} />
-                            <Stack.Screen name="SearchList" component={SearchList} options={{ headerShown: false }} />
+                            })} />
+                        <Stack.Screen name="Signup" component={Signup} options={{ title: '회원가입' }} />
+                        <Stack.Screen name="OTTListScreen" component={OTTListScreen} options={{ headerShown: false }} />
+                        <Stack.Screen name="MovieListScreen" component={MovieListScreen} options={{ headerShown: false }} />
+                        <Stack.Screen name="FindTheater" component={FindTheater} options={{ headerShown: false }} />
+                        <Stack.Screen name="MapScreen" component={MapScreen} options={{ headerShown: false }} />
+                        <Stack.Screen name="AIRecommend" component={AIRecommend} options={{ headerShown: false }} />
+                        <Stack.Screen name="SearchList" component={SearchList} options={{ headerShown: false }} />
 
-                            <Stack.Screen name="ReviewDetail" component={ReviewDetail} />
-                            <Stack.Screen name="ReviewWrite" component={ReviewWrite} options={{ headerShown: false }} />
-                            <Stack.Screen name="Support" component={SupportWrapper} options={{ headerShown: false }} />
+                        <Stack.Screen name="ReviewDetail" component={ReviewDetail} />
+                        <Stack.Screen name="ReviewWrite" component={ReviewWrite} options={{ headerShown: false }} />
+                        <Stack.Screen name="Support" component={SupportWrapper} options={{ headerShown: false }} />
 
-                            <Stack.Screen name="InfoDetail" component={InfoDetail} options={{ headerShown: false }} />
+                        <Stack.Screen name="InfoDetail" component={InfoDetail} options={{ headerShown: false }} />
 
-                            <Stack.Screen name="FindId" component={FindId} options={{ headerShown: false }} />
-                            <Stack.Screen name="FindPassword" component={FindPassword} options={{ headerShown: false }} />
-                            <Stack.Screen name="MyPage" component={MyPage} options={{ headerShown: false }} />
+                        <Stack.Screen name="FindId" component={FindId} options={{ headerShown: false }} />
+                        <Stack.Screen name="FindPassword" component={FindPassword} options={{ headerShown: false }} />
+                        <Stack.Screen
+                            name="MyPage"
+                            component={MyPage}
+                            options={({ navigation }) => ({
+                                title: "마이페이지",
+                                headerTitleAlign: 'center',
+                                headerRight: () => (
+                                    <TouchableOpacity
+                                        onPress={() => navigation.navigate("BottomTabMenu", { screen: 'Home' })}
+                                    >
+                                        <Ionicons name="home-outline" size={24} color="black" />
+                                    </TouchableOpacity>
+                                ),
 
-                        </Stack.Navigator>
+                            })} />
+
+                    </Stack.Navigator>
                 </NavigationContainer>
             </SafeAreaProvider>
         </UserProvider>

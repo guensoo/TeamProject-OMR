@@ -33,7 +33,7 @@ const Login = () => {
             const res = await loginUser(userData);
             loginUserInfo(res.user);
             console.log("user정보: ", res)
-            // Alert.alert("로그인 완료", "로그인 성공");
+            Alert.alert("로그인 완료", "로그인 성공");
             navigation.navigate("BottomTabMenu",{Screen: 'Home'});
         } catch (error) {
             Alert.alert("로그인 실패", error.message);
