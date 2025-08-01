@@ -46,7 +46,7 @@ public class NoticeController {
     
     
     //D
-    @DeleteMapping(name = "/id")
+    @DeleteMapping(name = "/{id}")
     public ResponseEntity<?> delete(@PathVariable long id){
     	boolean result = noticeService.delete(id);
     	return ResponseEntity.ok().body(Map.of("result",result));

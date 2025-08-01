@@ -1,5 +1,8 @@
-import { useCallback, useRef, useState, useEffect } from "react";
-import { View, Text, ScrollView, TouchableOpacity, Animated, Easing, ActivityIndicator, TextInput } from "react-native";
+import { useCallback, useRef, useState, useEffect, useMemo } from "react";
+import {
+    View, Text, ScrollView, TouchableOpacity, Animated, Easing,
+    ActivityIndicator, TextInput
+} from "react-native";
 import { Picker } from '@react-native-picker/picker';
 import { useFocusEffect } from "@react-navigation/native";
 import { GenreFilter } from "./GenreFilter";
@@ -7,6 +10,7 @@ import { PlatformFilter } from "./PlatformFilter";
 import ReviewComponent from "./ReviewComponent";
 import styles from './ReviewListStyle';
 import { SafeAreaView } from "react-native-safe-area-context";
+import { fetchReviews } from "../../All/api/ReviewApi"; // ★ 이 부분만 경로 맞춰주세요!
 
 const ReviewList = ({ navigation, route }) => {
     // 상태 선언
@@ -18,6 +22,7 @@ const ReviewList = ({ navigation, route }) => {
     const [show, setShow] = useState(true);
     const [searchText, setSearchText] = useState('');
 
+    // 작품명 자동입력 (검색어 세팅)
     useEffect(() => {
         if (route?.params?.initialKeyword) {
             setSearchText(route.params.initialKeyword);
@@ -42,7 +47,6 @@ const ReviewList = ({ navigation, route }) => {
             useNativeDriver: false,
         }).start();
     };
-
     const unShown = () => {
         Animated.timing(Anim, {
             toValue: 0,
@@ -58,25 +62,35 @@ const ReviewList = ({ navigation, route }) => {
         newSelected.has(genre) ? newSelected.delete(genre) : newSelected.add(genre);
         setSelectedGenres(newSelected);
     };
-
     const togglePlatform = (platform) => {
         const newSelected = new Set(selectedPlatforms);
         newSelected.has(platform) ? newSelected.delete(platform) : newSelected.add(platform);
         setSelectedPlatforms(newSelected);
     };
 
-    // 검색어에 따른 리뷰 필터링
-    const filteredReviews = reviews.filter(review => {
-        if (!searchText.trim()) return true;
-
-        const searchLower = searchText.toLowerCase();
-        return (
-            review.title?.toLowerCase().includes(searchLower) ||
-            review.content?.toLowerCase().includes(searchLower) ||
-            review.gameName?.toLowerCase().includes(searchLower) ||
-            review.author?.toLowerCase().includes(searchLower)
-        );
-    });
+    // 1) 검색 + 2) 정렬을 useMemo로 최적화
+    const filteredReviews = useMemo(() => {
+        let searched = reviews;
+        if (searchText.trim()) {
+            const searchLower = searchText.toLowerCase();
+            searched = reviews.filter(review =>
+                (review.title?.toLowerCase().includes(searchLower)) ||
+                (review.content?.toLowerCase().includes(searchLower)) ||
+                (review.selectedMovie?.title?.toLowerCase().includes(searchLower)) ||
+                (review.author?.toLowerCase().includes(searchLower))
+            );
+        }
+        // 정렬
+        if (searched.length <= 1) return searched;
+        if (sort === 'latest') {
+            return [...searched].sort((a, b) => new Date(b.createAt) - new Date(a.createAt));
+        } else if (sort === 'popular') {
+            return [...searched].sort((a, b) => (b.liked || 0) - (a.liked || 0));
+        } else if (sort === 'rating') {
+            return [...searched].sort((a, b) => (b.rating || 0) - (a.rating || 0));
+        }
+        return searched;
+    }, [reviews, searchText, sort]);
 
     // 리뷰 데이터 fetch (페이지 접근시 or focus시마다)
     useFocusEffect(
@@ -84,15 +98,7 @@ const ReviewList = ({ navigation, route }) => {
             setLoading(true);
             (async () => {
                 try {
-                    // TODO: 쿼리스트링에 sort/필터 적용
-                    const response = await fetch('http://10.0.2.2:8888/api/review', {
-                        method: 'GET',
-                        headers: { 'Content-Type': 'application/json' }
-                    });
-
-                    if (!response.ok) throw new Error('네트워크 오류 또는 서버 오류');
-                    const data = await response.json();
-                    // console.log('리뷰 데이터:', data);
+                    const data = await fetchReviews(); // 🔥 API 함수 사용
                     setReviews(data);
                 } catch (error) {
                     console.log('리뷰 불러오기 실패:', error);
@@ -112,7 +118,7 @@ const ReviewList = ({ navigation, route }) => {
                         <Text style={styles.searchIcon}>🔍</Text>
                         <TextInput
                             style={styles.searchInput}
-                            placeholder="작품명 검색하기"
+                            placeholder="작품명, 제목, 내용, 작성자 검색"
                             placeholderTextColor="#999"
                             value={searchText}
                             onChangeText={setSearchText}
@@ -170,7 +176,6 @@ const ReviewList = ({ navigation, route }) => {
                             dropdownIconColor="#666"
                         >
                             <Picker.Item label="최신순" value="latest" />
-                            <Picker.Item label="인기순" value="popular" />
                             <Picker.Item label="평점순" value="rating" />
                         </Picker>
                     </View>
@@ -212,12 +217,13 @@ const ReviewList = ({ navigation, route }) => {
                             </View>
                         ) : (
                             filteredReviews.map((item) => (
-                                <ReviewComponent
-                                    key={item.reviewId}
-                                    review={item}
-                                    navigation={navigation}
-                                    onPress={() => navigation.navigate('ReviewDetail', { review: item })}
-                                />
+                                <View key={item.reviewId} style={styles.reviewItemContainer}>
+                                    <ReviewComponent
+                                        review={item}
+                                        navigation={navigation}
+                                        onPress={() => navigation.navigate('ReviewDetail', { review: item })}
+                                    />
+                                </View>
                             ))
                         )}
                     </ScrollView>

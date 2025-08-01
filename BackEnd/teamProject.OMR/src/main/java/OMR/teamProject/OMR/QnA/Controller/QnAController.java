@@ -46,7 +46,7 @@ public class QnAController {
     }
     
     //D
-    @DeleteMapping("/id")
+    @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable long id){
     	boolean result =qnaService.delete(id);
     	return ResponseEntity.ok().body(Map.of("Result",result));
