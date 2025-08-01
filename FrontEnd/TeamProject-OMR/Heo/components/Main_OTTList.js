@@ -3,10 +3,13 @@ import { FlatList, View, Image, Text, TouchableOpacity, Dimensions, StyleSheet }
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 const Main_OTTList = ({ data }) => {
+    const uniqueData = data.filter((item, index, arr) =>
+        arr.findIndex(i => i.id === item.id) === index
+    );
     return (
         <FlatList
             // data={data.filter(item => item.provider === provider)}
-            data={data}
+            data={uniqueData}
             horizontal
             showsHorizontalScrollIndicator={false}
             keyExtractor={(item, index) =>

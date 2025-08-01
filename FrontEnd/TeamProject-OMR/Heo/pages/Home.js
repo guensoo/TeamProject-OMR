@@ -11,95 +11,27 @@ import TrailerModal from "../components/TrailerModal"
 import OTTSelector from "../utils/OTTSelector"
 import ProviderInfo from "../utils/ProviderInfo"
 import { useNavigation } from "@react-navigation/native"
+import LoadingSpinner from "../utils/Spinner"
+import PopularReviewList from "../components/PopularReviewList"
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
-const firstProvider = Object.keys(ProviderInfo)[0]; //인기작 Netflix 버튼
-
-// 세련된 로딩 스피너 컴포넌트
-const LoadingSpinner = () => {
-    const spinValue = useRef(new Animated.Value(0)).current;
-    const scaleValue = useRef(new Animated.Value(0.8)).current;
-
-    useEffect(() => {
-        // 회전 애니메이션
-        const spinAnimation = Animated.loop(
-            Animated.timing(spinValue, {
-                toValue: 1,
-                duration: 1000,
-                useNativeDriver: true,
-            })
-        );
-
-        // 크기 변화 애니메이션
-        const scaleAnimation = Animated.loop(
-            Animated.sequence([
-                Animated.timing(scaleValue, {
-                    toValue: 1.2,
-                    duration: 800,
-                    useNativeDriver: true,
-                }),
-                Animated.timing(scaleValue, {
-                    toValue: 0.8,
-                    duration: 800,
-                    useNativeDriver: true,
-                }),
-            ])
-        );
-
-        spinAnimation.start();
-        scaleAnimation.start();
-
-        return () => {
-            spinAnimation.stop();
-            scaleAnimation.stop();
-        };
-    }, []);
-
-    const spin = spinValue.interpolate({
-        inputRange: [0, 1],
-        outputRange: ['0deg', '360deg'],
-    });
-
-    return (
-        <View style={styles.loadingContainer}>
-            <View style={styles.loadingBackground}>
-                <Animated.View
-                    style={[
-                        styles.spinnerContainer,
-                        {
-                            transform: [
-                                { rotate: spin },
-                                { scale: scaleValue }
-                            ],
-                        },
-                    ]}
-                >
-                    {/* 외부 링 */}
-                    <View style={styles.outerRing} />
-                    {/* 내부 링 */}
-                    <View style={styles.innerRing} />
-                    {/* 중앙 점 */}
-                    <View style={styles.centerDot} />
-                </Animated.View>
-                <Text style={styles.loadingText}>예고편을 불러오는 중...</Text>
-                <View style={styles.loadingDots}>
-                    <ActivityIndicator size="small" color="#007bff" />
-                </View>
-            </View>
-        </View>
-    );
-};
+const playerWidth = SCREEN_WIDTH * 1;
+const playerHeight = (playerWidth * 9) / 16;
+// const firstProvider = Object.keys(ProviderInfo)[0]; //인기작 Netflix 버튼
 
 const Home = () => {
     const navigation = useNavigation();
 
     const [selectedTrailerData, setSelectedTrailerData] = useState([]);
     const [allPosters, setAllPosters] = useState([]);
+    const [allOTTPosters, setAllOTTPosters] = useState([]);
+    const [allMoviePosters, setAllMoviePosters] = useState([]);
     const [isLoadingTrailers, setIsLoadingTrailers] = useState(true); // 로딩 상태 추가
 
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedTrailer, setSelectedTrailer] = useState(null);
-    const [selectedProvider, setSelectedProvider] = useState(firstProvider);
+    const [selectedProvider, setSelectedProvider] = useState('');
+    const [selectCategory, setSelectCategory] = useState('ott');
 
     //예고편
     useEffect(() => {
@@ -125,22 +57,14 @@ const Home = () => {
             } catch (error) {
                 console.error('예고편 데이터 로딩 실패:', error);
             } finally {
-                console.log('[DEBUG] setIsLoadingTrailers(false) 호출!');
+                console.log('로딩완료!');
                 setIsLoadingTrailers(false); // 로딩 완료
             }
         }
         fetchData();
     }, [])
 
-    // //인기작 포스터
-    // useEffect(() => {
-    //     const fetchPosters = async () => {
-    //         const data = await getAllOTTPopular();
-    //         const allMovies = Object.values(data).flat();
-    //         setAllPosters(allMovies);
-    //     };
-    //     fetchPosters();
-    // }, []);
+    //포스터 인기순
     useEffect(() => {
         const fetchAllPopular = async () => {
             const ottData = await getAllOTTPopular();
@@ -149,40 +73,32 @@ const Home = () => {
                 type: 'ott',
             }));
 
-            const today = new Date().toISOString().split('T')[0].replace(/-/g, ''); // YYYYMMDD
-            const movieData = await getBoxOfficeWithPostersAndTrailer(today);
+            const today = new Date();
+            today.setDate(today.getDate() - 1);
+            const y = today.getFullYear();
+            const m = String(today.getMonth() + 1).padStart(2, '0');
+            const d = String(today.getDate()).padStart(2, '0');
+            const dateStr = `${y}${m}${d}`;
+
+            const movieData = await getBoxOfficeWithPostersAndTrailer(dateStr);
             const allMovies = movieData.map(item => ({
                 ...item,
                 provider: '영화',  // 👉 provider 없을 수 있으니 명시적으로
                 type: 'movie',
             }));
 
-            const combined = [...allOTT, ...allMovies];
-
-            // console.log("OTT sample data:", allOTT.slice(0, 10));
-            // console.log("Movie sample data:", allMovies.slice(0, 10));
-            // console.log("Combined sample data:", combined.slice(0, 10));
-
-            // 🔽 정렬: TMDB 인기순(popularity), 또는 rank 기반 정렬
-            const sorted = combined.sort((a, b) => {
-                if (a.rank && b.rank) {
-                    return Number(a.rank) - Number(b.rank); // 박스오피스 기준
-                }
-                if (a.popularity && b.popularity) {
-                    return b.popularity - a.popularity; // TMDB 기준
-                }
+            const sortByRankOrPopularity = (a, b) => {
+                if (a.rank && b.rank) return Number(a.rank) - Number(b.rank);
+                if (a.popularity && b.popularity) return b.popularity - a.popularity;
                 return 0;
-            });
+            };
 
-            setAllPosters(sorted);
+            setAllOTTPosters(allOTT.sort(sortByRankOrPopularity));
+            setAllMoviePosters(allMovies.sort(sortByRankOrPopularity));
         };
 
         fetchAllPopular();
     }, []);
-
-//     useEffect(() => {
-//   console.log("allPosters 상태 변경됨:", allPosters.slice(0, 20));
-// }, [allPosters]);
 
     const handlePlay = (trailerKey) => {
         setSelectedTrailer(trailerKey);
@@ -193,9 +109,6 @@ const Home = () => {
         setSelectedTrailer(null);
         setModalVisible(false);
     };
-
-    const playerWidth = SCREEN_WIDTH * 1;
-    const playerHeight = (playerWidth * 9) / 16;
 
     // 로딩 중일 때 스피너 표시
     if (isLoadingTrailers) {
@@ -230,31 +143,44 @@ const Home = () => {
                 </>
 
                 {/* 3️⃣ 선택한 OTT별 인기작 리스트 */}
-                {selectedProvider && (
-                    <>
-                        <View style={styles.popularHeader}>
-                            <Text style={styles.popularTitle}>전체 인기순</Text>
-                            <TouchableOpacity onPress={() => navigation.navigate("ReviewList")}>
-                                <Text style={styles.seeAllText}>전체보기</Text>
+                {/* {selectedProvider && ( */}
+                <>
+                    <View style={styles.popularHeader}>
+                        <Text style={styles.popularTitle}>인기순</Text>
+                        <View style={styles.rightButtons}>
+                            <TouchableOpacity onPress={() => setSelectCategory('ott')}>
+                                <Text style={[
+                                    styles.OttText,
+                                    selectCategory === 'ott' && styles.selectedCategoryText
+                                ]}>OTT</Text>
+                            </TouchableOpacity>
+                            <Text style={styles.divider}>|</Text>
+                            <TouchableOpacity onPress={() => setSelectCategory('movie')}>
+                                <Text style={[
+                                    styles.MovieText,
+                                    selectCategory === 'movie' && styles.selectedCategoryText
+                                ]}>영화</Text>
                             </TouchableOpacity>
                         </View>
-                        <Main_OTTList
-                            data={allPosters}
-                            provider={selectedProvider}
-                        />
+                    </View>
+                    <Main_OTTList
+                        data={selectCategory === 'ott' ? allOTTPosters : allMoviePosters}
+                    // provider={selectedProvider}
+                    />
 
-                        {/* <View style={styles.popularHeader}>
-                            <Text style={styles.popularTitle}>리뷰 인기순</Text>
-                            <TouchableOpacity onPress={() => navigation.navigate("ReviewList")}>
-                                <Text style={styles.seeAllText}>전체보기</Text>
-                            </TouchableOpacity>
-                        </View>
-                        <Main_OTTList
-                            data={allPosters}
-                            provider={selectedProvider}
-                        /> */}
-                    </>
-                )}
+                    <View style={styles.popularHeader}>
+                        <Text style={styles.popularTitle}>리뷰 인기순</Text>
+                        <TouchableOpacity onPress={() => navigation.navigate("ReviewList")}>
+                            <Text style={styles.seeAllText}>전체보기</Text>
+                        </TouchableOpacity>
+                    </View>
+                    {/* <Main_OTTList
+                        data={allPosters}
+                    // provider={selectedProvider}
+                    /> */}
+                    <PopularReviewList />
+                </>
+                {/* )} */}
 
                 <Footer />
             </ScrollView>
@@ -288,16 +214,38 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginTop: 20,
     },
+    rightButtons: {
+        flexDirection: 'row',
+        gap: 12,
+    },
     popularTitle: {
         fontSize: 20,
         fontWeight: 'bold',
         marginLeft: 16,
         marginVertical: 10,
     },
+    divider: {
+        marginHorizontal: 6,
+    },
     seeAllText: {
         fontSize: 16,
         color: '#007bff',
         marginRight: 12,
+    },
+    OttText: {
+        fontSize: 16,
+        color: '#000',
+        // marginRight: 12,
+    },
+    MovieText: {
+        fontSize: 16,
+        color: '#000',
+        marginRight: 12,
+    },
+    selectedCategoryText: {
+        color: '#007bff',
+        fontWeight: 'bold', 
+        textDecorationLine: 'underline',
     },
     // 로딩 스피너 스타일
     loadingContainer: {

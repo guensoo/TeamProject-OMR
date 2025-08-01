@@ -26,5 +26,5 @@ public class ReviewRequestDto {
     private Integer commentCount; // 댓글 수
 
     private String userId; // 사용자 id
-    private UserEntity userData;
+//    private UserEntity userData;
 }

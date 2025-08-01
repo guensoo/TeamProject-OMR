@@ -7,6 +7,11 @@ const SCREEN_RATIO = SCREEN_HEIGHT / SCREEN_WIDTH;
 const Trailer = ({ data, onPlay }) => {
     if (!data || data.length === 0) return null;
 
+    // console.log("data: ",data)
+    const uniqueData = data.filter((item, index, arr) =>
+        arr.findIndex(i => i.id === item.id ) === index
+    );
+
     const getFullPosterUrl = (item) => {
         if (item.posterPath) {
             // 이미 전체 URL인 경우
@@ -37,7 +42,7 @@ const Trailer = ({ data, onPlay }) => {
         <View>
             {/* <Text style={styles.header}>🔥 지금 뜨는 예고편</Text> */}
             <FlatList
-                data={data}
+                data={uniqueData}
                 keyExtractor={(item, index) => item.id?.toString() || index.toString()}
                 renderItem={renderItem}
                 horizontal
