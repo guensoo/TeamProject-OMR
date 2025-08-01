@@ -180,12 +180,21 @@ const styles = StyleSheet.create({
     scrollView: {
         flex: 1,
     },
+    
+    // 🔥 2열 레이아웃을 위한 수정된 dataContainer
     dataContainer: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        justifyContent: 'space-between',
+        justifyContent: 'space-between', // 좌우 간격 균등분배
+        alignContent: 'flex-start', // 상단 정렬
         paddingHorizontal: 16,
         paddingBottom: 100, // 플로팅 버튼을 위한 하단 여백 추가
+    },
+    
+    // 🆕 ReviewComponent를 위한 새로운 스타일 추가 (이게 핵심!)
+    reviewItemContainer: {
+        width: '48%', // 48%로 설정하여 2열 + 간격 확보
+        marginBottom: 16, // 상하 간격
     },
     
     // 플로팅 버튼 스타일 추가

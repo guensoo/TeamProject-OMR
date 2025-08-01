@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect, useContext } from "react";
 import {
     View,
     Text,
@@ -13,6 +13,7 @@ import {
 import { RichEditor, RichToolbar, actions } from 'react-native-pell-rich-editor';
 import * as ImagePicker from 'expo-image-picker';
 import styles from './ReviewWriteStyles';
+import { UserContext } from "../../All/context/UserContext";
 
 export const ReviewWrite = ({ navigation }) => {
     const [title, setTitle] = useState('');
@@ -21,6 +22,25 @@ export const ReviewWrite = ({ navigation }) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [selectedMovie, setSelectedMovie] = useState(null);
     const richText = useRef();
+    const { user } = useContext(UserContext);
+
+    useEffect(() => {
+        if (!user) {
+            Alert.alert(
+                "로그인 필요",
+                '리뷰 작성은 로그인 후 이용하실 수 있습니다.',
+                [
+                    {
+                        text: '확인',
+                        onPress: () => navigation.replace('Login')
+                    }
+                ],
+                { cancelable: false }
+            );
+        }
+    }, [user]);
+
+    if (!user) return null;
 
     const handleRatingPress = (selectedRating) => {
         setRating(selectedRating);
@@ -45,7 +65,7 @@ export const ReviewWrite = ({ navigation }) => {
         }
     };
 
-    
+
 
     const handleSubmit = async () => {
         console.log("selectedMovie ::", selectedMovie);
@@ -85,7 +105,7 @@ export const ReviewWrite = ({ navigation }) => {
                     views: 0, // 조회 수
                     liked: 0, // 좋아요 수
                     commentCount: 0, // 댓글 수
-                    
+
                     userId: 5, // 유저 통합 데이터
                 }),
             });
