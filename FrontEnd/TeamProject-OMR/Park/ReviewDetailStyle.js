@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Platform } from "react-native";
 
 const styles = StyleSheet.create({
     safeArea: {
@@ -12,7 +12,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     container: {
-        paddingBottom: 100, // 댓글 입력창 공간 확보
+        paddingBottom: 120, // 댓글 입력창 공간을 더 넉넉하게 확보
     },
     loadingContainer: {
         flex: 1,
@@ -304,6 +304,7 @@ const styles = StyleSheet.create({
         borderTopColor: "#E9ECEF",
         paddingHorizontal: 16,
         paddingVertical: 12,
+        paddingBottom: 34, // iOS 홈 인디케이터 공간을 고려한 고정값
         elevation: 8,
         shadowColor: "#000",
         shadowOffset: { width: 0, height: -2 },
@@ -368,6 +369,106 @@ const styles = StyleSheet.create({
     },
     sendButtonTextInactive: {
         color: "#ADB5BD",
+    },
+
+    // 헤더 컨테이너 (헤더와 더보기 버튼을 포함)
+    headerContainer: {
+        position: 'relative',
+        backgroundColor: "#FFFFFF",
+        borderBottomWidth: 1,
+        borderBottomColor: "#F0F0F0",
+    },
+    headerContent: {
+        paddingRight: 50, // 더보기 버튼 공간 확보
+    },
+
+    // 더보기 버튼
+    moreButton: {
+        position: 'absolute',
+        top: 20,
+        right: 20,
+        width: 32,
+        height: 32,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 16,
+        backgroundColor: 'transparent',
+        zIndex: 10,
+    },
+    moreIcon: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#666',
+        lineHeight: 18,
+        textAlign: 'center',
+    },
+
+    // 메뉴 백드롭 (0으로 설정)
+    menuBackdrop: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'transparent', // 투명하게 설정
+        zIndex: 0, // 가장 낮은 z-index로 설정
+    },
+
+    // 드롭다운 메뉴
+    dropdownMenu: {
+        position: 'absolute',
+        top: 55, // 더보기 버튼 아래쪽에 위치
+        right: 20,
+        backgroundColor: '#FFFFFF',
+        borderRadius: 8,
+        paddingVertical: 4,
+        minWidth: 120,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 10, // Android shadow
+        zIndex: 15, // 백드롭보다 높은 z-index
+        borderWidth: 1,
+        borderColor: '#E9ECEF',
+    },
+
+    // 메뉴 아이템
+    menuItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+        minHeight: 44,
+        backgroundColor: 'transparent',
+    },
+
+    // 메뉴 아이콘
+    menuIcon: {
+        fontSize: 16,
+        marginRight: 12,
+        width: 20,
+        textAlign: 'center',
+    },
+
+    // 메뉴 텍스트
+    menuItemText: {
+        fontSize: 15,
+        color: '#333',
+        fontWeight: '500',
+        flex: 1,
+    },
+
+    // 삭제 메뉴 텍스트 (빨간색)
+    deleteMenuText: {
+        color: '#e53e3e',
+    },
+
+    // 메뉴 구분선
+    menuDivider: {
+        height: 1,
+        backgroundColor: '#f0f0f0',
+        marginHorizontal: 8,
     },
 });
 

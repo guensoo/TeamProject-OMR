@@ -23,20 +23,37 @@ const ReviewComponent = ({ review, onPress }) => {
         <TouchableOpacity
             style={styles.card}
             activeOpacity={0.85}
-            onPress={onPress}  // 여기!
+            onPress={onPress}
         >
             {thumbnail && <Image source={{ uri: thumbnail }} style={styles.thumbnail} />}
-            <Text style={styles.title}>{title}</Text>
-            <Text style={styles.movieTitle}>
+            
+            {/* 🔥 제목 텍스트에 말줄임표 적용 */}
+            <Text 
+                style={styles.title}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+            >
+                {title}
+            </Text>
+            
+            {/* 🔥 영화 제목에도 말줄임표 적용 */}
+            <Text 
+                style={styles.movieTitle}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+            >
                 {selectMovie?.title ? `[${selectMovie.title}]` : ""}
             </Text>
+            
             <View style={styles.row}>
                 <Text style={styles.author}>{userData?.nickname || "익명"}</Text>
                 <Text style={styles.date}>{createdAt?.slice(0, 10)}</Text>
             </View>
+            
             <Text style={styles.contentPreview} numberOfLines={2}>
                 {content?.replace(/<[^>]*>/g, "").replace(/&nbsp;/g, " ")}
             </Text>
+            
             <View style={styles.row}>
                 <Text style={styles.rating}>⭐ {rating}</Text>
                 <Text style={styles.counts}>👍 {liked}</Text>

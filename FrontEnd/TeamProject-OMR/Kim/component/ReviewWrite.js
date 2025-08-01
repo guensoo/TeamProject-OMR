@@ -1,19 +1,13 @@
 import { useRef, useState, useEffect, useContext } from "react";
 import {
-    View,
-    Text,
-    ScrollView,
-    TextInput,
-    TouchableOpacity,
-    SafeAreaView,
-    KeyboardAvoidingView,
-    Platform,
-    Alert
+    View, Text, ScrollView, TextInput, TouchableOpacity,
+    SafeAreaView, KeyboardAvoidingView, Platform, Alert
 } from "react-native";
 import { RichEditor, RichToolbar, actions } from 'react-native-pell-rich-editor';
 import * as ImagePicker from 'expo-image-picker';
 import styles from './ReviewWriteStyles';
 import { UserContext } from "../../All/context/UserContext";
+import { createReview } from '../../All/api/ReviewApi'; // ✅ 추가
 
 export const ReviewWrite = ({ navigation }) => {
     const [title, setTitle] = useState('');
@@ -65,10 +59,8 @@ export const ReviewWrite = ({ navigation }) => {
         }
     };
 
-
-
+    // ✅ 여기서부터만 완전 변경
     const handleSubmit = async () => {
-        console.log("selectedMovie ::", selectedMovie);
         if (!title.trim()) {
             Alert.alert('알림', '제목을 입력해주세요.');
             return;
@@ -85,37 +77,20 @@ export const ReviewWrite = ({ navigation }) => {
         setIsSubmitting(true);
 
         try {
-            const response = await fetch('http://10.0.2.2:8888/api/review', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    title: title, // 제목
-                    content: content, // 내용
-                    rating: rating, // 별점
-
-                    selectMovie: selectedMovie, // 작품 통합 데이터
-                    movieId: selectedMovie ? selectedMovie.id : null, // 작품의 CODE(ID)
-
-                    createAt: new Date().toISOString(), // 작성일
-                    updateAt: new Date().toISOString(), // 수정일
-                    isUpdate: false, // 수정 여부
-
-                    views: 0, // 조회 수
-                    liked: 0, // 좋아요 수
-                    commentCount: 0, // 댓글 수
-                    
-                    userId: user.userId, // 유저 통합 데이터
-                }),
+            await createReview({
+                title: title,
+                content: content,
+                rating: rating,
+                selectMovie: selectedMovie,
+                movieId: selectedMovie ? selectedMovie.id : null,
+                createAt: new Date().toISOString(),
+                updateAt: new Date().toISOString(),
+                isUpdate: false,
+                views: 0,
+                liked: 0,
+                commentCount: 0,
+                userId: user.userId,
             });
-
-            if (!response.ok) {
-                console.log(error)
-                throw new Error('리뷰 생성 실패');
-            }
-
-            const result = await response.json();
             Alert.alert('완료', '리뷰가 성공적으로 작성되었습니다!', [
                 { text: '확인', onPress: () => navigation.goBack() }
             ]);

@@ -2,6 +2,7 @@ package OMR.teamProject.OMR.Review.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -35,9 +36,17 @@ public class ReviewService {
                 .collect(Collectors.toList());
     }
 
+    // 리뷰 단건 조회
+    @Transactional(readOnly = true)
+    public ReviewResponseDto getReviewById(Long id) {
+        return reviewRepository.findById(id)
+                .map(this::toDto)
+                .orElse(null);
+    }
+
     // 리뷰 등록
     public ReviewResponseDto reviewCreate(ReviewRequestDto dto) {
-    	if (dto.getUserId() == null) {
+        if (dto.getUserId() == null) {
             throw new IllegalArgumentException("사용자 ID가 없습니다.");
         }
         UserEntity user = userRepository.findByUserId(dto.getUserId())
@@ -63,7 +72,35 @@ public class ReviewService {
         return toDto(reviewRepository.save(review));
     }
 
-    // Entity → DTO 변환
+    // 리뷰 수정
+    public ReviewResponseDto updateReview(Long id, ReviewRequestDto dto) {
+        Optional<ReviewEntity> optional = reviewRepository.findById(id);
+        if (optional.isEmpty()) return null;
+
+        ReviewEntity review = optional.get();
+
+        // 필요한 값만 업데이트
+        review.setTitle(dto.getTitle());
+        review.setContent(dto.getContent());
+        review.setRating(dto.getRating());
+        review.setUpdateAt(LocalDateTime.now());
+        review.setIsUpdate(true);
+
+        // 선택 영화 정보 수정
+        review.setMovieId(dto.getMovieId());
+        review.setSelectMovie(serializeToJson(dto.getSelectMovie()));
+
+        return toDto(reviewRepository.save(review));
+    }
+
+    // 리뷰 삭제
+    public boolean deleteReview(Long id) {
+        if (!reviewRepository.existsById(id)) return false;
+        reviewRepository.deleteById(id);
+        return true;
+    }
+
+    // --- 아래는 변환 함수/유틸 ---
     private ReviewResponseDto toDto(ReviewEntity review) {
         return ReviewResponseDto.builder()
                 .reviewId(review.getReviewId())
@@ -82,7 +119,6 @@ public class ReviewService {
                 .build();
     }
 
-    // 유저 변환
     private UserResponseDto toUserDto(UserEntity user) {
         if (user == null) return null;
         return UserResponseDto.builder()
@@ -94,7 +130,6 @@ public class ReviewService {
                 .build();
     }
 
-    // 영화 정보 직렬화
     private String serializeToJson(Object obj) {
         if (obj == null) return null;
         try {
@@ -104,17 +139,15 @@ public class ReviewService {
         }
     }
 
-    // 영화 정보 역직렬화
     private SelectedMovieDto deserializeFromJson(String json) {
         if (json == null) return null;
         try {
             return objectMapper.readValue(json, SelectedMovieDto.class);
         } catch (Exception e) {
-            return null; // 혹은 에러 로깅
+            return null; // 에러시 null
         }
     }
 
-    // 날짜 포맷 (필요시 형식 맞추기)
     private String formatDateTime(LocalDateTime time) {
         return time != null ? time.toString() : null;
     }
