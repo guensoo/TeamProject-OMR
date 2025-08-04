@@ -64,8 +64,20 @@ export const getAllOTTPopular = async () => {
                     const movies = await getOTTPopularMovie(providerId);
                     const tvs = await getOTTPopularTV(providerId);
 
-                    const combined = [...movies.slice(0, 5), ...tvs.slice(0, 5)]
-                        .map(item => ({ ...item, title: item.title || item.name, provider: key, }))
+                    const movies5 = movies.slice(0, 5).map(item => ({
+                        ...item,
+                        title: item.title || item.name,
+                        provider: key,
+                        media_type: 'movie'
+                    }));
+                    const tvs5 = tvs.slice(0, 5).map(item => ({
+                        ...item,
+                        title: item.title || item.name,
+                        provider: key,
+                        media_type: 'tv'
+                    }));
+
+                    const combined = [...movies5, ...tvs5];
 
                     return [key, combined];
                 } catch (err) {
