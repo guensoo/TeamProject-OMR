@@ -74,20 +74,20 @@ export async function deleteComment(reviewId, commentId) {
     if (!res.ok) throw new Error("댓글 삭제 실패");
     return true;
 }
-
-// 9. 리뷰 좋아요 등록 (POST /api/review/{reviewId}/like/{userId})
+// 6. 리뷰 좋아요 등록 (POST /api/review/like/{reviewId}/{userId})
 export async function postReviewLike(reviewId, userId) {
-    const res = await fetch(`${REVIEW_URL}/${reviewId}/like/${userId}`, {
+    const res = await fetch(`${REVIEW_URL}/like/${reviewId}/${userId}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId }),
     });
     if (!res.ok) throw new Error("리뷰 좋아요 등록 실패");
-    return await res.json();
+    return await res.text();  // json() 대신 text()로 변경
 }
 
-// 10. 리뷰 좋아요 취소 (DELETE /api/review/{reviewId}/like/{userId})
+// 7. 리뷰 좋아요 취소 (DELETE /api/review/like/{reviewId}/{userId})
 export async function deleteReviewLike(reviewId, userId) {
-    const res = await fetch(`${REVIEW_URL}/${reviewId}/like/${userId}`, {
+    const res = await fetch(`${REVIEW_URL}/like/${reviewId}/${userId}`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' }
     });
@@ -95,11 +95,15 @@ export async function deleteReviewLike(reviewId, userId) {
     return true;
 }
 
-// 11. 리뷰 좋아요 여부 조회 (GET /api/review/{reviewId}/like/{userId})
+// 8. 리뷰 좋아요 여부 조회 (GET /api/review/like/{reviewId}/{userId})
 export async function getReviewLikeStatus(reviewId, userId) {
-    const res = await fetch(`${REVIEW_URL}/${reviewId}/like/${userId}`);
+    const res = await fetch(`${REVIEW_URL}/like/${reviewId}/${userId}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    });
     if (!res.ok) throw new Error("리뷰 좋아요 상태 조회 실패");
-    // { liked: true/false } 반환한다고 가정
-    const data = await res.json();
-    return data.liked;
+    const data = await res.json(); // { liked: true }
+    return data;
 }

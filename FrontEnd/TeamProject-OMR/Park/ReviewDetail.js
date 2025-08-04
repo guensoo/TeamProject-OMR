@@ -35,8 +35,11 @@ const ReviewDetail = ({ route, navigation }) => {
     useEffect(() => {
         if (user && review?.reviewId) {
             getReviewLikeStatus(review.reviewId, user.userId)
-                .then(setLiked)
-                .catch(() => setLiked(false));
+                .then(setLiked) // 여기서 liked 값 제대로 들어가는지 확인
+                .catch(e => {
+                    console.error('좋아요 상태 조회 중 에러:', e);
+                    setLiked(false);
+                });
         }
     }, [user, review?.reviewId]);
 
@@ -170,6 +173,7 @@ const ReviewDetail = ({ route, navigation }) => {
                 setLikeCount((count) => count + 1);
             }
         } catch (error) {
+            console.error('좋아요 처리 오류:', error);
             Alert.alert('오류', '좋아요 처리 중 오류가 발생했습니다.');
         }
     };

@@ -17,8 +17,8 @@ public class ReviewLikeController {
     // 좋아요 등록
     @PostMapping("/{reviewId}/{userId}")
     public ResponseEntity<String> likeReview(
-        @PathVariable Long reviewId,
-        @PathVariable String userId
+        @PathVariable("reviewId") Long reviewId,
+        @PathVariable("userId") String userId
     ) {
         System.out.println("[likeReview] reviewId: " + reviewId + ", userId: " + userId);
         boolean result = likeService.likeReview(reviewId, userId);
@@ -32,8 +32,8 @@ public class ReviewLikeController {
     // 좋아요 취소
     @DeleteMapping("/{reviewId}/{userId}")
     public ResponseEntity<String> unlikeReview(
-        @PathVariable Long reviewId,
-        @PathVariable String userId
+        @PathVariable("reviewId") Long reviewId,
+        @PathVariable("userId") String userId
     ) {
         boolean result = likeService.unlikeReview(reviewId, userId);
         if (result) {
@@ -46,9 +46,9 @@ public class ReviewLikeController {
     // 좋아요 여부 조회
     @GetMapping("/{reviewId}/{userId}")
     public ResponseEntity<Boolean> isLiked(
-        @PathVariable Long reviewId,
-        @PathVariable String userId
-    ) {
+        @PathVariable("reviewId") Long reviewId,
+        @PathVariable("userId") String userId
+    ) { 
         boolean liked = likeService.isLikedByUser(reviewId, userId);
         return ResponseEntity.ok(liked);
     }
