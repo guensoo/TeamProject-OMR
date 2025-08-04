@@ -104,3 +104,40 @@ export async function postComment(reviewId, text, writer) {
     if (!res.ok) throw new Error("댓글 등록 실패");
     return await res.json();
 }
+
+// 6. 리뷰 좋아요 등록 (POST /api/review/{reviewId}/like/{userId})
+export async function postReviewLike(reviewId, userId) {
+    const res = await fetch(`${REVIEW_URL}/${reviewId}/like/${userId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+    if (!res.ok) throw new Error("리뷰 좋아요 등록 실패");
+    return await res.json();
+}
+
+// 7. 리뷰 좋아요 취소 (DELETE /api/review/{reviewId}/like/{userId})
+export async function deleteReviewLike(reviewId, userId) {
+    const res = await fetch(`${REVIEW_URL}/${reviewId}/like/${userId}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    });
+    if (!res.ok) throw new Error("리뷰 좋아요 취소 실패");
+    return true;
+}
+
+// 8. 리뷰 좋아요 여부 조회 (GET /api/review/{reviewId}/like/{userId})
+export async function getReviewLikeStatus(reviewId, userId) {
+    const res = await fetch(`${REVIEW_URL}/${reviewId}/like/${userId}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    });
+    if (!res.ok) throw new Error("리뷰 좋아요 상태 조회 실패");
+    const data = await res.json(); // { liked: true }
+    return data;
+}

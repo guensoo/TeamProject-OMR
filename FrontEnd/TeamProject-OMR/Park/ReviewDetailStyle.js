@@ -185,6 +185,25 @@ const styles = StyleSheet.create({
         color: "#FF6B6B",
     },
 
+    // 포스터 섹션
+    posterSection: {
+        alignItems: "center",
+        paddingVertical: 24,
+        paddingHorizontal: 20,
+        backgroundColor: "#FFFFFF",
+    },
+    posterImage: {
+        width: 200,
+        height: 300,
+        borderRadius: 12,
+        backgroundColor: "#F5F5F5",
+        elevation: 4,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.15,
+        shadowRadius: 8,
+    },
+
     // 영상 배너
     videoBanner: {
         margin: 20,

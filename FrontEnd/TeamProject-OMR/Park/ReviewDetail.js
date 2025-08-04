@@ -9,7 +9,15 @@ import styles from './ReviewDetailStyle';
 import ReviewHeader from './ReviewHeader';
 import ReviewDetailComment from "./ReviewDetailComment";
 import { UserContext } from '../All/context/UserContext';
-import { updateReview, deleteReview, getComments, postComment } from '../All/api/ReviewApi';
+import {
+    updateReview,
+    deleteReview,
+    getComments,
+    postComment,
+    postReviewLike,
+    deleteReviewLike,
+    getReviewLikeStatus
+} from '../All/api/ReviewApi';
 import { getMovieDetail, getTVDetail } from "../All/api/tmdb";
 
 const ReviewDetail = ({ route, navigation }) => {
@@ -17,7 +25,9 @@ const ReviewDetail = ({ route, navigation }) => {
     const [token, setToken] = useState(null);
     const review = route.params?.review;
     const currentUserId = user?.userId ?? null;
-    const [liked, setLiked] = useState(false); // 공감(좋아요) 여부
+
+    const [liked, setLiked] = useState(false);
+    const [likeCount, setLikeCount] = useState(review.liked || 0);
 
     // 댓글 관련 state
     const [comments, setComments] = useState([]);
@@ -26,14 +36,17 @@ const ReviewDetail = ({ route, navigation }) => {
     const [submittingComment, setSubmittingComment] = useState(false);
     const [showMenu, setShowMenu] = useState(false);
 
-    // 토큰 가져오기 (필요 없다면 제거 가능)
+    // 컴포넌트가 마운트될 때 좋아요 상태 조회
     useEffect(() => {
-        const fetchToken = async () => {
-            const savedToken = await AsyncStorage.getItem('authToken');
-            setToken(savedToken);
-        };
-        fetchToken();
-    }, []);
+        if (user && review?.reviewId) {
+            getReviewLikeStatus(review.reviewId, user.userId)
+                .then(setLiked)
+                .catch(e => {
+                    console.error('좋아요 상태 조회 중 에러:', e);
+                    setLiked(false);
+                });
+        }
+    }, [user, review?.reviewId]);
 
     // 댓글 목록 불러오기
     const fetchComments = async () => {
@@ -121,18 +134,34 @@ const ReviewDetail = ({ route, navigation }) => {
         );
     };
 
-    const handleLike = () => {
-        setLiked(!liked);
-    }
+    // 좋아요 토글 함수
+    const handleLike = async () => {
+        if (!user) {
+            Alert.alert('로그인 필요', '좋아요는 로그인 후에 가능합니다.');
+            return;
+        }
+
+        try {
+            if (liked) {
+                await deleteReviewLike(review.reviewId, user.userId);
+                setLiked(false);
+                setLikeCount((count) => Math.max(count - 1, 0));
+            } else {
+                await postReviewLike(review.reviewId, user.userId);
+                setLiked(true);
+                setLikeCount((count) => count + 1);
+            }
+        } catch (error) {
+            Alert.alert('오류', '좋아요 처리 중 오류가 발생했습니다.');
+            console.error(error);
+        }
+    };
 
     // **여기가 핵심! robust하게 type/tmdbId 판별**
     const getRobustOttInfo = () => {
-        // selectMovie가 있으면 거기서 robust하게 판별
         if (review.selectMovie && review.selectMovie.id) {
             const tmdbId = review.selectMovie.id;
-            // 1. media_type이 있으면 무조건 사용
             let type = review.selectMovie.media_type || review.media_type;
-            // 2. 없으면 TV로 판별 가능한 힌트가 있으면 TV
             if (!type) {
                 if (typeof review.selectMovie.first_air_date === 'string' || review.selectMovie.original_name) {
                     type = 'tv';
@@ -142,16 +171,23 @@ const ReviewDetail = ({ route, navigation }) => {
             }
             return { tmdbId, type, selectMovie: review.selectMovie };
         }
-        // movieId만 있을 때 (이건 거의 없음)
         if (review.movieId) return { tmdbId: review.movieId, type: 'movie' };
-        // tvId만 있을 때
         if (review.tvId) return { tmdbId: review.tvId, type: 'tv' };
-        // id + type이 있으면 fallback
         if (review.id && review.media_type) return { tmdbId: review.id, type: review.media_type };
         return { tmdbId: null, type: null };
     };
 
-    // 예외 처리 (리뷰 없을 때)
+    const getPosterUrl = () => {
+        let posterPath = null;
+        if (review.selectMovie?.poster_path) posterPath = review.selectMovie.poster_path;
+        else if (review.poster_path) posterPath = review.poster_path;
+        else if (review.movieData?.poster_path) posterPath = review.movieData.poster_path;
+        else if (review.tvData?.poster_path) posterPath = review.tvData.poster_path;
+        if (!posterPath) return null;
+        if (posterPath.startsWith('http')) return posterPath;
+        return `https://image.tmdb.org/t/p/w500${posterPath}`;
+    };
+
     if (!review) {
         return (
             <SafeAreaView style={styles.errorContainer}>
@@ -160,15 +196,12 @@ const ReviewDetail = ({ route, navigation }) => {
         );
     }
 
-    console.log("comments:", comments);
-
     return (
         <SafeAreaView style={styles.safeArea}>
             <KeyboardAvoidingView
                 style={styles.keyboardView}
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             >
-                {/* 메뉴 백드롭 */}
                 {showMenu && (
                     <TouchableOpacity
                         style={styles.menuBackdrop}
@@ -183,7 +216,6 @@ const ReviewDetail = ({ route, navigation }) => {
                     showsVerticalScrollIndicator={false}
                     keyboardShouldPersistTaps="handled"
                 >
-                    {/* 헤더 */}
                     <View style={styles.headerContainer}>
                         <View style={styles.headerContent}>
                             <ReviewHeader
@@ -191,7 +223,7 @@ const ReviewDetail = ({ route, navigation }) => {
                                 author={review.userData?.nickname || review.author || "익명"}
                                 rating={review.rating}
                                 viewCount={review.views || review.viewCount || 0}
-                                likeCount={0}   // 좋아요 필드 없는 경우 0으로 고정
+                                likeCount={likeCount}
                                 commentCount={review.commentCount || comments.length || 0}
                             />
                         </View>
@@ -218,7 +250,6 @@ const ReviewDetail = ({ route, navigation }) => {
                         )}
                     </View>
 
-                    {/* 본문 */}
                     <View style={styles.contentSection}>
                         {contentArray.map((line, idx) => (
                             !!line && <Text key={idx} style={styles.contentText}>
@@ -238,7 +269,6 @@ const ReviewDetail = ({ route, navigation }) => {
                         )}
                     </View>
 
-                    {/* 액션 버튼 */}
                     <View style={styles.actionSection}>
                         <TouchableOpacity
                             style={[styles.actionButton, liked && styles.actionButtonLiked]}
@@ -248,7 +278,7 @@ const ReviewDetail = ({ route, navigation }) => {
                                 {liked ? '❤️' : '🤍'}
                             </Text>
                             <Text style={[styles.actionText, liked && styles.actionTextLiked]}>
-                                공감 {liked ? 1 : 0}
+                                공감 {likeCount}
                             </Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.actionButton}>
@@ -261,7 +291,16 @@ const ReviewDetail = ({ route, navigation }) => {
                         </TouchableOpacity>
                     </View>
 
-                    {/* 관련 영상 배너 */}
+                    {getPosterUrl() && (
+                        <View style={styles.posterSection}>
+                            <Image
+                                source={{ uri: getPosterUrl() }}
+                                style={styles.posterImage}
+                                resizeMode="cover"
+                            />
+                        </View>
+                    )}
+
                     <View style={styles.videoBanner}>
                         <Text style={styles.videoBannerText}>
                             🎬 이 영화가 궁금하다면?
@@ -269,9 +308,6 @@ const ReviewDetail = ({ route, navigation }) => {
                                 onPress={async () => {
                                     try {
                                         const { tmdbId, type, selectMovie } = getRobustOttInfo();
-                                        console.log('[상세보기] selectMovie:', selectMovie);
-                                        console.log('[상세보기] tmdbId:', tmdbId, 'type:', type);
-
                                         if (!tmdbId) {
                                             Alert.alert('작품 정보 없음', '이 리뷰에 연결된 작품을 찾을 수 없습니다.');
                                             return;
@@ -282,7 +318,6 @@ const ReviewDetail = ({ route, navigation }) => {
                                         } else if (type === "tv") {
                                             detail = await getTVDetail(tmdbId);
                                         } else {
-                                            // 혹시나 type 못찾으면 movie로 fallback
                                             detail = await getMovieDetail(tmdbId);
                                         }
                                         if (detail) {
@@ -300,7 +335,6 @@ const ReviewDetail = ({ route, navigation }) => {
                         </Text>
                     </View>
 
-                    {/* 댓글 섹션 */}
                     <View style={styles.commentSection}>
                         <Text style={styles.commentSectionTitle}>
                             댓글 {comments.length}개
@@ -319,7 +353,6 @@ const ReviewDetail = ({ route, navigation }) => {
                     </View>
                 </ScrollView>
 
-                {/* 댓글 입력 인풋 */}
                 {user?.userId ? (
                     <View style={styles.commentInputSection}>
                         <View style={styles.commentInputContainer}>
