@@ -171,4 +171,15 @@ public class ReviewService {
 
         return CommentResponseDto.from(comment);
     }
+    
+    public void deleteComment(Long reviewId, Long commentId) {
+        CommentEntity comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new RuntimeException("댓글을 찾을 수 없습니다."));
+
+        if (!comment.getReview().getReviewId().equals(reviewId)) {
+            throw new RuntimeException("리뷰/댓글 정보가 일치하지 않습니다.");
+        }
+
+        commentRepository.delete(comment);
+    }
 }

@@ -76,4 +76,11 @@ public class ReviewController {
     									  @RequestBody CommentRequestDto dto) {
         return reviewService.createComment(reviewId, dto);
     }
+    
+    @DeleteMapping("/{reviewId}/comments/{commentId}")
+    public ResponseEntity<?> deleteComment(@PathVariable("reviewId") Long reviewId,
+    									   @PathVariable("commentId") Long commentId) {
+    	reviewService.deleteComment(reviewId, commentId);
+        return ResponseEntity.ok().build();
+    }
 }

@@ -10,22 +10,17 @@ import ReviewHeader from './ReviewHeader';
 import ReviewDetailComment from "./ReviewDetailComment";
 import { UserContext } from '../All/context/UserContext';
 import {
-    updateReview,
-    deleteReview,
-    getComments,
-    postComment,
-    postReviewLike,
-    deleteReviewLike,
-    getReviewLikeStatus
+    deleteReview, getComments, postComment, deleteComment,
+    postReviewLike, deleteReviewLike, getReviewLikeStatus
 } from '../All/api/ReviewApi';
 import { getMovieDetail, getTVDetail } from "../All/api/tmdb";
 
 const ReviewDetail = ({ route, navigation }) => {
     const { user } = useContext(UserContext);
-    const [token, setToken] = useState(null);
     const review = route.params?.review;
     const currentUserId = user?.userId ?? null;
 
+    // 상태 선언
     const [liked, setLiked] = useState(false);
     const [likeCount, setLikeCount] = useState(review.liked || 0);
 
@@ -36,15 +31,12 @@ const ReviewDetail = ({ route, navigation }) => {
     const [submittingComment, setSubmittingComment] = useState(false);
     const [showMenu, setShowMenu] = useState(false);
 
-    // 컴포넌트가 마운트될 때 좋아요 상태 조회
+    // 좋아요 상태 가져오기
     useEffect(() => {
         if (user && review?.reviewId) {
             getReviewLikeStatus(review.reviewId, user.userId)
                 .then(setLiked)
-                .catch(e => {
-                    console.error('좋아요 상태 조회 중 에러:', e);
-                    setLiked(false);
-                });
+                .catch(() => setLiked(false));
         }
     }, [user, review?.reviewId]);
 
@@ -54,7 +46,7 @@ const ReviewDetail = ({ route, navigation }) => {
         setLoadingComments(true);
         try {
             const data = await getComments(review.reviewId);
-            setComments(data); // 서버 반환 구조에 따라 조정
+            setComments(data);
         } catch (error) {
             Alert.alert("오류", "댓글을 불러오지 못했습니다.");
         } finally {
@@ -62,7 +54,6 @@ const ReviewDetail = ({ route, navigation }) => {
         }
     };
 
-    // 리뷰 id 변경시 댓글 새로고침
     useEffect(() => {
         fetchComments();
     }, [review?.reviewId]);
@@ -81,7 +72,7 @@ const ReviewDetail = ({ route, navigation }) => {
         if (imgMatch && imgMatch[1]) imageUrl = imgMatch[1];
     }
 
-    // 댓글 등록 함수 (POST)
+    // 댓글 등록
     const handleSubmitComment = async () => {
         if (!user?.userId) {
             Alert.alert("로그인 필요", "로그인한 사용자만 댓글 작성이 가능합니다.");
@@ -100,7 +91,35 @@ const ReviewDetail = ({ route, navigation }) => {
         }
     };
 
-    // 리뷰 수정 함수
+    // 댓글 삭제 (본인 또는 관리자만 가능)
+    const handleDeleteComment = (commentId, writer) => {
+        const isAdmin = user?.role?.toLowerCase() === 'admin';
+        const isMine = user?.nickname === writer;
+        if (!isMine && !isAdmin) {
+            Alert.alert("권한 없음", "본인 또는 관리자만 댓글을 삭제할 수 있습니다.");
+            return;
+        }
+        Alert.alert(
+            "댓글 삭제",
+            "정말로 이 댓글을 삭제하시겠습니까?",
+            [
+                { text: "취소", style: "cancel" },
+                {
+                    text: "삭제", style: "destructive",
+                    onPress: async () => {
+                        try {
+                            await deleteComment(review.reviewId, commentId);
+                            fetchComments();
+                        } catch (error) {
+                            Alert.alert("오류", "댓글 삭제에 실패했습니다.");
+                        }
+                    }
+                }
+            ]
+        );
+    };
+
+    // 리뷰 수정
     const handleEditReview = () => {
         setShowMenu(false);
         navigation.navigate('ReviewEdit', {
@@ -109,7 +128,7 @@ const ReviewDetail = ({ route, navigation }) => {
         });
     };
 
-    // 리뷰 삭제 함수
+    // 리뷰 삭제
     const handleDeleteReview = () => {
         setShowMenu(false);
         Alert.alert(
@@ -134,13 +153,12 @@ const ReviewDetail = ({ route, navigation }) => {
         );
     };
 
-    // 좋아요 토글 함수
+    // 좋아요 토글
     const handleLike = async () => {
         if (!user) {
             Alert.alert('로그인 필요', '좋아요는 로그인 후에 가능합니다.');
             return;
         }
-
         try {
             if (liked) {
                 await deleteReviewLike(review.reviewId, user.userId);
@@ -153,11 +171,10 @@ const ReviewDetail = ({ route, navigation }) => {
             }
         } catch (error) {
             Alert.alert('오류', '좋아요 처리 중 오류가 발생했습니다.');
-            console.error(error);
         }
     };
 
-    // **여기가 핵심! robust하게 type/tmdbId 판별**
+    // OTT/포스터 robust 추출
     const getRobustOttInfo = () => {
         if (review.selectMovie && review.selectMovie.id) {
             const tmdbId = review.selectMovie.id;
@@ -202,6 +219,7 @@ const ReviewDetail = ({ route, navigation }) => {
                 style={styles.keyboardView}
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             >
+                {/* 메뉴 백드롭 */}
                 {showMenu && (
                     <TouchableOpacity
                         style={styles.menuBackdrop}
@@ -216,6 +234,7 @@ const ReviewDetail = ({ route, navigation }) => {
                     showsVerticalScrollIndicator={false}
                     keyboardShouldPersistTaps="handled"
                 >
+                    {/* 헤더 */}
                     <View style={styles.headerContainer}>
                         <View style={styles.headerContent}>
                             <ReviewHeader
@@ -250,6 +269,7 @@ const ReviewDetail = ({ route, navigation }) => {
                         )}
                     </View>
 
+                    {/* 본문 */}
                     <View style={styles.contentSection}>
                         {contentArray.map((line, idx) => (
                             !!line && <Text key={idx} style={styles.contentText}>
@@ -269,6 +289,7 @@ const ReviewDetail = ({ route, navigation }) => {
                         )}
                     </View>
 
+                    {/* 액션 버튼 */}
                     <View style={styles.actionSection}>
                         <TouchableOpacity
                             style={[styles.actionButton, liked && styles.actionButtonLiked]}
@@ -291,6 +312,7 @@ const ReviewDetail = ({ route, navigation }) => {
                         </TouchableOpacity>
                     </View>
 
+                    {/* 작품 포스터 */}
                     {getPosterUrl() && (
                         <View style={styles.posterSection}>
                             <Image
@@ -301,6 +323,7 @@ const ReviewDetail = ({ route, navigation }) => {
                         </View>
                     )}
 
+                    {/* OTT 상세배너 */}
                     <View style={styles.videoBanner}>
                         <Text style={styles.videoBannerText}>
                             🎬 이 영화가 궁금하다면?
@@ -313,18 +336,11 @@ const ReviewDetail = ({ route, navigation }) => {
                                             return;
                                         }
                                         let detail = null;
-                                        if (type === "movie") {
-                                            detail = await getMovieDetail(tmdbId);
-                                        } else if (type === "tv") {
-                                            detail = await getTVDetail(tmdbId);
-                                        } else {
-                                            detail = await getMovieDetail(tmdbId);
-                                        }
-                                        if (detail) {
-                                            navigation.navigate('InfoDetail', { ott: detail });
-                                        } else {
-                                            Alert.alert('상세 정보를 불러올 수 없습니다.');
-                                        }
+                                        if (type === "movie") detail = await getMovieDetail(tmdbId);
+                                        else if (type === "tv") detail = await getTVDetail(tmdbId);
+                                        else detail = await getMovieDetail(tmdbId);
+                                        if (detail) navigation.navigate('InfoDetail', { ott: detail });
+                                        else Alert.alert('상세 정보를 불러올 수 없습니다.');
                                     } catch (e) {
                                         Alert.alert('상세 정보를 불러오는 중 오류가 발생했습니다.');
                                     }
@@ -335,6 +351,7 @@ const ReviewDetail = ({ route, navigation }) => {
                         </Text>
                     </View>
 
+                    {/* 댓글 섹션 */}
                     <View style={styles.commentSection}>
                         <Text style={styles.commentSectionTitle}>
                             댓글 {comments.length}개
@@ -346,13 +363,19 @@ const ReviewDetail = ({ route, navigation }) => {
                                 <Text style={styles.emptyCommentText}>아직 댓글이 없습니다.</Text>
                             ) : (
                                 comments.map(comment => (
-                                    <ReviewDetailComment key={comment.id} {...comment} />
+                                    <ReviewDetailComment
+                                        key={comment.id}
+                                        {...comment}
+                                        user={user}
+                                        onDelete={handleDeleteComment}
+                                    />
                                 ))
                             )
                         )}
                     </View>
                 </ScrollView>
 
+                {/* 댓글 입력 */}
                 {user?.userId ? (
                     <View style={styles.commentInputSection}>
                         <View style={styles.commentInputContainer}>
