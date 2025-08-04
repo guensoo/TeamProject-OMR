@@ -87,9 +87,10 @@ export async function verifyResetCode(email, code) {
 }
 
 //비밀번호 재설정 api
-export async function resetPassword(userId, newPassword) {
+export async function resetPasswordApi(userId, newPassword) {
     try {
         const res = await axios.post(`${API}/api/users/reset-password`, { userId, newPassword });
+        console.log("reset.res.data: ",res.data)
         return res.data;
     } catch (error) {
         const message = error.response?.data || error.message || '비밀번호 재설정 실패';

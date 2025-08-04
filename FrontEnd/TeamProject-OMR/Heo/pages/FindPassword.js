@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Text, View, StyleSheet, TextInput, TouchableOpacity, SafeAreaView, KeyboardAvoidingView, Platform, Alert } from "react-native";
+import { Text, View, StyleSheet, TextInput, TouchableOpacity, SafeAreaView, KeyboardAvoidingView, Platform, Alert, ActivityIndicator } from "react-native";
 import { useNavigation } from '@react-navigation/native';
 import { findPassword } from "../../All/api/UserApi";
 import { useRoute } from "@react-navigation/native";
@@ -8,7 +8,7 @@ import { sendResetCode, verifyResetCode } from "../../All/api/UserApi";
 const FindPassword = ({ navigation }) => {
     // const navigation = useNavigation();
     // const route = useRoute();
-
+    
     const [id, setId] = useState('');
     const [email, setEmail] = useState('');
     const [authCode, setAuthCode] = useState('');
@@ -45,7 +45,7 @@ const FindPassword = ({ navigation }) => {
         try {
             setIsSendingCode(true);
             const res = await sendResetCode(id, email);
-            Alert.alert("완료", res.message);
+            Alert.alert("완료", res.message || "인증코드 발송 완료");
             setIsCodeSent(true);
         } catch (error) {
             Alert.alert("오류", error.message);
@@ -60,6 +60,7 @@ const FindPassword = ({ navigation }) => {
             setCodeError('인증코드를 입력해주세요.');
             return;
         }
+        console.log("id:", id)
         setCodeError('');
         try {
             setIsVerifyingCode(true);
@@ -155,7 +156,11 @@ const FindPassword = ({ navigation }) => {
                                 </View>
 
                                 <TouchableOpacity style={styles.findButton} onPress={handleVerifyCode}>
-                                    <Text style={styles.findButtonText}>인증코드 확인</Text>
+                                    {isVerifyingCode ? (
+                                        <ActivityIndicator size="small" color="#ffffff" />
+                                    ) : (
+                                        <Text style={styles.findButtonText}>인증코드 확인</Text>
+                                    )}
                                 </TouchableOpacity>
 
                                 <TouchableOpacity onPress={() => setIsCodeSent(false)} style={{ marginTop: 20, marginBottom: 10 }}>

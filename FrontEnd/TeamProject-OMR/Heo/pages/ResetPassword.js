@@ -1,14 +1,15 @@
 import { useState } from "react";
-import { View, TextInput, Button, Alert, StyleSheet } from "react-native";
-import { resetPassword } from "../../All/api/UserApi";
+import { View, TextInput, Button, Alert, StyleSheet, Text } from "react-native";
+import { resetPasswordApi } from "../../All/api/UserApi";
 
 const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,16}$/;
 
 const ResetPassword = ({ route, navigation }) => {
+
     const { userId } = route.params;
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-
+    
     const handleReset = async () => {
         if (!newPassword) {
             Alert.alert('오류', '새 비밀번호를 입력해주세요.');
@@ -26,15 +27,18 @@ const ResetPassword = ({ route, navigation }) => {
         }
 
         try {
-            const message = await resetPassword(userId, newPassword);
+            console.log('resetPasswordApi:', typeof resetPasswordApi); 
+            const message = await resetPasswordApi(userId, newPassword);
+            console.log('message:', message);
             Alert.alert("성공", message, [
                 { text: "확인", onPress: () => navigation.navigate('Login') }
             ])
         } catch (error) {
+            console.error('resetPasswordApi error:', error);
             Alert.alert("실패", error.message);
         }
     }
-
+    
     return (
         <View style={styles.container}>
             <TextInput

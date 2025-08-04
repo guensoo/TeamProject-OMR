@@ -27,7 +27,7 @@ public class UserService {
     public UserResponseDto register(UserRequestDto dto) {
         UserEntity user = UserEntity.builder()
             .userId(dto.getUserId())
-            .password(dto.getPassword()) // 보통 암호화 필요!
+            .password(passwordEncoder.encode(dto.getPassword())) // 보통 암호화 필요!
             .nickname(dto.getNickname())
             .email(dto.getEmail())
             .role("USER")
