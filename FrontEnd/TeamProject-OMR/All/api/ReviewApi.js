@@ -49,12 +49,12 @@ export async function createReview(data) {
 }
 
 // 4. 리뷰 수정 (PUT /api/review/{id})
-export async function updateReview(reviewId, data) {
+export async function updateReview(reviewId, updatedReview) {
     try {
         const res = await fetch(`${REVIEW_URL}/${reviewId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
+            body: JSON.stringify(updatedReview)   // 수정할 값들을 body로 전달!
         });
         if (!res.ok) throw new Error('리뷰 수정 실패');
         return await res.json();
@@ -65,12 +65,11 @@ export async function updateReview(reviewId, data) {
 }
 
 // 5. 리뷰 삭제 (DELETE /api/review/{id})
-export async function deleteReview(reviewId, token) {
+export async function deleteReview(reviewId) {
     try {
         const res = await fetch(`${REVIEW_URL}/${reviewId}`, {
             method: 'DELETE',
             headers: {
-                // 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             }
         });
@@ -80,4 +79,28 @@ export async function deleteReview(reviewId, token) {
         console.error('[deleteReview]', error);
         throw error;
     }
+}
+
+// 댓글 목록 조회
+export async function getComments(reviewId) {
+    const res = await fetch(`${REVIEW_URL}/${reviewId}/comments`);
+    if (!res.ok) throw new Error("댓글 불러오기 실패");
+    return await res.json();
+}
+
+// 댓글 등록
+export async function postComment(reviewId, text, writer) {
+    const res = await fetch(`${REVIEW_URL}/${reviewId}/comments`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            reviewId,
+            text,
+            writer,
+        }),
+    });
+    if (!res.ok) throw new Error("댓글 등록 실패");
+    return await res.json();
 }

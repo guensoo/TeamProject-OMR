@@ -6,8 +6,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 
+import OMR.teamProject.OMR.Review.DTO.CommentRequestDto;
+import OMR.teamProject.OMR.Review.DTO.CommentResponseDto;
 import OMR.teamProject.OMR.Review.DTO.ReviewRequestDto;
 import OMR.teamProject.OMR.Review.DTO.ReviewResponseDto;
+import OMR.teamProject.OMR.Review.DTO.ReviewUpdateRequest;
 import OMR.teamProject.OMR.Review.Service.ReviewService;
 import lombok.RequiredArgsConstructor;
 
@@ -42,11 +45,9 @@ public class ReviewController {
 
     // 4. 리뷰 수정
     @PutMapping("/{id}")
-    public ResponseEntity<ReviewResponseDto> updateReview(
-            @PathVariable Long id,
-            @RequestBody ReviewRequestDto dto
-    ) {
-        ReviewResponseDto updated = reviewService.updateReview(id, dto);
+    public ResponseEntity<ReviewResponseDto> updateReview(@PathVariable("id") Long id,
+            											  @RequestBody ReviewUpdateRequest request) {
+        ReviewResponseDto updated = reviewService.updateReview(id, request);
         if (updated == null) {
             return ResponseEntity.notFound().build();
         }
@@ -61,5 +62,18 @@ public class ReviewController {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok().body("삭제 성공");
+    }
+    
+    // 리뷰 댓글 조회
+    @GetMapping("/{reviewId}/comments")
+    public List<CommentResponseDto> getComments(@PathVariable("reviewId") Long reviewId) {
+        return reviewService.getCommentsByReviewId(reviewId);
+    }
+
+    // 리뷰 댓글 등록
+    @PostMapping("/{reviewId}/comments")
+    public CommentResponseDto postComment(@PathVariable("reviewId") Long reviewId,
+    									  @RequestBody CommentRequestDto dto) {
+        return reviewService.createComment(reviewId, dto);
     }
 }

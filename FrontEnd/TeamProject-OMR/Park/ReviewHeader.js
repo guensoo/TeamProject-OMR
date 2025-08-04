@@ -17,7 +17,7 @@ const ReviewHeader = ({ title, author, rating, viewCount, likeCount, commentCoun
                                 key={star}
                                 style={[
                                     styles.star,
-                                    star <= Math.floor(rating / 2) ? styles.starFilled : styles.starEmpty
+                                    star <= rating ? styles.starFilled : styles.starEmpty
                                 ]}
                             >
                                 ★

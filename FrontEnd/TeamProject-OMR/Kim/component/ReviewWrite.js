@@ -61,8 +61,6 @@ export const ReviewWrite = ({ navigation }) => {
 
     // ✅ 여기서부터만 완전 변경
     const handleSubmit = async () => {
-        console.log("selectedMovie ::", selectedMovie);
-        console.log("title ::", selectedMovie.title);
         if (!selectedMovie.title) {
             selectedMovie.title = selectedMovie.original_name;
         }

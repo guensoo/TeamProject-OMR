@@ -2,7 +2,6 @@ package OMR.teamProject.OMR.Review.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -10,10 +9,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import OMR.teamProject.OMR.Review.DTO.CommentRequestDto;
+import OMR.teamProject.OMR.Review.DTO.CommentResponseDto;
 import OMR.teamProject.OMR.Review.DTO.ReviewRequestDto;
 import OMR.teamProject.OMR.Review.DTO.ReviewResponseDto;
+import OMR.teamProject.OMR.Review.DTO.ReviewUpdateRequest;
 import OMR.teamProject.OMR.Review.DTO.SelectedMovieDto;
+import OMR.teamProject.OMR.Review.Entity.CommentEntity;
 import OMR.teamProject.OMR.Review.Entity.ReviewEntity;
+import OMR.teamProject.OMR.Review.Repository.CommentRepository;
 import OMR.teamProject.OMR.Review.Repository.ReviewRepository;
 import OMR.teamProject.OMR.User.DTO.UserResponseDto;
 import OMR.teamProject.OMR.User.Entity.UserEntity;
@@ -27,6 +31,7 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final UserRepository userRepository;
     private final ObjectMapper objectMapper;
+    private final CommentRepository commentRepository;
 
     // 전체 리뷰 목록 조회
     @Transactional(readOnly = true)
@@ -73,24 +78,18 @@ public class ReviewService {
     }
 
     // 리뷰 수정
-    public ReviewResponseDto updateReview(Long id, ReviewRequestDto dto) {
-        Optional<ReviewEntity> optional = reviewRepository.findById(id);
-        if (optional.isEmpty()) return null;
+    public ReviewResponseDto updateReview(Long id, ReviewUpdateRequest req) {
+        ReviewEntity review = reviewRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("리뷰를 찾을 수 없습니다."));
 
-        ReviewEntity review = optional.get();
+        review.setTitle(req.getTitle());
+        review.setContent(req.getContent());
+        review.setRating(req.getRating());
 
-        // 필요한 값만 업데이트
-        review.setTitle(dto.getTitle());
-        review.setContent(dto.getContent());
-        review.setRating(dto.getRating());
-        review.setUpdateAt(LocalDateTime.now());
-        review.setIsUpdate(true);
+        // (필요시 selectMovie, isUpdate, updateAt 등도 여기서 같이 set)
+        reviewRepository.save(review);
 
-        // 선택 영화 정보 수정
-        review.setMovieId(dto.getMovieId());
-        review.setSelectMovie(serializeToJson(dto.getSelectMovie()));
-
-        return toDto(reviewRepository.save(review));
+        return ReviewResponseDto.from(review);
     }
 
     // 리뷰 삭제
@@ -150,5 +149,26 @@ public class ReviewService {
 
     private String formatDateTime(LocalDateTime time) {
         return time != null ? time.toString() : null;
+    }
+    
+    public List<CommentResponseDto> getCommentsByReviewId(Long reviewId) {
+        List<CommentEntity> comments = commentRepository.findByReview_ReviewId(reviewId);
+        return comments.stream().map(CommentResponseDto::from).collect(Collectors.toList());
+    }
+
+    public CommentResponseDto createComment(Long reviewId, CommentRequestDto dto) {
+        ReviewEntity review = reviewRepository.findById(reviewId)
+            .orElseThrow(() -> new RuntimeException("리뷰 없음"));
+
+        CommentEntity comment = CommentEntity.builder()
+            .review(review)
+            .text(dto.getText())
+            .writer(dto.getWriter()) // writer 없이 익명으로 할 수도 있음
+            .createdAt(LocalDateTime.now())
+            .build();
+
+        commentRepository.save(comment);
+
+        return CommentResponseDto.from(comment);
     }
 }

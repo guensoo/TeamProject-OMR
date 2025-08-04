@@ -2,37 +2,30 @@ import { useState, useEffect, useContext } from "react";
 import {
     View, Text, ScrollView, ActivityIndicator, Image,
     TouchableOpacity, SafeAreaView, TextInput,
-    KeyboardAvoidingView, Platform, Alert, Modal
+    KeyboardAvoidingView, Platform, Alert
 } from "react-native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from './ReviewDetailStyle';
 import ReviewHeader from './ReviewHeader';
-import Comment from "./ReviewDetailComment";
+import ReviewDetailComment from "./ReviewDetailComment";
 import { UserContext } from '../All/context/UserContext';
-import { updateReview, deleteReview } from '../All/api/ReviewApi';
-
-// 샘플 댓글 (이 부분은 남겨도 OK)
-const sampleComments = [
-    {
-        id: 1,
-        user: "Indominus Rex",
-        text: "12세 관람가 ㅋㅋㅋ",
-        date: "2015.6.16. 11:43",
-        likes: 0,
-    },
-];
+import { updateReview, deleteReview, getComments, postComment } from '../All/api/ReviewApi';
 
 const ReviewDetail = ({ route, navigation }) => {
-    // 리뷰 전체 객체를 route로 받음
     const { user } = useContext(UserContext);
     const [token, setToken] = useState(null);
     const review = route.params?.review;
     const currentUserId = user?.userId ?? null;
+    const [liked, setLiked] = useState(false); // 공감(좋아요) 여부
 
-    useEffect(() => {
-        console.log('[ReviewDetail] currentUserId:', currentUserId);
-    }, [currentUserId]);
+    // 댓글 관련 state
+    const [comments, setComments] = useState([]);
+    const [loadingComments, setLoadingComments] = useState(false);
+    const [commentText, setCommentText] = useState('');
+    const [submittingComment, setSubmittingComment] = useState(false);
+    const [showMenu, setShowMenu] = useState(false);
 
+    // 토큰 가져오기 (필요 없다면 제거 가능)
     useEffect(() => {
         const fetchToken = async () => {
             const savedToken = await AsyncStorage.getItem('authToken');
@@ -41,53 +34,55 @@ const ReviewDetail = ({ route, navigation }) => {
         fetchToken();
     }, []);
 
-    const [liked, setLiked] = useState(false);
-    const [commentText, setCommentText] = useState('');
-    const [comments, setComments] = useState(sampleComments);
-    const [showMenu, setShowMenu] = useState(false); // 더보기 메뉴 상태
+    // 댓글 목록 불러오기
+    const fetchComments = async () => {
+        if (!review?.reviewId) return;
+        setLoadingComments(true);
+        try {
+            const data = await getComments(review.reviewId);
+            setComments(data); // 서버 반환 구조에 따라 조정
+        } catch (error) {
+            Alert.alert("오류", "댓글을 불러오지 못했습니다.");
+        } finally {
+            setLoadingComments(false);
+        }
+    };
 
-    if (!review) {
-        return (
-            <SafeAreaView style={styles.errorContainer}>
-                <Text style={styles.errorText}>리뷰를 찾을 수 없습니다.</Text>
-            </SafeAreaView>
-        );
-    }
+    // 리뷰 id 변경시 댓글 새로고침
+    useEffect(() => {
+        fetchComments();
+    }, [review?.reviewId]);
 
-
-    // 내가 쓴 글인지 판별 (userId 또는 user.userId 활용)
+    // 내가 쓴 글인지 판별
     const reviewUserId = review.userId ?? review.userData?.userId ?? review.user?.userId ?? null;
     const isMine = currentUserId && reviewUserId && currentUserId === reviewUserId;
 
     // content 매핑 (html, string, array 등 커버)
     const contentArray = Array.isArray(review.content) ? review.content : [review.content || ""];
 
-    // 썸네일 이미지 추출 (content에 <img ... src=...> 태그가 있으면 뽑기)
+    // 썸네일 이미지 추출
     let imageUrl = review.imageUrl;
     if (!imageUrl && review.content) {
         const imgMatch = review.content.match(/<img[^>]+src="([^">]+)"/);
         if (imgMatch && imgMatch[1]) imageUrl = imgMatch[1];
     }
 
-    const handleLike = () => setLiked(!liked);
-
-    const handleSubmitComment = () => {
-        if (commentText.trim()) {
-            const newComment = {
-                id: comments.length + 1,
-                user: "현재 사용자",
-                text: commentText.trim(),
-                date: new Date().toLocaleDateString('ko-KR', {
-                    year: 'numeric',
-                    month: 'numeric',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                }).replace(/\./g, '.').replace(/\s/, '. '),
-                likes: 0,
-            };
-            setComments([newComment, ...comments]);
+    // 댓글 등록 함수 (POST)
+    const handleSubmitComment = async () => {
+        if (!user?.userId) {
+            Alert.alert("로그인 필요", "로그인한 사용자만 댓글 작성이 가능합니다.");
+            return;
+        }
+        if (!commentText.trim() || !review?.reviewId) return;
+        setSubmittingComment(true);
+        try {
+            await postComment(review.reviewId, commentText.trim(), user.nickname);
             setCommentText('');
+            fetchComments();
+        } catch (error) {
+            Alert.alert("댓글 등록 실패", "다시 시도해주세요.");
+        } finally {
+            setSubmittingComment(false);
         }
     };
 
@@ -99,40 +94,25 @@ const ReviewDetail = ({ route, navigation }) => {
             mode: 'edit'
         });
     };
-    console.log("review:", review);
-    console.log("user:", user);
-    console.log("review.id", review.reviewId);
-    // console.log("token:", token);
+
+    // 리뷰 삭제 함수
     const handleDeleteReview = () => {
-        // if (!token) {
-        //     Alert.alert("로그인 필요", "로그인 후 다시 시도해 주세요.");
-        //     return;
-        // }
         setShowMenu(false);
         Alert.alert(
             "리뷰 삭제",
             "정말로 이 리뷰를 삭제하시겠습니까?\n삭제된 리뷰는 복구할 수 없습니다.",
             [
-                {
-                    text: "취소",
-                    style: "cancel"
-                },
+                { text: "취소", style: "cancel" },
                 {
                     text: "삭제",
                     style: "destructive",
                     onPress: async () => {
                         try {
-                            // ✅ 토큰 전달
                             await deleteReview(review.reviewId);
-
-                            // 삭제 성공 시 뒤로 이동
                             navigation.goBack();
                             Alert.alert("삭제 완료", "리뷰가 삭제되었습니다.");
                         } catch (error) {
-                            Alert.alert(
-                                "삭제 실패",
-                                "리뷰 삭제 중 오류가 발생했습니다. 다시 시도해주세요."
-                            );
+                            Alert.alert("삭제 실패", "리뷰 삭제 중 오류가 발생했습니다. 다시 시도해주세요.");
                         }
                     }
                 }
@@ -140,11 +120,21 @@ const ReviewDetail = ({ route, navigation }) => {
         );
     };
 
-    const handleBackdropPress = () => {
-        if (showMenu) {
-            setShowMenu(false);
-        }
+    // 공감(좋아요) 버튼 (임시 토글만, 실제 서버 기능 붙일 때 확장)
+    const handleLike = () => {
+        setLiked(!liked);
     };
+
+    // 예외 처리 (리뷰 없을 때)
+    if (!review) {
+        return (
+            <SafeAreaView style={styles.errorContainer}>
+                <Text style={styles.errorText}>리뷰를 찾을 수 없습니다.</Text>
+            </SafeAreaView>
+        );
+    }
+
+    console.log("comments:", comments);
 
     return (
         <SafeAreaView style={styles.safeArea}>
@@ -157,9 +147,7 @@ const ReviewDetail = ({ route, navigation }) => {
                     <TouchableOpacity
                         style={styles.menuBackdrop}
                         activeOpacity={1}
-                        onPress={() => {
-                            setShowMenu(false);
-                        }}
+                        onPress={() => setShowMenu(false)}
                     />
                 )}
 
@@ -169,7 +157,7 @@ const ReviewDetail = ({ route, navigation }) => {
                     showsVerticalScrollIndicator={false}
                     keyboardShouldPersistTaps="handled"
                 >
-                    {/* 헤더와 더보기 버튼 */}
+                    {/* 헤더 */}
                     <View style={styles.headerContainer}>
                         <View style={styles.headerContent}>
                             <ReviewHeader
@@ -177,11 +165,10 @@ const ReviewDetail = ({ route, navigation }) => {
                                 author={review.userData?.nickname || review.author || "익명"}
                                 rating={review.rating}
                                 viewCount={review.views || review.viewCount || 0}
-                                likeCount={review.liked || review.likeCount || 0}
+                                likeCount={0}   // 좋아요 필드 없는 경우 0으로 고정
                                 commentCount={review.commentCount || comments.length || 0}
                             />
                         </View>
-                        {/* 2️⃣ 내 글일 때만 더보기 노출 */}
                         {isMine && (
                             <TouchableOpacity
                                 style={styles.moreButton}
@@ -190,22 +177,14 @@ const ReviewDetail = ({ route, navigation }) => {
                                 <Text style={styles.moreIcon}>⋮</Text>
                             </TouchableOpacity>
                         )}
-
-                        {/* 드롭다운 메뉴 */}
                         {showMenu && (
                             <View style={styles.dropdownMenu}>
-                                <TouchableOpacity
-                                    style={styles.menuItem}
-                                    onPress={handleEditReview}
-                                >
+                                <TouchableOpacity style={styles.menuItem} onPress={handleEditReview}>
                                     <Text style={styles.menuIcon}>✏️</Text>
                                     <Text style={styles.menuItemText}>수정</Text>
                                 </TouchableOpacity>
                                 <View style={styles.menuDivider} />
-                                <TouchableOpacity
-                                    style={styles.menuItem}
-                                    onPress={handleDeleteReview}
-                                >
+                                <TouchableOpacity style={styles.menuItem} onPress={handleDeleteReview}>
                                     <Text style={styles.menuIcon}>🗑️</Text>
                                     <Text style={[styles.menuItemText, styles.deleteMenuText]}>삭제</Text>
                                 </TouchableOpacity>
@@ -215,7 +194,7 @@ const ReviewDetail = ({ route, navigation }) => {
 
                     {/* 본문 */}
                     <View style={styles.contentSection}>
-                        {contentArray.slice(0, 4).map((line, idx) => (
+                        {contentArray.map((line, idx) => (
                             !!line && <Text key={idx} style={styles.contentText}>
                                 {/* HTML 태그 제거 */}
                                 {typeof line === "string"
@@ -232,13 +211,6 @@ const ReviewDetail = ({ route, navigation }) => {
                                 />
                             </View>
                         )}
-                        {contentArray.slice(4).map((line, idx) => (
-                            !!line && <Text key={idx + 10} style={styles.contentText}>
-                                {typeof line === "string"
-                                    ? line.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ')
-                                    : ""}
-                            </Text>
-                        ))}
                     </View>
 
                     {/* 액션 버튼 */}
@@ -251,12 +223,12 @@ const ReviewDetail = ({ route, navigation }) => {
                                 {liked ? '❤️' : '🤍'}
                             </Text>
                             <Text style={[styles.actionText, liked && styles.actionTextLiked]}>
-                                공감 {liked ? (review.liked || review.likeCount || 0) + 1 : (review.liked || review.likeCount || 0)}
+                                공감 {liked ? 1 : 0}
                             </Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.actionButton}>
                             <Text style={styles.actionIcon}>💬</Text>
-                            <Text style={styles.actionText}>댓글 {review.commentCount || comments.length || 0}</Text>
+                            <Text style={styles.actionText}>댓글 {comments.length}</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.actionButton}>
                             <Text style={styles.actionIcon}>📤</Text>
@@ -268,9 +240,7 @@ const ReviewDetail = ({ route, navigation }) => {
                     <View style={styles.videoBanner}>
                         <Text style={styles.videoBannerText}>
                             🎬 이 영화가 궁금하다면?
-                            <TouchableOpacity
-                                onPress={() => navigation.navigate('InfoDetail', { review })}
-                            >
+                            <TouchableOpacity onPress={() => navigation.navigate('InfoDetail', { review })}>
                                 <Text style={styles.videoBannerLink}> 상세보기</Text>
                             </TouchableOpacity>
                         </Text>
@@ -281,44 +251,60 @@ const ReviewDetail = ({ route, navigation }) => {
                         <Text style={styles.commentSectionTitle}>
                             댓글 {comments.length}개
                         </Text>
-                        {comments.map(comment => (
-                            <Comment key={comment.id} {...comment} />
-                        ))}
+                        {loadingComments ? (
+                            <ActivityIndicator />
+                        ) : (
+                            comments.length === 0 ? (
+                                <Text style={styles.emptyCommentText}>아직 댓글이 없습니다.</Text>
+                            ) : (
+                                comments.map(comment => (
+                                    <ReviewDetailComment key={comment.id} {...comment} />
+                                ))
+                            )
+                        )}
                     </View>
                 </ScrollView>
 
                 {/* 댓글 입력 인풋 */}
-                <View style={styles.commentInputSection}>
-                    <View style={styles.commentInputContainer}>
-                        <View style={styles.currentUserAvatar}>
-                            <Text style={styles.currentUserAvatarText}>나</Text>
+                {user?.userId ? (
+                    <View style={styles.commentInputSection}>
+                        <View style={styles.commentInputContainer}>
+                            <View style={styles.currentUserAvatar}>
+                                <Text style={styles.currentUserAvatarText}>나</Text>
+                            </View>
+                            <TextInput
+                                style={styles.commentInput}
+                                placeholder="댓글을 입력하세요..."
+                                placeholderTextColor="#999"
+                                value={commentText}
+                                onChangeText={setCommentText}
+                                multiline
+                                maxLength={500}
+                            />
+                            <TouchableOpacity
+                                style={[
+                                    styles.sendButton,
+                                    commentText.trim() && !submittingComment ? styles.sendButtonActive : styles.sendButtonInactive
+                                ]}
+                                onPress={handleSubmitComment}
+                                disabled={!commentText.trim() || submittingComment}
+                            >
+                                <Text style={[
+                                    styles.sendButtonText,
+                                    commentText.trim() && !submittingComment ? styles.sendButtonTextActive : styles.sendButtonTextInactive
+                                ]}>
+                                    {submittingComment ? '등록 중...' : '전송'}
+                                </Text>
+                            </TouchableOpacity>
                         </View>
-                        <TextInput
-                            style={styles.commentInput}
-                            placeholder="댓글을 입력하세요..."
-                            placeholderTextColor="#999"
-                            value={commentText}
-                            onChangeText={setCommentText}
-                            multiline
-                            maxLength={500}
-                        />
-                        <TouchableOpacity
-                            style={[
-                                styles.sendButton,
-                                commentText.trim() ? styles.sendButtonActive : styles.sendButtonInactive
-                            ]}
-                            onPress={handleSubmitComment}
-                            disabled={!commentText.trim()}
-                        >
-                            <Text style={[
-                                styles.sendButtonText,
-                                commentText.trim() ? styles.sendButtonTextActive : styles.sendButtonTextInactive
-                            ]}>
-                                전송
-                            </Text>
-                        </TouchableOpacity>
                     </View>
-                </View>
+                ) : (
+                    <View style={styles.commentInputSection}>
+                        <Text style={{ color: '#888', textAlign: 'center', padding: 18, fontSize: 16 }}>
+                            댓글 작성은 로그인 후 이용할 수 있습니다.
+                        </Text>
+                    </View>
+                )}
             </KeyboardAvoidingView>
         </SafeAreaView>
     );

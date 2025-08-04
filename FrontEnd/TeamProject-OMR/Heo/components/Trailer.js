@@ -7,7 +7,6 @@ const SCREEN_RATIO = SCREEN_HEIGHT / SCREEN_WIDTH;
 const Trailer = ({ data, onPlay }) => {
     if (!data || data.length === 0) return null;
 
-    // console.log("data: ",data)
     const uniqueData = data.filter((item, index, arr) =>
         arr.findIndex(i => i.id === item.id ) === index
     );

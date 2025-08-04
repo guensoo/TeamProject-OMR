@@ -97,14 +97,14 @@ const ReviewEdit = ({ route, navigation }) => {
         setIsSubmitting(true);
 
         try {
+            // reviewId는 params로 전달, 나머지는 body에 담음
             const updatedReview = {
-                reviewId: review.reviewId,
                 title: title.trim(),
                 content: content.trim(),
                 rating: rating
             };
 
-            await updateReview(updatedReview);
+            await updateReview(review.reviewId, updatedReview);
 
             Alert.alert(
                 "수정 완료",

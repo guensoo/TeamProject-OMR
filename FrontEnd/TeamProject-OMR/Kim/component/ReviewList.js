@@ -91,7 +91,6 @@ const ReviewList = ({ navigation, route }) => {
         return searched;
     }, [reviews, searchText, sort]);
 
-
     // 리뷰 데이터 fetch (페이지 접근시 or focus시마다)
     useFocusEffect(
         useCallback(() => {
