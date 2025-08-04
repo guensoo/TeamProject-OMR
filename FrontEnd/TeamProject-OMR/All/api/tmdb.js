@@ -210,3 +210,34 @@ export const getMovieDetail = async (movieId) => {
         return null;
     }
 };
+
+// TV 프로그램 상세정보 가져오기
+export const getTVDetail = async (tvId) => {
+    try {
+        const res = await axios.get(`${BASE_URL}/tv/${tvId}`, {
+            params: {
+                api_key: API_KEY,
+                language: 'ko-KR',
+                append_to_response: 'videos,credits,content_ratings,images',
+            },
+        });
+
+        console.log("TVDetail::", res.data);
+
+        // 한국 등급 추출 (TV용은 content_ratings에서 가져와야 함)
+        let certification = null;
+        const ratings = res.data.content_ratings?.results || [];
+        const krRating = ratings.find(r => r.iso_3166_1 === 'KR');
+        if (krRating) {
+            certification = krRating.rating;
+        }
+
+        return {
+            ...res.data,
+            certification,
+        };
+    } catch (err) {
+        console.error('TV 상세정보 가져오기 실패:', err.message);
+        return null;
+    }
+};

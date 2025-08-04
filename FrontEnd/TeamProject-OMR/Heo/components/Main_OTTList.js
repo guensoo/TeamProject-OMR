@@ -1,6 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
-import { useState } from "react";
 import { FlatList, View, Image, Text, TouchableOpacity, Dimensions, StyleSheet } from "react-native";
+import { getMovieDetail, getTVDetail } from "../../All/api/tmdb";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
@@ -41,35 +41,45 @@ const PosterCard = ({ image, title, isActive, onToggle, onReviewPress, onDetailP
     </TouchableOpacity>
 );
 
-const Main_OTTList = ({ data }) => {
+const Main_OTTList = ({ data, activeCard, onToggleCard }) => {
     const uniqueData = data.filter((item, index, arr) =>
         arr.findIndex(i => i.id === item.id) === index
     );
 
     const navigation = useNavigation();
-    const [activeCard, setActiveCard] = useState(null);
 
     // 상세 fetch → navigation
     const handleDetailPress = async (item) => {
         try {
             let detail = null;
-            if (item.media_type === 'movie' || item.title) {
-                detail = await getMovieDetail(item.id);
+            if (item.type === 'movie' || item.title) {
+                detail = await getMovieDetail(item.tmdbId || item.id);
+                navigation.navigate("InfoDetail", { movie: detail });
+                console.log("item::", item)
+                console.log("title::", item.title)
+                console.log("id::", item.id)
+                console.log("tmdbId::", item.tmdbId)
+                console.log("detail::", detail)
+                console.log("이건뭐지::", item.id === "65270")
+                console.log("제목::", item.title === "Kenny Chesney: Summer In 3D")
             } else {
                 detail = await getTVDetail(item.id);
-            }
-            if (detail) {
-                navigation.navigate("InfoDetail");
-            } else {
-                alert('상세 정보를 불러올 수 없습니다.');
-            }
+                navigation.navigate("InfoDetail", { ott: detail });
+                console.log("item::", item)
+                console.log("detail::", detail)
+            } 
+            // else {
+            //     alert('상세 정보를 불러올 수 없습니다.');
+            // }
         } catch (e) {
+            console.log("item::", item)
+            console.log("type::", item.type)
             alert('상세 정보를 불러오는 중 오류가 발생했습니다.');
         }
     };
 
     const onToggle = (id) => {
-        setActiveCard((prev) => (prev === id ? null : id));
+        onToggleCard(id);
     };
 
     return (
@@ -146,10 +156,10 @@ const styles = StyleSheet.create({
         width: 80,
         alignItems: 'center',
     },
-    reviewText: { 
-        color: '#000', 
-        fontSize: 12, 
-        fontWeight: 'bold' 
+    reviewText: {
+        color: '#000',
+        fontSize: 12,
+        fontWeight: 'bold'
     },
     detailButton: {
         backgroundColor: '#e50914',
@@ -159,10 +169,10 @@ const styles = StyleSheet.create({
         width: 80,
         alignItems: 'center',
     },
-    detailText: { 
-        color: '#fff', 
-        fontSize: 12, 
-        fontWeight: 'bold' 
+    detailText: {
+        color: '#fff',
+        fontSize: 12,
+        fontWeight: 'bold'
     },
     title: {
         fontSize: 16,

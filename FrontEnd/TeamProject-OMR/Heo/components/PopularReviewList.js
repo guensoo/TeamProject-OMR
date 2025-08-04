@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { View, Text, Image, TouchableOpacity, ActivityIndicator, StyleSheet, Dimensions, FlatList } from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { getMovieDetail, getTVDetail } from "../../All/api/tmdb";
@@ -41,12 +41,10 @@ const PosterCard = ({ image, title, isActive, onToggle, onReviewPress, onDetailP
     </TouchableOpacity>
 );
 
-const PopularReviewList = () => {
+const PopularReviewList = ({activeCard, onToggleCard}) => {
     const navigation = useNavigation();
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
-
-    const [activeCard, setActiveCard] = useState(null);
 
     useFocusEffect(
         useCallback(() => {
@@ -59,7 +57,7 @@ const PopularReviewList = () => {
                     });
                     if (!response.ok) throw new Error('네트워크 오류 또는 서버 오류');
                     const data = await response.json();
-                    console.log("data", data)
+                    // console.log("data", data)
                     const countMap = new Map();
 
                     // 먼저 title별로 개수 세기
@@ -97,25 +95,27 @@ const PopularReviewList = () => {
     const handleDetailPress = async (item) => {
         try {
             let detail = null;
-            console.log("item ::" , item)
-            if (item.media_type === 'movie' || item.title) {
-                detail = await getMovieDetail(item.id);
-            } else {
+            if (item.type === 'movie' || item.title) {
+                detail = await getMovieDetail(item.tmdbId || item.id);
+                navigation.navigate("InfoDetail", { movie: detail });
+                console.log("item::", item)
+                console.log("detail::", detail)
+            } else if (item.type === 'ott') {
                 detail = await getTVDetail(item.id);
-            }
-            if (detail) {
-                navigation.navigate("InfoDetail");
+                navigation.navigate("InfoDetail", { ott: detail });
+                console.log("detail::", detail)
             } else {
                 alert('상세 정보를 불러올 수 없습니다.');
             }
         } catch (e) {
-            console.log("item ::" , item)
+            console.log("item::", item)
+            console.log("type::", item.type)
             alert('상세 정보를 불러오는 중 오류가 발생했습니다.');
         }
     };
 
     const onToggle = (id) => {
-        setActiveCard((prev) => (prev === id ? null : id));
+        onToggleCard(id);
     };
 
     return (

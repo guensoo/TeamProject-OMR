@@ -23,15 +23,19 @@ const Home = () => {
     const navigation = useNavigation();
 
     const [selectedTrailerData, setSelectedTrailerData] = useState([]);
-    const [allPosters, setAllPosters] = useState([]);
     const [allOTTPosters, setAllOTTPosters] = useState([]);
     const [allMoviePosters, setAllMoviePosters] = useState([]);
     const [isLoadingTrailers, setIsLoadingTrailers] = useState(true); // 로딩 상태 추가
 
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedTrailer, setSelectedTrailer] = useState(null);
-    const [selectedProvider, setSelectedProvider] = useState('');
+    // const [selectedProvider, setSelectedProvider] = useState('');
     const [selectCategory, setSelectCategory] = useState('ott');
+
+    const [activeCard, setActiveCard] = useState({
+        ott: null,
+        review: null,
+    });
 
     //예고편
     useEffect(() => {
@@ -165,6 +169,13 @@ const Home = () => {
                     </View>
                     <Main_OTTList
                         data={selectCategory === 'ott' ? allOTTPosters : allMoviePosters}
+                        activeCard={activeCard.ott}
+                        onToggleCard={(id) =>
+                            setActiveCard(prev => ({ 
+                                ott: prev.ott === id ? null : id,
+                                review: null,
+                            }))
+                        }
                     // provider={selectedProvider}
                     />
 
@@ -174,11 +185,16 @@ const Home = () => {
                             <Text style={styles.seeAllText}>전체보기</Text>
                         </TouchableOpacity>
                     </View>
-                    {/* <Main_OTTList
-                        data={allPosters}
-                    // provider={selectedProvider}
-                    /> */}
-                    <PopularReviewList />
+
+                    <PopularReviewList
+                        activeCard={activeCard.review}
+                        onToggleCard={(id) =>
+                            setActiveCard(prev => ({ 
+                                ott: null, 
+                                review: prev.review === id ? null : id
+                            }))
+                        }
+                    />
                 </>
                 {/* )} */}
 
@@ -244,7 +260,7 @@ const styles = StyleSheet.create({
     },
     selectedCategoryText: {
         color: '#007bff',
-        fontWeight: 'bold', 
+        fontWeight: 'bold',
         textDecorationLine: 'underline',
     },
     // 로딩 스피너 스타일
