@@ -57,7 +57,7 @@ const ReviewDetail = ({ route, navigation }) => {
     const reviewUserId = review.userId ?? review.userData?.userId ?? review.user?.userId ?? null;
     const isMine = currentUserId && reviewUserId && currentUserId === reviewUserId;
 
-    // content 매핑 (html, string, array 등 커버)
+    // content 매핑
     const contentArray = Array.isArray(review.content) ? review.content : [review.content || ""];
 
     // 썸네일 이미지 추출
@@ -120,9 +120,30 @@ const ReviewDetail = ({ route, navigation }) => {
         );
     };
 
-    // 공감(좋아요) 버튼 (임시 토글만, 실제 서버 기능 붙일 때 확장)
-    const handleLike = () => {
-        setLiked(!liked);
+    // **여기가 핵심! robust하게 type/tmdbId 판별**
+    const getRobustOttInfo = () => {
+        // selectMovie가 있으면 거기서 robust하게 판별
+        if (review.selectMovie && review.selectMovie.id) {
+            const tmdbId = review.selectMovie.id;
+            // 1. media_type이 있으면 무조건 사용
+            let type = review.selectMovie.media_type || review.media_type;
+            // 2. 없으면 TV로 판별 가능한 힌트가 있으면 TV
+            if (!type) {
+                if (typeof review.selectMovie.first_air_date === 'string' || review.selectMovie.original_name) {
+                    type = 'tv';
+                } else {
+                    type = 'movie';
+                }
+            }
+            return { tmdbId, type, selectMovie: review.selectMovie };
+        }
+        // movieId만 있을 때 (이건 거의 없음)
+        if (review.movieId) return { tmdbId: review.movieId, type: 'movie' };
+        // tvId만 있을 때
+        if (review.tvId) return { tmdbId: review.tvId, type: 'tv' };
+        // id + type이 있으면 fallback
+        if (review.id && review.media_type) return { tmdbId: review.id, type: review.media_type };
+        return { tmdbId: null, type: null };
     };
 
     // 예외 처리 (리뷰 없을 때)
@@ -196,7 +217,6 @@ const ReviewDetail = ({ route, navigation }) => {
                     <View style={styles.contentSection}>
                         {contentArray.map((line, idx) => (
                             !!line && <Text key={idx} style={styles.contentText}>
-                                {/* HTML 태그 제거 */}
                                 {typeof line === "string"
                                     ? line.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ')
                                     : ""}
@@ -240,7 +260,36 @@ const ReviewDetail = ({ route, navigation }) => {
                     <View style={styles.videoBanner}>
                         <Text style={styles.videoBannerText}>
                             🎬 이 영화가 궁금하다면?
-                            <TouchableOpacity onPress={() => navigation.navigate('InfoDetail', { review })}>
+                            <TouchableOpacity
+                                onPress={async () => {
+                                    try {
+                                        const { tmdbId, type, selectMovie } = getRobustOttInfo();
+                                        console.log('[상세보기] selectMovie:', selectMovie);
+                                        console.log('[상세보기] tmdbId:', tmdbId, 'type:', type);
+
+                                        if (!tmdbId) {
+                                            Alert.alert('작품 정보 없음', '이 리뷰에 연결된 작품을 찾을 수 없습니다.');
+                                            return;
+                                        }
+                                        let detail = null;
+                                        if (type === "movie") {
+                                            detail = await getMovieDetail(tmdbId);
+                                        } else if (type === "tv") {
+                                            detail = await getTVDetail(tmdbId);
+                                        } else {
+                                            // 혹시나 type 못찾으면 movie로 fallback
+                                            detail = await getMovieDetail(tmdbId);
+                                        }
+                                        if (detail) {
+                                            navigation.navigate('InfoDetail', { ott: detail });
+                                        } else {
+                                            Alert.alert('상세 정보를 불러올 수 없습니다.');
+                                        }
+                                    } catch (e) {
+                                        Alert.alert('상세 정보를 불러오는 중 오류가 발생했습니다.');
+                                    }
+                                }}
+                            >
                                 <Text style={styles.videoBannerLink}> 상세보기</Text>
                             </TouchableOpacity>
                         </Text>

@@ -11,7 +11,7 @@ import {
     StatusBar
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { getAllPopularGlobal } from '../All/api/tmdb';
+import { getAllPopularKR } from '../All/api/tmdb';
 
 function getYear(date) {
     if (!date) return '';
@@ -29,13 +29,20 @@ export default function SearchList() {
     const [popular, setPopular] = useState([]);
     const [filter, setFilter] = useState('all'); // 전체/영화/드라마
 
-    // ✅ 인기 리스트 로딩 - filter가 바뀔 때마다!
+    // 인기 리스트 로딩 (filter가 바뀔 때마다!)
     useEffect(() => {
         const fetchPopular = async () => {
             setLoading(true);
             try {
-                const allPopular = await getAllPopularGlobal(20, filter);
-                setPopular(allPopular);
+                const allPopular = await getAllPopularKR(20, filter);
+                // 여기서도 media_type 무조건 보장
+                const dataWithType = allPopular.map(item => ({
+                    ...item,
+                    media_type:
+                        item.media_type ||
+                        (item.first_air_date ? 'tv' : 'movie'),
+                }));
+                setPopular(dataWithType);
             } catch {
                 setPopular([]);
             }
@@ -44,7 +51,7 @@ export default function SearchList() {
         fetchPopular();
     }, [filter]);
 
-    // ✅ 검색 - filter 반영 (검색 쿼리/필터 바뀔 때마다)
+    // 검색 (query/filter 바뀔 때마다)
     useEffect(() => {
         if (query.trim().length < 2) {
             setResults([]);
@@ -56,6 +63,7 @@ export default function SearchList() {
         return () => clearTimeout(timeout);
     }, [query, filter]);
 
+    // 실제 검색 함수
     const doSearch = async (keyword) => {
         setLoading(true);
         try {
@@ -68,13 +76,19 @@ export default function SearchList() {
                 const resMovie = await fetch(
                     `${BASE_URL}/search/movie?api_key=${API_KEY}&language=ko-KR&query=${encodeURIComponent(keyword)}&include_adult=false`
                 );
-                movies = (await resMovie.json()).results || [];
+                movies = ((await resMovie.json()).results || []).map(item => ({
+                    ...item,
+                    media_type: 'movie'
+                }));
             }
             if (filter === 'all' || filter === 'tv') {
                 const resTv = await fetch(
                     `${BASE_URL}/search/tv?api_key=${API_KEY}&language=ko-KR&query=${encodeURIComponent(keyword)}&include_adult=false`
                 );
-                tvs = (await resTv.json()).results || [];
+                tvs = ((await resTv.json()).results || []).map(item => ({
+                    ...item,
+                    media_type: 'tv'
+                }));
             }
             let combined = [...movies, ...tvs].sort((a, b) =>
                 ((b.popularity || 0) - (a.popularity || 0))
@@ -86,15 +100,24 @@ export default function SearchList() {
         setLoading(false);
     };
 
-    // ✅ 검색 시에도 이미 filter별로 doSearch 결과만 반환되기 때문에 여기선 별도 filter X
+    // keyExtractor: media_type, id, index까지!
+    const keyExtractor = (item, idx) =>
+        `${item.media_type || 'unknown'}_${item.id}_${idx}`;
+
+    // 리스트 데이터 분기
     const data = query.trim().length < 2 ? popular : results;
 
+    // 아이템 렌더
     const renderItem = ({ item, index }) => (
         <TouchableOpacity
             style={[styles.itemCard, { marginTop: index === 0 ? 0 : 8 }]}
             activeOpacity={0.95}
             onPress={() => {
-                if (onSelect) onSelect(item);
+                // media_type 보장해서 넘기기
+                const media_type =
+                    item.media_type ||
+                    (item.first_air_date ? 'tv' : 'movie');
+                if (onSelect) onSelect({ ...item, media_type });
                 navigation.goBack();
             }}
         >
@@ -110,7 +133,6 @@ export default function SearchList() {
                     </View>
                 )}
             </View>
-
             <View style={styles.contentContainer}>
                 <View style={styles.titleRow}>
                     <Text style={styles.title} numberOfLines={2}>
@@ -118,11 +140,10 @@ export default function SearchList() {
                     </Text>
                     <View style={styles.typeTag}>
                         <Text style={styles.typeText}>
-                            {item.title ? '영화' : '드라마'}
+                            {(item.media_type === 'movie' || item.title) ? '영화' : '드라마'}
                         </Text>
                     </View>
                 </View>
-
                 <View style={styles.metaRow}>
                     <Text style={styles.year}>
                         {getYear(item.release_date || item.first_air_date)}
@@ -136,7 +157,6 @@ export default function SearchList() {
                         </View>
                     )}
                 </View>
-
                 {(item.original_title || item.original_name) &&
                     (item.original_title !== item.title && item.original_name !== item.name) && (
                         <Text style={styles.originalTitle} numberOfLines={1}>
@@ -150,7 +170,6 @@ export default function SearchList() {
     return (
         <View style={styles.container}>
             <StatusBar barStyle="light-content" backgroundColor="#0F0F23" translucent={false} />
-
             {/* 헤더 */}
             <View style={styles.header}>
                 <TouchableOpacity
@@ -162,7 +181,6 @@ export default function SearchList() {
                 <Text style={styles.headerTitle}>작품 선택</Text>
                 <View style={styles.headerSpacer} />
             </View>
-
             {/* 검색창 */}
             <View style={styles.searchContainer}>
                 <View style={styles.searchInputContainer}>
@@ -177,7 +195,6 @@ export default function SearchList() {
                     />
                 </View>
             </View>
-
             {/* 카테고리 필터 */}
             <View style={styles.filterBar}>
                 <TouchableOpacity onPress={() => setFilter('all')}>
@@ -199,7 +216,6 @@ export default function SearchList() {
                     ]}>드라마</Text>
                 </TouchableOpacity>
             </View>
-
             {/* 섹션 타이틀 */}
             <View style={styles.sectionHeader}>
                 <Text style={styles.sectionTitle}>
@@ -211,7 +227,6 @@ export default function SearchList() {
                     </Text>
                 )}
             </View>
-
             {/* 로딩 */}
             {loading && (
                 <View style={styles.loadingContainer}>
@@ -219,11 +234,10 @@ export default function SearchList() {
                     <Text style={styles.loadingText}>검색 중...</Text>
                 </View>
             )}
-
             {/* 리스트 */}
             <FlatList
                 data={data}
-                keyExtractor={item => String(item.id) + (item.title ? '_movie' : '_tv')}
+                keyExtractor={keyExtractor}
                 renderItem={renderItem}
                 contentContainerStyle={styles.listContainer}
                 showsVerticalScrollIndicator={false}

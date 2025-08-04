@@ -7,7 +7,7 @@ import { RichEditor, RichToolbar, actions } from 'react-native-pell-rich-editor'
 import * as ImagePicker from 'expo-image-picker';
 import styles from './ReviewWriteStyles';
 import { UserContext } from "../../All/context/UserContext";
-import { createReview } from '../../All/api/ReviewApi'; // ✅ 추가
+import { createReview } from '../../All/api/ReviewApi';
 
 export const ReviewWrite = ({ navigation }) => {
     const [title, setTitle] = useState('');
@@ -59,10 +59,11 @@ export const ReviewWrite = ({ navigation }) => {
         }
     };
 
-    // ✅ 여기서부터만 완전 변경
+    // ⭐ 반드시 여기서 media_type 보정!
     const handleSubmit = async () => {
-        if (!selectedMovie.title) {
-            selectedMovie.title = selectedMovie.original_name;
+        if (!selectedMovie || (!selectedMovie.title && !selectedMovie.name && !selectedMovie.original_name)) {
+            Alert.alert('알림', '리뷰할 작품을 선택해주세요.');
+            return;
         }
         if (!title.trim()) {
             Alert.alert('알림', '제목을 입력해주세요.');
@@ -77,6 +78,19 @@ export const ReviewWrite = ({ navigation }) => {
             return;
         }
 
+        // ✅ selectMovie에 media_type이 확실히 없으면 붙임!
+        let media_type = selectedMovie.media_type;
+        if (!media_type) {
+            if (selectedMovie.first_air_date || selectedMovie.name) media_type = 'tv';
+            else if (selectedMovie.release_date || selectedMovie.title) media_type = 'movie';
+            else media_type = 'movie'; // fallback
+        }
+
+        const selectMovieToSave = {
+            ...selectedMovie,
+            media_type,
+        };
+
         setIsSubmitting(true);
 
         try {
@@ -84,7 +98,7 @@ export const ReviewWrite = ({ navigation }) => {
                 title: title,
                 content: content,
                 rating: rating,
-                selectMovie: selectedMovie,
+                selectMovie: selectMovieToSave,
                 movieId: selectedMovie ? selectedMovie.id : null,
                 createAt: new Date().toISOString(),
                 updateAt: new Date().toISOString(),

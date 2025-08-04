@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { View, FlatList, ActivityIndicator, TouchableOpacity, Text, StyleSheet, Dimensions } from 'react-native';
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
-import { getOTTPopularMovie, OTT_PROVIDERS, getMovieDetail, getTVDetail } from '../All/api/tmdb'; // ⭐ 상세 fetch import!
+import { getOTTPopularMovie, getOTTPopularTV, OTT_PROVIDERS, getMovieDetail, getTVDetail } from '../All/api/tmdb'; // ⭐ 상세 fetch import!
 import OTTListCard from './components/card/OTTListCard';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const initialLayout = { width: Dimensions.get('window').width };
 
-function OTTTabContent({providerKey, sortBy }) {
+function OTTTabContent({ providerKey, sortBy }) {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
@@ -27,17 +27,25 @@ function OTTTabContent({providerKey, sortBy }) {
         try {
             setLoading(true);
             const providerId = OTT_PROVIDERS[providerKey];
-            const res = await getOTTPopularMovie(providerId, pageNum, sortOption);
+            // 영화+TV 모두 병렬 호출!
+            const [movies, tvs] = await Promise.all([
+                getOTTPopularMovie(providerId, pageNum, sortOption),
+                getOTTPopularTV(providerId, pageNum, sortOption),
+            ]);
+            // 타입 추가!
+            const moviesWithType = (movies || []).map(item => ({ ...item, media_type: 'movie' }));
+            const tvsWithType = (tvs || []).map(item => ({ ...item, media_type: 'tv' }));
 
-            if (!res || res.length === 0) {
-                setIsEnd(true);
-                return;
-            }
-            if (pageNum === 1) {
-                setData(res);
-            } else {
-                setData((prev) => [...prev, ...res]);
-            }
+            // 정렬 기준에 따라 섞어서 반환
+            const combined = [...moviesWithType, ...tvsWithType].sort((a, b) => {
+                if (sortOption === 'release_date.desc') {
+                    return new Date(b.release_date || b.first_air_date || 0) - new Date(a.release_date || a.first_air_date || 0);
+                }
+                return (b.popularity || 0) - (a.popularity || 0);
+            });
+
+            if (pageNum === 1) setData(combined);
+            else setData(prev => [...prev, ...combined]);
         } finally {
             setLoading(false);
         }
@@ -102,8 +110,8 @@ function OTTTabContent({providerKey, sortBy }) {
     };
 
     return (
-                        
-            
+
+
         <View style={styles.tabContainer}>
             {(loading && page === 1) || fetchingDetail ? (
                 <ActivityIndicator size="large" />
@@ -136,7 +144,7 @@ function OTTTabContent({providerKey, sortBy }) {
                     )}
                 />
             )}
-            
+
         </View>
     );
 }
@@ -161,24 +169,24 @@ export default function OTTListScreen({ route }) {
     };
 
     return (
-            <SafeAreaView style={{ flex: 1, backgroundColor: '#0f0f23' }} edges={['top', 'left', 'right']}>
-        <TabView
-            navigationState={{ index, routes }}
-            renderScene={renderScene}
-            onIndexChange={setIndex}
-            initialLayout={initialLayout}
-            renderTabBar={props =>
-                <TabBar
-                    {...props}
-                    style={{ backgroundColor: '#181830' }}
-                    indicatorStyle={{ backgroundColor: '#fff' }}
-                    labelStyle={{ color: '#fff', fontWeight: 'bold' }}
-                    inactiveColor="#aaa"
-                    activeColor="#fff"
-                />
-            }
-            style={{ backgroundColor: '#0f0f23' }}
-        />
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#0f0f23' }} edges={['top', 'left', 'right']}>
+            <TabView
+                navigationState={{ index, routes }}
+                renderScene={renderScene}
+                onIndexChange={setIndex}
+                initialLayout={initialLayout}
+                renderTabBar={props =>
+                    <TabBar
+                        {...props}
+                        style={{ backgroundColor: '#181830' }}
+                        indicatorStyle={{ backgroundColor: '#fff' }}
+                        labelStyle={{ color: '#fff', fontWeight: 'bold' }}
+                        inactiveColor="#aaa"
+                        activeColor="#fff"
+                    />
+                }
+                style={{ backgroundColor: '#0f0f23' }}
+            />
         </SafeAreaView>
     );
 }

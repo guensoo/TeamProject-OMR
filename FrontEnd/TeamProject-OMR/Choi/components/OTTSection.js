@@ -11,16 +11,18 @@ function OTTSection({ title, data, activeCard, onToggle, providerKey }) {
     const handleDetailPress = async (item) => {
         try {
             let detail = null;
-            console.log("OTTITEM:" , item)
-            if (item.media_type === 'movie' || item.title) {
-                detail = await getMovieDetail(item.id);
-            } else {
-                detail = await getTVDetail(item.id);
-            }
-            if (detail) {
+
+            console.log("item::", item)
+
+            const type = item.media_type || item.type;
+            const id = item.tmdbId || item.id;
+
+            if (type === 'movie') {
+                detail = await getMovieDetail(id);
+                navigation.navigate("InfoDetail", { movie: detail });
+            } else if (type === 'tv') {
+                detail = await getTVDetail(id);
                 navigation.navigate("InfoDetail", { ott: detail });
-            } else {
-                alert('상세 정보를 불러올 수 없습니다.');
             }
         } catch (e) {
             alert('상세 정보를 불러오는 중 오류가 발생했습니다.');
@@ -53,7 +55,7 @@ function OTTSection({ title, data, activeCard, onToggle, providerKey }) {
                         onToggle={() => onToggle(item.id)}
                         onReviewPress={() => {
                             navigation.navigate("ReviewList", {
-                                initialKeyword: item.title || item.name // ★ 이 부분이 핵심!
+                                initialKeyword: item.title || item.name
                             });
                         }}
                         onDetailPress={() => handleDetailPress(item)}
@@ -64,23 +66,24 @@ function OTTSection({ title, data, activeCard, onToggle, providerKey }) {
     );
 }
 
+
 export default memo(OTTSection);
 
 const styles = StyleSheet.create({
-    section: { 
-        marginBottom: 20 
+    section: {
+        marginBottom: 20
     },
     header: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center'
     },
-    title: { 
-        fontSize: 18, 
-        fontWeight: 'bold' 
+    title: {
+        fontSize: 18,
+        fontWeight: 'bold'
     },
-    seeAll: { 
-        color: '#007BFF', 
-        fontSize: 14 
+    seeAll: {
+        color: '#007BFF',
+        fontSize: 14
     },
 });

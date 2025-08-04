@@ -28,6 +28,7 @@ export const getOTTPopularMovie = async (
             with_watch_providers: providerId,
             // with_original_language: 'ko',
             page: page,
+            media_type: 'movie',
         },
     });
     return res.data.results.slice(0, 20);
@@ -48,6 +49,7 @@ export const getOTTPopularTV = async (
             with_watch_providers: providerId,
             // with_original_language: 'ko',
             page: page,
+            media_type: 'tv',
         },
     });
     return res.data.results.slice(0, 20);
@@ -157,28 +159,46 @@ export const getAllOTTPopularWithTrailer = async () => {
     return results;
 };
 
-// 전세계 인기작
-export const getAllPopularGlobal = async (count = 20, type = 'all') => {
+// "한국 서비스 중인 인기작"만 뽑는 버전
+export const getAllPopularKR = async (count = 20, type = 'all', sortBy = 'popularity.desc') => {
     try {
-        // 인기 영화
-        const resMovie = await axios.get(`${BASE_URL}/movie/popular`, {
+        // 영화
+        const resMovie = await axios.get(`${BASE_URL}/discover/movie`, {
             params: {
                 api_key: API_KEY,
                 language: 'ko-KR',
+                watch_region: 'KR',
+                sort_by: sortBy,
                 page: 1,
             },
         });
-        const movies = resMovie.data.results || [];
+        const movies = (resMovie.data.results || []).map(item => ({
+            ...item,
+            media_type: 'movie',
+        }));
 
-        // 인기 드라마(TV)
-        const resTv = await axios.get(`${BASE_URL}/tv/popular`, {
+        // 드라마(TV)
+        const resTv = await axios.get(`${BASE_URL}/discover/tv`, {
             params: {
                 api_key: API_KEY,
                 language: 'ko-KR',
+                watch_region: 'KR',
+                sort_by: sortBy,
                 page: 1,
             },
         });
-        const tvs = resTv.data.results || [];
+        const tvs = (resTv.data.results || []).map(item => ({
+            ...item,
+            media_type: 'tv',
+        }));
+
+        // 🔥 콘솔로 무조건 까기!
+        console.log('🎬 [MOVIES]', movies.map(x => ({
+            id: x.id, title: x.title, media_type: x.media_type, release_date: x.release_date
+        })));
+        console.log('📺 [TVS]', tvs.map(x => ({
+            id: x.id, name: x.name, media_type: x.media_type, first_air_date: x.first_air_date
+        })));
 
         let merged;
         if (type === 'movie') merged = movies;
@@ -187,10 +207,12 @@ export const getAllPopularGlobal = async (count = 20, type = 'all') => {
 
         return merged.slice(0, count);
     } catch (err) {
-        console.error('Error fetching global popular movies/tv:', err.message);
+        console.error('Error fetching KR popular movies/tv:', err.message);
         return [];
     }
 };
+
+
 
 // 상세정보 + 추가자료 fetch
 export const getMovieDetail = async (movieId) => {

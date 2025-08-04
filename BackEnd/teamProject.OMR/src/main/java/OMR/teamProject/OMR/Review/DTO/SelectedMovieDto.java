@@ -24,4 +24,5 @@ public class SelectedMovieDto {
     private Boolean video;
     private Double vote_average;
     private Integer vote_count;
+    private String media_type;
 }
