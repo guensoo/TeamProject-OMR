@@ -20,6 +20,7 @@ import linking from './Heo/utils/Linking';
 
 // 박세현
 import ReviewDetail from './Park/ReviewDetail';
+import ReviewEdit from './Park/ReviewEdit';
 import InfoDetail from './Park/InfoDetail';
 
 //
@@ -67,6 +68,7 @@ export default function App() {
 
                         <Stack.Screen name="ReviewDetail" component={ReviewDetail} />
                         <Stack.Screen name="ReviewWrite" component={ReviewWrite} options={{ headerShown: false }} />
+                        <Stack.Screen name="ReviewEdit" component={ReviewEdit} options={{ headerShown: false }} />
                         <Stack.Screen
                             name="Support"
                             component={SupportWrapper}
