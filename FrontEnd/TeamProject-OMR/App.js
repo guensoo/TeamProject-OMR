@@ -15,6 +15,7 @@ import FindId from './Heo/pages/FindId';
 import FindPassword from './Heo/pages/FindPassword';
 import MyPage from './Heo/pages/MyPage';
 import linking from './Heo/utils/Linking';
+import ResetPassword from './Heo/pages/ResetPassword';
 
 //
 
@@ -89,6 +90,7 @@ export default function App() {
 
                         <Stack.Screen name="FindId" component={FindId} options={{ headerShown: false }} />
                         <Stack.Screen name="FindPassword" component={FindPassword} options={{ headerShown: false }} />
+                        <Stack.Screen name="ResetPassword" component={ResetPassword} options={{ headerShown: false }} />
                         <Stack.Screen
                             name="MyPage"
                             component={MyPage}

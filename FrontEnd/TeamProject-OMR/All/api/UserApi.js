@@ -13,6 +13,28 @@ export async function registerUser(userData) {
     }
 }
 
+// 회원가입 이메일 인증 코드 전송
+export async function sendSignupCode(email) {
+    try {
+        const res = await axios.post(`${API}/api/users/signup/send-code`, { email });
+        return res.data;
+    } catch (error) {
+        const message = error.response?.data || error.message || '이메일 인증 코드 전송 실패';
+        throw new Error(message);
+    }
+}
+
+// 회원가입 이메일 인증 코드 확인
+export async function verifySignupCode(email, code) {
+    try {
+        const res = await axios.post(`${API}/api/users/signup/verify-code`, { email, code });
+        return res.data;
+    } catch (error) {
+        const message = error.response?.data || error.message || '이메일 인증 실패';
+        throw new Error(message);
+    }
+}
+
 //로그인 api
 export async function loginUser(userData) {
     try {
@@ -42,24 +64,35 @@ export async function findId(email) {
     }
 }
 
-//비밀번호찾기 api
-export async function findPassword(userId, email) {
+//비밀번호찾기 인증코드 이메일 발송 API
+export async function sendResetCode(userId, email) {
     try {
-        const res = await axios.post(`${API}/api/users/find-password`, { userId, email });
+        const res = await axios.post(`${API}/api/users/send-reset-code`, { userId, email });
         return res.data;
     } catch (error) {
-        const message = error.response?.data?.message || error.message || '비밀번호 찾기 실패';
+        const message = error.response?.data?.message || error.message || '인증코드 전송 실패';
+        throw new Error(message);
+    }
+}
+
+// 인증코드 검증 API
+export async function verifyResetCode(email, code) {
+    try {
+        const res = await axios.post(`${API}/api/users/verify-reset-code`, { email, code });
+        return res.data;
+    } catch (error) {
+        const message = error.response?.data || error.message || '인증코드 검증 실패';
         throw new Error(message);
     }
 }
 
 //비밀번호 재설정 api
-export async function resetPassword(token, newPassword) {
+export async function resetPassword(userId, newPassword) {
     try {
-        const res = await axios.post(`${API}/api/users/reset-password`, { token, newPassword });
+        const res = await axios.post(`${API}/api/users/reset-password`, { userId, newPassword });
         return res.data;
     } catch (error) {
-        const message = error.response?.data?.message || error.message || '비밀번호 재설정 실패';
+        const message = error.response?.data || error.message || '비밀번호 재설정 실패';
         throw new Error(message);
     }
 }

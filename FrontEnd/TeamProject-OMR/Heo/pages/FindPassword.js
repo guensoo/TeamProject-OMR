@@ -3,32 +3,25 @@ import { Text, View, StyleSheet, TextInput, TouchableOpacity, SafeAreaView, Keyb
 import { useNavigation } from '@react-navigation/native';
 import { findPassword } from "../../All/api/UserApi";
 import { useRoute } from "@react-navigation/native";
+import { sendResetCode, verifyResetCode } from "../../All/api/UserApi";
 
-const FindPassword = () => {
-    const navigation = useNavigation();
-    const route = useRoute();
-
-    // 딥링크에서 받은 토큰 파라미터
-    const token = route.params?.token ?? null;
+const FindPassword = ({ navigation }) => {
+    // const navigation = useNavigation();
+    // const route = useRoute();
 
     const [id, setId] = useState('');
     const [email, setEmail] = useState('');
+    const [authCode, setAuthCode] = useState('');
+    const [isCodeSent, setIsCodeSent] = useState(false);
+
+    const [isSendingCode, setIsSendingCode] = useState(false);
+    const [isVerifyingCode, setIsVerifyingCode] = useState(false);
 
     const [idError, setIdError] = useState('');
     const [emailError, setEmailError] = useState('');
+    const [codeError, setCodeError] = useState('');
 
-    useEffect(() => {
-        if (token) {
-            console.log("딥링크 토큰: ", token);
-
-            // 예: 토큰이 있으면 아이디/이메일 입력 없이 바로 비밀번호 재설정 API 호출 등 가능
-            // 예: 또는 id/email state 자동 세팅 가능 (아래는 예시)
-            // setId(''); // 토큰만으로 재설정 한다면 입력란 숨기고 바로 화면 전환할 수도
-            // setEmail('');
-        }
-    }, [token])
-
-    const handleFindPassword = async () => {
+    const handleSendCode = async () => {
         if (!id) {
             setIdError("아이디를 입력해주세요.");
             return;
@@ -38,8 +31,6 @@ const FindPassword = () => {
             setEmailError("이메일을 입력해주세요.");
             return;
         }
-
-        // const idRegex = ;
 
         // 간단 이메일 유효성 검사
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -52,10 +43,40 @@ const FindPassword = () => {
         setEmailError('');
 
         try {
-            const res = await findPassword(id, email);
-            Alert.alert("완료", res.message || "비밀번호 재설정 링크가 이메일로 발송되었습니다.");
+            setIsSendingCode(true);
+            const res = await sendResetCode(id, email);
+            Alert.alert("완료", res.message);
+            setIsCodeSent(true);
         } catch (error) {
-            Alert.alert("오류", error.message || "비밀번호를 찾을 수 없습니다.");
+            Alert.alert("오류", error.message);
+        } finally {
+            setIsSendingCode(false);
+        }
+    };
+
+    // 2) 인증코드 검증 후 ResetPassword 화면으로 이동
+    const handleVerifyCode = async () => {
+        if (!authCode) {
+            setCodeError('인증코드를 입력해주세요.');
+            return;
+        }
+        setCodeError('');
+        try {
+            setIsVerifyingCode(true);
+            await verifyResetCode(email, authCode);
+            Alert.alert('성공', '인증 성공', [
+                {
+                    text: '확인',
+                    onPress: () =>
+                        navigation.navigate('ResetPassword', {
+                            userId: id,
+                        }),
+                },
+            ]);
+        } catch (err) {
+            Alert.alert('오류', err.message);
+        } finally {
+            setIsVerifyingCode(false);
         }
     };
 
@@ -67,46 +88,82 @@ const FindPassword = () => {
             >
                 <View style={styles.content}>
                     <View style={styles.form}>
-                        <View style={styles.inputContainer}>
-                            <Text style={styles.inputLabel}>아이디</Text>
-                            <TextInput
-                                style={styles.input}
-                                placeholder="가입하신 아이디를 입력하세요."
-                                placeholderTextColor="#9CA3AF"
-                                value={id}
-                                onChangeText={(text) => {
-                                    setId(text);
-                                    if (text) setIdError('');
-                                }}
-                                keyboardType="default"
-                                autoCapitalize="none"
-                                autoCorrect={false}
-                            />
-                            {idError && <Text style={styles.errorText}>{idError}</Text>}
-                        </View>
+                        {!isCodeSent ? (
+                            <>
+                                <View style={styles.inputContainer}>
+                                    <Text style={styles.inputLabel}>아이디</Text>
+                                    <TextInput
+                                        style={styles.input}
+                                        placeholder="가입하신 아이디를 입력하세요."
+                                        placeholderTextColor="#9CA3AF"
+                                        value={id}
+                                        onChangeText={(text) => {
+                                            setId(text);
+                                            if (text) setIdError('');
+                                        }}
+                                        keyboardType="default"
+                                        autoCapitalize="none"
+                                        autoCorrect={false}
+                                    />
+                                    {idError && <Text style={styles.errorText}>{idError}</Text>}
+                                </View>
 
-                        <View style={styles.inputContainer}>
-                            <Text style={styles.inputLabel}>이메일</Text>
-                            <TextInput
-                                style={styles.input}
-                                placeholder="가입하신 이메일을 입력하세요."
-                                placeholderTextColor="#9CA3AF"
-                                value={email}
-                                onChangeText={(text) => {
-                                    setEmail(text);
-                                    if (text) setEmailError('');
-                                }}
-                                keyboardType="email-address"
-                                autoCapitalize="none"
-                                autoCorrect={false}
-                            />
-                            {emailError && <Text style={styles.errorText}>{emailError}</Text>}
-                        </View>
+                                <View style={styles.inputContainer}>
+                                    <Text style={styles.inputLabel}>이메일</Text>
+                                    <TextInput
+                                        style={styles.input}
+                                        placeholder="가입하신 이메일을 입력하세요."
+                                        placeholderTextColor="#9CA3AF"
+                                        value={email}
+                                        onChangeText={(text) => {
+                                            setEmail(text);
+                                            if (text) setEmailError('');
+                                        }}
+                                        keyboardType="email-address"
+                                        autoCapitalize="none"
+                                        autoCorrect={false}
+                                    />
+                                    {emailError && <Text style={styles.errorText}>{emailError}</Text>}
+                                </View>
 
-                        <TouchableOpacity style={styles.findButton} onPress={handleFindPassword}>
-                            <Text style={styles.findButtonText}>비밀번호 재설정 링크 보내기</Text>
-                        </TouchableOpacity>
+                                <TouchableOpacity style={styles.findButton} onPress={handleSendCode} disabled={isSendingCode}>
+                                    {isSendingCode ? (
+                                        <ActivityIndicator size="small" color="#ffffff" />
+                                    ) : (
+                                        <Text style={styles.findButtonText}>인증코드 보내기</Text>
+                                    )}
+                                </TouchableOpacity>
+                            </>
+                        ) : (
+                            <>
+                                <View style={styles.inputContainer}>
+                                    <Text style={styles.inputLabel}>인증코드</Text>
+                                    <TextInput
+                                        style={styles.input}
+                                        placeholder="이메일로 받은 인증코드를 입력하세요."
+                                        placeholderTextColor="#9CA3AF"
+                                        value={authCode}
+                                        onChangeText={(text) => {
+                                            setAuthCode(text);
+                                            if (text) setCodeError('');
+                                        }}
+                                        keyboardType="number-pad"
+                                        autoCapitalize="none"
+                                        autoCorrect={false}
+                                    />
+                                    {codeError && <Text style={styles.errorText}>{codeError}</Text>}
+                                </View>
 
+                                <TouchableOpacity style={styles.findButton} onPress={handleVerifyCode}>
+                                    <Text style={styles.findButtonText}>인증코드 확인</Text>
+                                </TouchableOpacity>
+
+                                <TouchableOpacity onPress={() => setIsCodeSent(false)} style={{ marginTop: 20, marginBottom: 10 }}>
+                                    <Text style={{ color: 'blue', textAlign: 'center' }}>인증코드 재전송</Text>
+                                </TouchableOpacity>
+                            </>
+                        )}
+                        {/* 조건문 끝 */}
                         <TouchableOpacity onPress={() => navigation.navigate("Login")}>
                             <Text style={styles.goLoginText}>로그인 화면으로 돌아가기</Text>
                         </TouchableOpacity>

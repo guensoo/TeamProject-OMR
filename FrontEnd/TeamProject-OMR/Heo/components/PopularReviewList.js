@@ -41,7 +41,7 @@ const PosterCard = ({ image, title, isActive, onToggle, onReviewPress, onDetailP
     </TouchableOpacity>
 );
 
-const PopularReviewList = ({activeCard, onToggleCard}) => {
+const PopularReviewList = ({ activeCard, onToggleCard }) => {
     const navigation = useNavigation();
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -77,7 +77,7 @@ const PopularReviewList = ({activeCard, onToggleCard}) => {
                             count
                         }))
                         .sort((a, b) => b.count - a.count); // 많이 나온 순 정렬
-                    
+
                     setData(countedList.slice(0, 10));
                 } catch (error) {
                     console.log('리뷰 불러오기 실패:', error);
@@ -191,10 +191,10 @@ const styles = StyleSheet.create({
         width: 80,
         alignItems: 'center',
     },
-    reviewText: { 
-        color: '#000', 
-        fontSize: 12, 
-        fontWeight: 'bold' 
+    reviewText: {
+        color: '#000',
+        fontSize: 12,
+        fontWeight: 'bold'
     },
     detailButton: {
         backgroundColor: '#e50914',
@@ -204,10 +204,10 @@ const styles = StyleSheet.create({
         width: 80,
         alignItems: 'center',
     },
-    detailText: { 
-        color: '#fff', 
-        fontSize: 12, 
-        fontWeight: 'bold' 
+    detailText: {
+        color: '#fff',
+        fontSize: 12,
+        fontWeight: 'bold'
     },
     title: {
         fontSize: 16,
