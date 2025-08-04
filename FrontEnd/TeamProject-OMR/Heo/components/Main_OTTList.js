@@ -52,28 +52,23 @@ const Main_OTTList = ({ data, activeCard, onToggleCard }) => {
     const handleDetailPress = async (item) => {
         try {
             let detail = null;
-            if (item.type === 'movie' || item.title) {
-                detail = await getMovieDetail(item.tmdbId || item.id);
-                navigation.navigate("InfoDetail", { movie: detail });
-                console.log("item::", item)
-                console.log("title::", item.title)
-                console.log("id::", item.id)
-                console.log("tmdbId::", item.tmdbId)
-                console.log("detail::", detail)
-                console.log("이건뭐지::", item.id === "65270")
-                console.log("제목::", item.title === "Kenny Chesney: Summer In 3D")
+            if (item.title) {
+                if (item.type === 'movie') {
+                    detail = await getMovieDetail(item.tmdbId || item.id);
+                    navigation.navigate("InfoDetail", { movie: detail });
+                } else {
+                    if (item.media_type === 'tv') {
+                        detail = await getTVDetail(item.id);
+                        navigation.navigate("InfoDetail", { ott: detail });
+                    } else {
+                        detail = await getMovieDetail(item.id);
+                        navigation.navigate("InfoDetail", { movie: detail });
+                    }
+                }
             } else {
-                detail = await getTVDetail(item.id);
-                navigation.navigate("InfoDetail", { ott: detail });
-                console.log("item::", item)
-                console.log("detail::", detail)
-            } 
-            // else {
-            //     alert('상세 정보를 불러올 수 없습니다.');
-            // }
+                alert('상세 정보를 불러올 수 없습니다.');
+            }
         } catch (e) {
-            console.log("item::", item)
-            console.log("type::", item.type)
             alert('상세 정보를 불러오는 중 오류가 발생했습니다.');
         }
     };
