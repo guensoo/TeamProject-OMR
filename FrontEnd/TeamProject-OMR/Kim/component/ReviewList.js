@@ -76,14 +76,13 @@ const ReviewList = ({ navigation, route }) => {
             searched = reviews.filter(review =>
                 (review.title?.toLowerCase().includes(searchLower)) ||
                 (review.content?.toLowerCase().includes(searchLower)) ||
-                (review.selectedMovie?.title?.toLowerCase().includes(searchLower)) ||
-                (review.author?.toLowerCase().includes(searchLower))
+                (review.selectMovie?.title?.toLowerCase().includes(searchLower)) ||
+                (review.userData?.nickname?.toLowerCase().includes(searchLower))      // ★ 이 부분!
             );
         }
-        // 정렬
         if (searched.length <= 1) return searched;
         if (sort === 'latest') {
-            return [...searched].sort((a, b) => new Date(b.createAt) - new Date(a.createAt));
+            return [...searched].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
         } else if (sort === 'popular') {
             return [...searched].sort((a, b) => (b.liked || 0) - (a.liked || 0));
         } else if (sort === 'rating') {
@@ -91,6 +90,7 @@ const ReviewList = ({ navigation, route }) => {
         }
         return searched;
     }, [reviews, searchText, sort]);
+
 
     // 리뷰 데이터 fetch (페이지 접근시 or focus시마다)
     useFocusEffect(
