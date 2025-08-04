@@ -55,7 +55,7 @@ public class ReviewController {
 
     // 5. 리뷰 삭제
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteReview(@PathVariable Long id) {
+    public ResponseEntity<?> deleteReview(@PathVariable("id") Long id) {
         boolean deleted = reviewService.deleteReview(id);
         if (!deleted) {
             return ResponseEntity.notFound().build();

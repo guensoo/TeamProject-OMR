@@ -4,6 +4,7 @@ import {
     TouchableOpacity, SafeAreaView, TextInput,
     KeyboardAvoidingView, Platform, Alert, Modal
 } from "react-native";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from './ReviewDetailStyle';
 import ReviewHeader from './ReviewHeader';
 import Comment from "./ReviewDetailComment";
@@ -24,12 +25,21 @@ const sampleComments = [
 const ReviewDetail = ({ route, navigation }) => {
     // 리뷰 전체 객체를 route로 받음
     const { user } = useContext(UserContext);
+    const [token, setToken] = useState(null);
     const review = route.params?.review;
     const currentUserId = user?.userId ?? null;
 
     useEffect(() => {
         console.log('[ReviewDetail] currentUserId:', currentUserId);
     }, [currentUserId]);
+
+    useEffect(() => {
+        const fetchToken = async () => {
+            const savedToken = await AsyncStorage.getItem('authToken');
+            setToken(savedToken);
+        };
+        fetchToken();
+    }, []);
 
     const [liked, setLiked] = useState(false);
     const [commentText, setCommentText] = useState('');
@@ -89,7 +99,15 @@ const ReviewDetail = ({ route, navigation }) => {
             mode: 'edit'
         });
     };
+    console.log("review:", review);
+    console.log("user:", user);
+    console.log("review.id", review.reviewId);
+    // console.log("token:", token);
     const handleDeleteReview = () => {
+        // if (!token) {
+        //     Alert.alert("로그인 필요", "로그인 후 다시 시도해 주세요.");
+        //     return;
+        // }
         setShowMenu(false);
         Alert.alert(
             "리뷰 삭제",
@@ -104,7 +122,12 @@ const ReviewDetail = ({ route, navigation }) => {
                     style: "destructive",
                     onPress: async () => {
                         try {
+                            // ✅ 토큰 전달
+                            await deleteReview(review.reviewId);
+
+                            // 삭제 성공 시 뒤로 이동
                             navigation.goBack();
+                            Alert.alert("삭제 완료", "리뷰가 삭제되었습니다.");
                         } catch (error) {
                             Alert.alert(
                                 "삭제 실패",
@@ -116,6 +139,7 @@ const ReviewDetail = ({ route, navigation }) => {
             ]
         );
     };
+
     const handleBackdropPress = () => {
         if (showMenu) {
             setShowMenu(false);

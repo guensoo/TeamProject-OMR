@@ -70,7 +70,7 @@ export async function deleteReview(reviewId, token) {
         const res = await fetch(`${REVIEW_URL}/${reviewId}`, {
             method: 'DELETE',
             headers: {
-                'Authorization': `Bearer ${token}`,
+                // 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             }
         });
