@@ -10,6 +10,7 @@ import ReviewHeader from './ReviewHeader';
 import ReviewDetailComment from "./ReviewDetailComment";
 import { UserContext } from '../All/context/UserContext';
 import { updateReview, deleteReview, getComments, postComment } from '../All/api/ReviewApi';
+import { getMovieDetail, getTVDetail } from "../All/api/tmdb";
 
 const ReviewDetail = ({ route, navigation }) => {
     const { user } = useContext(UserContext);
