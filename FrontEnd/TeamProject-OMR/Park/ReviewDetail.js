@@ -120,6 +120,10 @@ const ReviewDetail = ({ route, navigation }) => {
         );
     };
 
+    const handleLike = () => {
+        setLiked(!liked);
+    }
+
     // **여기가 핵심! robust하게 type/tmdbId 판별**
     const getRobustOttInfo = () => {
         // selectMovie가 있으면 거기서 robust하게 판별
