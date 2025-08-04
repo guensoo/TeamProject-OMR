@@ -14,13 +14,13 @@ const Login = () => {
 
     const handleLogin = async () => {
         // 로그인 로직 구현
-        if(!id){
-            Alert.alert("아이디 미입력","아이디를 입력해주세요.");
+        if (!id) {
+            Alert.alert("아이디 미입력", "아이디를 입력해주세요.");
             return;
         }
 
-        if(!password){
-            Alert.alert("비밀번호 미입력","비밀번호를 입력해주세요.");
+        if (!password) {
+            Alert.alert("비밀번호 미입력", "비밀번호를 입력해주세요.");
             return;
         }
 
@@ -34,7 +34,7 @@ const Login = () => {
             loginUserInfo(res.user);
             console.log("user정보: ", res)
             Alert.alert("로그인 완료", "로그인 성공");
-            navigation.navigate("BottomTabMenu",{Screen: 'Home'});
+            navigation.navigate("BottomTabMenu", { Screen: 'Home' });
         } catch (error) {
             Alert.alert("로그인 실패", error.message);
         }
@@ -47,6 +47,28 @@ const Login = () => {
                 style={styles.keyboardView}
             >
                 <View style={styles.content}>
+                    {/* 유저/관리자 자동 입력 버튼 */}
+                    <View style={styles.roleButtons}>
+                        <TouchableOpacity
+                            style={styles.roleButton}
+                            onPress={() => {
+                                setId('test');
+                                setPassword('11111111');
+                            }}
+                        >
+                            <Text style={styles.roleButtonText}>유저</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            style={styles.roleButton}
+                            onPress={() => {
+                                setId('aaaa');
+                                setPassword('11111111');
+                            }}
+                        >
+                            <Text style={styles.roleButtonText}>관리자</Text>
+                        </TouchableOpacity>
+                    </View>
                     {/* 입력 폼 */}
                     <View style={styles.form}>
                         <View style={styles.inputContainer}>
@@ -216,6 +238,23 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#6366F1',
         fontWeight: '600',
+    },
+    roleButtons: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginBottom: 16,
+        gap: 12, // React Native 0.71 이상일 때만 사용 가능
+    },
+    roleButton: {
+        backgroundColor: '#E0E7FF',
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 8,
+    },
+    roleButtonText: {
+        color: '#1E40AF',
+        fontWeight: '600',
+        fontSize: 14,
     },
 });
 
