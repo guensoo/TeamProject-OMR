@@ -58,6 +58,7 @@ public class QnAEntity {
     				.answer(answer)
     				.createdAt(createdAt)
     				.updatedAt(updatedAt)
+    				.userId(entity.getId())
     				.userName(entity.getNickname())
     				.userData(UserResponseDto
     						.builder()

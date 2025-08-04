@@ -50,7 +50,7 @@ public class SecurityConfig {
                 .requestMatchers(
                 		"/",
                 		"/**",
-                		"api/reviews/**"
+                		"/api/reviews/**"
                 ).permitAll()
                 .anyRequest().authenticated()
             )

@@ -1,20 +1,23 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Animated, Switch, Alert } from "react-native";
-import React, { useState, useRef, useContext, useCallback, useEffect } from "react";
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Animated,  Alert } from "react-native";
+import React, { useState, useRef, useContext, useEffect } from "react";
 import { SupportNavbar } from "./SupportNavbar";
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SupportContext } from "../context/SupportContext";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { UserContext } from "../../All/context/UserContext";
 import { API } from "../../All/api/API";
 
 // FAQ 아이템 컴포넌트
-const FAQItem = ({id,question, answer, isExpanded, onToggle }) => {
-
+const FAQItem = ({id,question, answer, isExpanded, onToggle,onDeleted,onUpdated,item }) => {
     const animatedHeight = useRef(new Animated.Value(0)).current;
     const rotation = useRef(new Animated.Value(0)).current;
+    // 수정하기 편집모드
+    const [showEdit, setShowEdit] = useState(false);
+    const [newQuestion, setNewQuestion] = useState(question);
+    const [newContent, setNewContent ] = useState(answer)
+    // 유저 정보 찾아오기
     const {user} = useContext(UserContext);
 
-    React.useEffect(() => {
+    useEffect(() => {
         Animated.parallel([
             Animated.timing(animatedHeight, {
                 toValue: isExpanded ? 1 : 0,
@@ -35,30 +38,78 @@ const FAQItem = ({id,question, answer, isExpanded, onToggle }) => {
     });
     
     // 수정하기
-    const handleUpdate = () => {
-        try {
-            // const conncet = await fetch(`${API}/api/faq/${id}`)
-            // const result = await conncet.json()
-            // console.log('삭제하기 :: ',result)
-        } catch (error) {
-            console.log(error)
-            Alert.alert("오류","수정하기 오류")
+    const handleUpdate = async () => {    
+
+        if(!showEdit){
+            setShowEdit(true);
+        }else{
+            const data = {
+                ...item,
+                question: newQuestion,
+                asnwer: newContent,
+                updatedAt : new Date()
+            }
+
+            try {
+                const connect = await fetch(`${API}/api/faq`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const response = await connect.json();
+
+                console.log(response)
+
+                setShowEdit(false)
+                onUpdated();
+            } catch (error) {
+                console.log(error)
+                Alert.alert("오류","수정하기 오류")
+            }
         }
+
     }
 
     // 삭제하기
-    const handleDelete = async () => {
-        try {
-            const conncet = await fetch(`${API}/api/faq/${id}`,{
-                method:"DELETE"
-            })
-            const result = await conncet.json()
-            alert("삭제하기 성공")
-            console.log('삭제하기 :: ',result)
-        } catch (error) {
-            console.log(error)
-            Alert.alert("오류","삭제하기 오류")
-        }
+    const handleDelete = () => {
+
+        Alert.alert("삭제 확인", "정말 삭제하시겠습니까?", 
+            [
+                {
+                    text: "취소",
+                    style: "cancel"
+                },
+                {
+                    text: "삭제",
+                    style: "destructive",
+                    onPress: async () => {
+                        try {
+                            const conncet = await fetch(`${API}/api/faq/${id}`,{
+                                method:"DELETE"
+                            })
+                            const result = await conncet.json()
+
+                            if(result.Result){
+                                alert("삭제하기 성공")    
+                                onDeleted(id);
+                            }else{
+                                alert("삭제하기 실패")    
+                            }
+                            
+                            
+                        } catch (error) {
+                            console.log(error)
+                            Alert.alert("오류","삭제하기 오류")
+                        }
+                    }
+                }
+            ]
+        );
+        
+
     }
 
     return (
@@ -72,7 +123,9 @@ const FAQItem = ({id,question, answer, isExpanded, onToggle }) => {
                     <View style={styles.questionIcon}>
                         <Text style={styles.questionIconText}>Q</Text>
                     </View>
-                    <Text style={styles.questionText}>{question}</Text>
+                    {!showEdit&&<Text style={styles.questionText}>{question}</Text>}
+                    {showEdit&&<TextInput style={[styles.answerText,styles.editTrue]}
+                        value={newQuestion} onChangeText={text=>setNewQuestion(text)} />}
                 </View>
                 <Animated.View style={[styles.expandIcon, { transform: [{ rotate: rotateIcon }] }]}>
                     <Text style={styles.expandIconText}>⌄</Text>
@@ -95,7 +148,9 @@ const FAQItem = ({id,question, answer, isExpanded, onToggle }) => {
                     <View style={styles.answerIcon}>
                         <Text style={styles.answerIconText}>A</Text>
                     </View>
-                    <Text style={styles.answerText}>{answer}</Text>
+                    {!showEdit&&<Text style={styles.answerText}>{answer}</Text>}
+                    {showEdit&&<TextInput style={[styles.answerText,styles.editTrue]}
+                        multiline value={newContent} onChangeText={text=>setNewContent(text)} />}
                 </View>
 
                 {user?.id===1&&<View style={styles.editButtonContainer}>
@@ -140,21 +195,22 @@ export const FAQ = () => {
 
     const [faqData, setFaqData] = useState([]);
 
+    const fetchFAQData = async () => {
+        try {
+            const connect = await fetch(`${API}/api/faq`)
+            const result = await connect.json() ;
+            setFaqData(result)
+            // console.log(result)
+
+        } catch (error) {
+            Alert.alert("에러","자주 묻는 질문 불러오기에 실패했습니다")
+            console.log(error);
+        }
+    }
+
     //페이지 로드시 데이터 보여주기.
     useEffect(()=>{
-        const findAll = async () => {
-            try {
-                const connect = await fetch(`${API}/api/faq`)
-                const result = await connect.json() ;
-                setFaqData(result)
-                // console.log(result)
-
-            } catch (error) {
-                Alert.alert("에러","자주 묻는 질문 불러오기에 실패했습니다")
-                console.log(error);
-            }
-        }
-        findAll()
+        fetchFAQData();
     },[showNewFAQ])
 
     const toggleExpanded = (id) => {
@@ -217,6 +273,14 @@ export const FAQ = () => {
         setFaqAnswer('');
         setFaqCategory('계정/로그인');
     };
+
+    const handleDeletedFAQ = (deleteId) => {
+        setFaqData(prev => prev.filter(item=>item.id !== deleteId));
+    }
+
+    const handleEditSuccess = () => {
+        fetchFAQData();
+    }
 
     // 관리자용 FAQ 작성 화면
     if (showNewFAQ) {
@@ -443,6 +507,9 @@ export const FAQ = () => {
                                         answer={item.answer}
                                         isExpanded={expandedItems.has(item.id)}
                                         onToggle={() => toggleExpanded(item.id)}
+                                        onDeleted={()=>handleDeletedFAQ(item.id)}
+                                        onUpdated={()=>handleEditSuccess()}
+                                        item={item}
                                     />
                                 )).reverse()}
                             </>
@@ -1055,4 +1122,9 @@ const styles = StyleSheet.create({
         justifyContent:'space-evenly',
         padding:5
     },
+    editTrue:{
+        borderRadius:8,
+        backgroundColor:'#FFFACD',
+        padding:10
+    }
 });

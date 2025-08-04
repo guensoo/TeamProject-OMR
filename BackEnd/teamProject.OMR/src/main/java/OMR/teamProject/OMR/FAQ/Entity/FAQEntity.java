@@ -50,19 +50,6 @@ public class FAQEntity {
     
     private Integer sortOrder; // 정렬용
     
-//    public FAQDto toDTO() {
-//    	return FAQDto
-//    			.builder()
-//    				.id(id)
-//    				.category(category)
-//    				.question(question)
-//    				.answer(answer)
-//    				.createdAt(createdAt)
-//    				.updatedAt(updatedAt)
-//    				.userId(userId)
-//    				.sortOrder(sortOrder)
-//    			.build();
-//    }
     
     public FAQDto toDTO(UserResponseDto dto) {
     	return FAQDto

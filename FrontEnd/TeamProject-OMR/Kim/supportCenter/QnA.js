@@ -3,100 +3,232 @@ import { View, ScrollView, Text, TouchableOpacity, StyleSheet, TextInput, Alert 
 import { SupportNavbar } from "./SupportNavbar";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { UserContext } from '../../All/context/UserContext';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API } from "../../All/api/API";
 
 
 // 한개의 문의사항 보여주는 카드
-const InquiryItem = ({ item, isExpanded, onToggle }) => {
+const InquiryItem = ({ item, isExpanded, onToggle, onDeleted, onUpdated }) => {
+    //편집모드 상태
+    const [showEdit, setShowEdit] = useState(false)
+    //답변작성모드 상태
+    const [showNewAnswer, setShowNewAnser] = useState(false);
+    // 새로운 답변 작성
+    const [newAnswer, setNewAnswer] = useState('');
 
-  const [showNewAnswer,setShowNewAnser] = useState(false);
-  const [newAnswer,setNewAnswer] = useState('');
+    //새로운 수정데이터
+    const [newTitle, setNewTitle] = useState(item.title);
+    const [newContent, setNewContent] = useState(item.content);
+    //유저 정보가져오기
+    const { user } = useContext(UserContext);
 
-  const {user} = useContext(UserContext);
-
-  const handleNewAnswer = () => {
-    
-  }
-  
-  return(
-    <View style={styles.inquiryItem}>
-        <TouchableOpacity style={styles.inquiryHeader} onPress={onToggle}>
-            <View style={styles.inquiryInfo}>
-                <Text style={styles.inquiryTitle}>{item.title}</Text>
-                <Text style={styles.inquiryDate}>{item.createdAt}</Text>
-                <Text style={styles.inquiryPreview}>{item.content}</Text>
-            </View>
-            <View style={styles.inquiryRight}>
-                <View style={[styles.statusBadge,
-                item.answer !== null ? styles.completedBadge : styles.pendingBadge
-                ]}>
-                    <Text style={[styles.statusText,
-                    item.answer !== null ? styles.completedText : styles.pendingText
-                    ]}>
-                        {item.answer!==null?'답변완료':'처리중'}
-                    </Text>
-                </View>
-                <Text style={styles.expandIcon}>{isExpanded ? '−' : '+'}</Text>
-            </View>
-        </TouchableOpacity>
-
-        {isExpanded && item.answer && (
-            <View style={styles.answerContainer}>
-                <Text style={styles.answerLabel}>답변</Text>
-                <Text style={styles.answerText}>{item.answer}</Text>
-            </View>
-        )}
-
-        {!showNewAnswer?
-        isExpanded && !item.answer && (
-            <View style={styles.answerContainer}>
-                <Text style={styles.pendingAnswer}>답변 준비 중입니다. 조금만 기다려주세요.</Text>
-
-              {user?.id===1&&<TouchableOpacity
-                  style={styles.newInquiryButton}
-                  onPress={()=>setShowNewAnser(true)}
-              >
-                  <Text style={styles.newInquiryButtonText}>답변 작성하기</Text>
-              </TouchableOpacity>}
-            </View>
-        )
-        :
-        isExpanded && !item.answer && (
-            <View style={[styles.modernInputContainer,styles.newAnswerbutton]}>
-              <TextInput
-                multiline
-                style={styles.modernAnswerInput}
-                placeholder="어떤 내용인지 간단히 적어주세요"
-                placeholderTextColor="#A0A0A0"
-                value={newAnswer}
-                onChangeText={setNewAnswer}
-                // onFocus={() => setTitleFocused(true)}
-                // onBlur={() => setTitleFocused(false)}
-                maxLength={50}
-            />
-            <View style={{gap:5}}>
-              <TouchableOpacity
-                      style={styles.newInquiryButton}
-                      onPress={handleNewAnswer}
-              >
-                <Text style={styles.newInquiryButtonText}>완료</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                      style={styles.newInquiryButton}
-                      onPress={()=>{
-                        setNewAnswer('')
-                        setShowNewAnser(false)
-                      }}
-              >
-                <Text style={styles.newInquiryButtonText}>취소</Text>
-              </TouchableOpacity>
-            </View>
-            </View>
-          )
+    //새로운 답변 작성하기(PUT)
+    const handleNewAnswer = async () => {
+        const data = {
+            ...item,
+            answer: newAnswer,
         }
-    </View>
-)};
+
+        try {
+            const connect = await fetch(`${API}/api/qna`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            });
+
+            const response = await connect.json();
+
+            console.log(response)
+
+            alert("수정이 완료되었습니다")
+            setShowNewAnser(false)
+            onUpdated();
+        } catch (error) {
+            console.log(error)
+            Alert.alert("오류", "수정하기 오류")
+        }
+
+    }
+
+    // 수정하기(PUT)
+    const handleUpdate = async () => {
+
+        if (!showEdit) {
+            setShowEdit(true);
+        } else {
+
+            const data = {
+                ...item,
+                title: newTitle,
+                content: newContent,
+                updatedAt: new Date()
+            }
+
+            try {
+                const connect = await fetch(`${API}/api/qna`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const response = await connect.json();
+
+                console.log(response)
+
+                alert("수정이 완료되었습니다")
+                setShowEdit(false)
+                onUpdated();
+            } catch (error) {
+                console.log(error)
+                Alert.alert("오류", "수정하기 오류")
+            }
+        }
+
+    }
+
+    // 삭제하기
+    const handleDelete = () => {
+
+        Alert.alert("삭제 확인", "정말 삭제하시겠습니까?",
+            [
+                {
+                    text: "취소",
+                    style: "cancel"
+                },
+                {
+                    text: "삭제",
+                    style: "destructive",
+                    onPress: async () => {
+                        try {
+                            const conncet = await fetch(`${API}/api/qna/${item.id}`, {
+                                method: "DELETE"
+                            })
+                            const result = await conncet.json()
+
+                            if (result.Result) {
+                                alert("삭제하기 성공")
+                                onDeleted(item.id);
+                            } else {
+                                alert("삭제하기 실패")
+                            }
+
+                        } catch (error) {
+                            console.log(error)
+                            Alert.alert("오류", "삭제하기 오류")
+                        }
+                    }
+                }
+            ]
+        );
+
+
+    }
+
+    return (
+        <View style={styles.inquiryItem}>
+            <TouchableOpacity style={styles.inquiryHeader} onPress={onToggle}>
+                <View style={styles.inquiryInfo}>
+                    {!showEdit && <Text style={styles.inquiryTitle}>{item.title}</Text>}
+                    {showEdit && <TextInput style={styles.editTrue}
+                        value={newTitle} onChangeText={text => setNewTitle(text)} />}
+                    <Text style={styles.inquiryDate}>{item.createdAt.slice(0, 10)}</Text>
+                    {!showEdit && <Text style={styles.inquiryPreview}>{item.content}</Text>}
+                    {showEdit && <TextInput style={styles.editTrue}
+                        value={newContent} onChangeText={text => setNewContent(text)} />}
+                </View>
+
+                <View style={styles.inquiryRight}>
+
+                    <View style={styles.inquiryRightEdit}>
+                        {(user?.id === 1||user?.id===item.userId) && <View style={styles.editButtonContainer}>
+                            <TouchableOpacity
+                                style={[styles.statusBadge, styles.pendingBadge]}
+                                onPress={handleUpdate}
+                            >
+                                <Text style={styles.pendingText}>수정</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={[styles.statusBadge, styles.pendingBadge]}
+                                onPress={handleDelete}
+                            >
+                                <Text style={styles.pendingText}>삭제</Text>
+                            </TouchableOpacity>
+                        </View>}
+                        <View style={[styles.statusBadge,
+                        item.answer !== null ? styles.completedBadge : styles.pendingBadge
+                        ]}>
+
+                            <Text style={[styles.statusText,
+                            item.answer !== null ? styles.completedText : styles.pendingText
+                            ]}>
+                                {item.answer !== null ? '답변완료' : '처리중'}
+                            </Text>
+
+                        </View>
+
+                    </View>
+                    <Text style={styles.expandIcon}>{isExpanded ? '−' : '+'}</Text>
+                </View>
+            </TouchableOpacity>
+
+            {isExpanded && item.answer && (
+                <View style={styles.answerContainer}>
+                    <Text style={styles.answerLabel}>답변</Text>
+                    <Text style={styles.answerText}>{item.answer}</Text>
+                </View>
+            )}
+
+            {!showNewAnswer ?
+                isExpanded && !item.answer && (
+                    <View style={styles.answerContainer}>
+                        <Text style={styles.pendingAnswer}>답변 준비 중입니다. 조금만 기다려주세요.</Text>
+
+                        {user?.id === 1 && <TouchableOpacity
+                            style={styles.newInquiryButton}
+                            onPress={() => setShowNewAnser(true)}
+                        >
+                            <Text style={styles.newInquiryButtonText}>답변 작성하기</Text>
+                        </TouchableOpacity>}
+                    </View>
+                )
+                :
+                isExpanded && !item.answer && (
+                    <View style={[styles.modernInputContainer, styles.newAnswerbutton]}>
+                        <TextInput
+                            multiline
+                            style={styles.modernAnswerInput}
+                            placeholder="어떤 내용인지 간단히 적어주세요"
+                            placeholderTextColor="#A0A0A0"
+                            value={newAnswer}
+                            onChangeText={setNewAnswer}
+                            maxLength={50}
+                        />
+                        <View style={{ gap: 5 }}>
+                            <TouchableOpacity
+                                style={styles.newInquiryButton}
+                                onPress={handleNewAnswer}
+                            >
+                                <Text style={styles.newInquiryButtonText}>완료</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={styles.newInquiryButton}
+                                onPress={() => {
+                                    setNewAnswer('')
+                                    setShowNewAnser(false)
+                                }}
+                            >
+                                <Text style={styles.newInquiryButtonText}>취소</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                )
+            }
+        </View>
+    )
+};
 
 export const QnA = () => {
     const [expandedItems, setExpandedItems] = useState(new Set());
@@ -110,9 +242,9 @@ export const QnA = () => {
     const [titleFocused, setTitleFocused] = useState(false);
     const [contentFocused, setContentFocused] = useState(false);
     //받아온 데이터
-    const [inquiryHistory,setInquiryHistory] = useState([]);
+    const [inquiryHistory, setInquiryHistory] = useState([]);
     //유저 데이터
-    const {user} = useContext(UserContext);
+    const { user } = useContext(UserContext);
 
     const inquiryTypes = ['일반문의', '기술지원', '결제문의', '계정문의', '신고/건의'];
 
@@ -126,79 +258,75 @@ export const QnA = () => {
         setExpandedItems(newExpanded);
     };
 
-    const handleNewInquiry = () => {
-        // AsyncStorage.getItem('authToken')
-        //     .then(token => {
-        //         alert("로그인이 필요합니다")
-        //     if (token === null) return;
-        //     setShowNewInquiry(true);
-        // });
+    const findAll = async () => {
+        try {
+            const connect = await fetch(`${API}/api/qna`)
+            const result = await connect.json();
+            setInquiryHistory(result)
+            // console.log(result)
 
-        if(user==null){
+        } catch (error) {
+            Alert.alert("에러", "문의사항 불러오기에 실패했습니다")
+            console.log(error);
+        }
+    }
+
+    const handleNewInquiry = () => {
+
+        if (user == null) {
             alert("로그인이 필요합니다")
-            }
-        else{setShowNewInquiry(true);}
+        }
+        else { setShowNewInquiry(true); }
+        findAll()
     };
 
-
     //컴포넌트 연결시 보여주기
-    useEffect(()=>{
-        const findAll = async () => {
-            try {
-                const connect = await fetch(`${API}/api/qna`)
-                const result = await connect.json() ;
-                setInquiryHistory(result)
-                // console.log(result)
-
-            } catch (error) {
-                Alert.alert("에러","문의사항 불러오기에 실패했습니다")
-                console.log(error);
-            }
-        }
+    useEffect(() => {
         findAll()
-    },[showNewInquiry])
+    }, [])
 
     // 새로운 문의글 작성(POST)
     const handleSubmitInquiry = async () => {
-      try {
-        if (inquiryTitle.trim() && inquiryContent.trim()) {
-            // 문의 제출 로직
-            const data = {
-                title: inquiryTitle,
-                content: inquiryContent,
-                answer: null,
-                types: inquiryType,
-                userId:user.id,
-                createdAt: new Date(),
-                updatedAt: new Date()
+        try {
+            if (inquiryTitle.trim() && inquiryContent.trim()) {
+                // 문의 제출 로직
+                const data = {
+                    title: inquiryTitle,
+                    content: inquiryContent,
+                    answer: null,
+                    types: inquiryType,
+                    userId: user.id,
+                    createdAt: new Date(),
+                    updatedAt: new Date()
+                }
+                console.log('문의 제출:', data);
+
+                const updateQna = await fetch(`${API}/api/qna`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const response = await updateQna.json();
+
+                // console.log("서버 응답:", response);         
+
+                //입력 필드 초기화
+                setInquiryTitle('');
+                setInquiryContent('');
+                setInquiryType('일반문의');
+                setShowNewInquiry(false);
+                findAll()
+                alert('문의가 성공적으로 접수되었습니다.');
+            } else {
+                alert('제목과 내용을 모두 입력해주세요.');
             }
-            console.log('문의 제출:', data);
-
-            const updateQna = await fetch(`${API}/api/qna`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(data)
-            });
-
-            const response = await updateQna.json();
-
-            // console.log("서버 응답:", response);         
-
-            //입력 필드 초기화
-            setInquiryTitle('');
-            setInquiryContent('');
-            setInquiryType('일반문의');
-            setShowNewInquiry(false);
-            alert('문의가 성공적으로 접수되었습니다.');
-        } else {
-            alert('제목과 내용을 모두 입력해주세요.');
+        } catch (error) {
+            Alert.alert("오류", "문의 작성에 실패했습니다.")
+            console.log(error)
         }
-      } catch (error) {
-        Alert.alert("오류","문의 작성에 실패했습니다.")
-        console.log(error)
-      }
     };
 
     const handleCancel = () => {
@@ -207,6 +335,14 @@ export const QnA = () => {
         setInquiryContent('');
         setInquiryType('일반문의');
     };
+
+    const handleDelete = (deleteId) => {
+        setInquiryHistory(prev => prev.filter(item => item.id !== deleteId));
+    }
+
+    const handleUpdate = () => {
+        findAll()
+    }
 
     // 문의 작성 화면
     if (showNewInquiry) {
@@ -421,6 +557,8 @@ export const QnA = () => {
                                     item={item}
                                     isExpanded={expandedItems.has(item.id)}
                                     onToggle={() => toggleExpanded(item.id)}
+                                    onDeleted={() => handleDelete(item.id)}
+                                    onUpdated={() => handleUpdate(item.id)}
                                 />
                             )).reverse()}
                         </View>
@@ -462,12 +600,12 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         paddingVertical: 8,
         borderRadius: 6,
-        marginRight:10
+        marginRight: 10
     },
     newInquiryButtonText: {
         color: '#fff',
         fontSize: 14,
-        fontWeight: '600',     
+        fontWeight: '600',
     },
     subtitle: {
         fontSize: 16,
@@ -538,9 +676,11 @@ const styles = StyleSheet.create({
     },
     completedText: {
         color: '#4CAF50',
+        textAlign: 'center'
     },
     pendingText: {
         color: '#FF9800',
+        textAlign: 'center'
     },
     expandIcon: {
         fontSize: 20,
@@ -975,17 +1115,28 @@ const styles = StyleSheet.create({
     bottomSpacing: {
         height: 100,
     },
-    newAnswerbutton : {
-      flexDirection: 'row',
-      alignItems:'center'
+    newAnswerbutton: {
+        flexDirection: 'row',
+        alignItems: 'center'
     },
     modernAnswerInput: {
-      paddingHorizontal: 16,
-      paddingVertical: 16,
-      fontSize: 16,
-      height:120,
-      color: '#0F172A',
-      fontWeight: '400',
-      flex :1
-  },
+        paddingHorizontal: 16,
+        paddingVertical: 16,
+        fontSize: 16,
+        height: 120,
+        color: '#0F172A',
+        fontWeight: '400',
+        flex: 1
+    },
+    editButtonContainer: {
+        gap: 5,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-evenly',
+    },
+    editTrue: {
+        borderRadius: 8,
+        backgroundColor: '#FFFACD',
+        padding: 10
+    }
 });

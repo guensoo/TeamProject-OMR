@@ -3,7 +3,6 @@ import { View, ScrollView, Text, TouchableOpacity, StyleSheet, TextInput, Switch
 import { SupportNavbar } from "./SupportNavbar";
 import { NoticeItem } from '../component/NoticeItem';
 import { UserContext } from '../../All/context/UserContext';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API } from "../../All/api/API";
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -54,20 +53,23 @@ export const Notice = () => {
         }
     }, [showNewNotice]);
 
+    //데이터 찾아오기
+    const findAll = async () => {
+        try {
+            const connect = await fetch(`${API}/api/notice`)
+            const result = await connect.json() ;
+            setNoticeData(result)
+            // console.log(result)
 
-    useEffect(()=>{
-        const findAll = async () => {
-            try {
-                const connect = await fetch(`${API}/api/notice`)
-                const result = await connect.json() ;
-                setNoticeData(result)
-                // console.log(result)
-
-            } catch (error) {
-                Alert.alert("에러","공지사항 불러오기에 실패했습니다")
-                console.log(error);
-            }
+        } catch (error) {
+            Alert.alert("에러","공지사항 불러오기에 실패했습니다")
+            console.log(error);
         }
+    }
+
+    //데이터 찾아오기
+    useEffect(()=>{
+        
         findAll()
     },[showNewNotice])
 
@@ -86,8 +88,8 @@ export const Notice = () => {
                 category: selectedNoticeCategory,
                 createdAt: new Date(),
                 updatedAt : new Date(),
-                isImportant,
-                isNew
+                important : isImportant,
+                new : isNew,
             }
 
             console.log('공지사항 발행 시작 :: ',data );
@@ -125,10 +127,9 @@ export const Notice = () => {
 
     const handleCancel = () => {
         setShowNewNotice(false);
-        
         setNoticeTitle("")
         setNoticeContent("")
-        setSelectedNoticeCategory("")
+        setSelectedNoticeCategory('전체')
         setIsImportant(false)
         setIsNew(false)
     };
@@ -196,7 +197,9 @@ export const Notice = () => {
                                                     selectedCategory === category && styles.selectedCategoryChip,
                                                     { backgroundColor: selectedCategory === category ? categoryColors[category] : '#F3F4F6' }
                                                 ]}
-                                                onPress={() => setSelectedCategory(category)}
+                                                onPress={() => {setSelectedCategory(category?.trim())
+                                                    console.log(category?.trim())
+                                                }}
                                             >
                                                 <Text style={[
                                                     styles.categoryChipText,
@@ -374,6 +377,14 @@ export const Notice = () => {
         );
     }
 
+    const onDeleted = (deletedId) => {
+        setNoticeData(prev=>prev.filter(item=>item.id !== deletedId));
+    }
+
+    const onUpdated = () =>{
+        findAll();
+    }
+
 
     return (
             <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
@@ -427,6 +438,8 @@ export const Notice = () => {
                                 item={item}
                                 isExpanded={expandedItems.has(item.id)}
                                 onToggle={() => toggleExpanded(item.id)}
+                                onDeleted={()=>onDeleted(item.id)}
+                                onUpdated={()=>onUpdated()}
                             />
                         )).reverse()}
                     </View>
