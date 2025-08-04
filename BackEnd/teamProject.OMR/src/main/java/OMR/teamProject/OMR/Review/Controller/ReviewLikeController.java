@@ -48,7 +48,7 @@ public class ReviewLikeController {
     public ResponseEntity<Boolean> isLiked(
         @PathVariable("reviewId") Long reviewId,
         @PathVariable("userId") String userId
-    ) { 
+    ) {
         boolean liked = likeService.isLikedByUser(reviewId, userId);
         return ResponseEntity.ok(liked);
     }

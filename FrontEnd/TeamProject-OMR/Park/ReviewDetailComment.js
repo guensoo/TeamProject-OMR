@@ -28,14 +28,6 @@ const ReviewDetailComment = ({
                 )}
             </View>
             <Text style={styles.commentText}>{text}</Text>
-            <View style={styles.commentFooter}>
-                <View style={styles.commentLike}>
-                    <TouchableOpacity>
-                        <Text style={styles.likeIcon}>♡</Text>
-                    </TouchableOpacity>
-                    <Text style={styles.likeCount}>{typeof likes === 'number' ? likes : 0}</Text>
-                </View>
-            </View>
         </View>
     );
 };
