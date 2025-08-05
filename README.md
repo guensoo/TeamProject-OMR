@@ -12,7 +12,6 @@
 **프로젝트명:** OMR (OTT Movie Review)  
 **과정명:** (스마트웹콘텐츠개발) AWS클라우드를 활용한 풀스택 개발  
 **발표일:** 2025.08.07.(목)  
-**담당강사:** 이현준  
 
 ---
 
@@ -86,7 +85,7 @@ OTT 콘텐츠는 많지만, 리뷰와 정보가 플랫폼마다 분산되어 있
 
 ## ⏰ 개발 기간
 
-- **2025.06 ~ 2025.08 (약 2개월)**
+- **2025.07 ~ 2025.08 (약 2개월)**
 
 ---
 
@@ -101,14 +100,12 @@ OTT 콘텐츠는 많지만, 리뷰와 정보가 플랫폼마다 분산되어 있
 ### 설치 방법
 
 ```bash
-# 저장소 클론
-git clone [repository-url]
 
 # 의존성 설치
 npm install
 
 # 개발 서버 실행
-npm start
+npx expo start
 ```
 
 ### 환경 설정
@@ -129,31 +126,6 @@ OMR/
 ├── database/         # MySQL 스키마 및 데이터
 └── docs/            # 프로젝트 문서
 ```
-
----
-
-## 🤝 기여하기
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
----
-
-## 📝 라이선스
-
-이 프로젝트는 MIT 라이선스 하에 배포됩니다. 자세한 내용은 `LICENSE` 파일을 참조하세요.
-
----
-
-## 📞 연락처
-
-프로젝트에 대한 문의사항이 있으시면 언제든지 연락주세요!
-
-- **팀장:** 박세현
-- **프로젝트 링크:** [GitHub Repository](#)
 
 ---
 
