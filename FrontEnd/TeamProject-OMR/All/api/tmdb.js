@@ -193,12 +193,12 @@ export const getAllPopularKR = async (count = 20, type = 'all', sortBy = 'popula
         }));
 
         // 🔥 콘솔로 무조건 까기!
-        console.log('🎬 [MOVIES]', movies.map(x => ({
-            id: x.id, title: x.title, media_type: x.media_type, release_date: x.release_date
-        })));
-        console.log('📺 [TVS]', tvs.map(x => ({
-            id: x.id, name: x.name, media_type: x.media_type, first_air_date: x.first_air_date
-        })));
+        // console.log('🎬 [MOVIES]', movies.map(x => ({
+        //     id: x.id, title: x.title, media_type: x.media_type, release_date: x.release_date
+        // })));
+        // console.log('📺 [TVS]', tvs.map(x => ({
+        //     id: x.id, name: x.name, media_type: x.media_type, first_air_date: x.first_air_date
+        // })));
 
         let merged;
         if (type === 'movie') merged = movies;

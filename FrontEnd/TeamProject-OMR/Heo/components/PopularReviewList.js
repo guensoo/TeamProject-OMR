@@ -58,7 +58,9 @@ const PopularReviewList = ({ activeCard, onToggleCard }) => {
 
                     // 먼저 title별로 개수 세기
                     for (const review of data) {
+                        console.log("review:", review)
                         const title = review.selectMovie.title;
+                        // console.log("title:", title)
                         const count = countMap.get(title) || { count: 0, review };
                         countMap.set(title, { count: count.count + 1, review }); // review는 마지막 걸 대표로 씀
                     }

@@ -89,7 +89,10 @@ export const ReviewWrite = ({ navigation }) => {
         const selectMovieToSave = {
             ...selectedMovie,
             media_type,
+            title: selectedMovie.title || selectedMovie.name || selectedMovie.original_name || '제목 없음',
         };
+
+        console.log("selectMovieToSave: ",selectMovieToSave)
 
         setIsSubmitting(true);
 
