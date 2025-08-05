@@ -35,6 +35,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         padding: 20,
         backgroundColor: '#FFFFFF',
+        marginTop: 30,
     },
     posterContainer: {
         position: 'relative',

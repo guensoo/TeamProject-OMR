@@ -38,7 +38,13 @@ const PosterCard = ({ image, title, isActive, onToggle, onReviewPress, onDetailP
                 </TouchableOpacity>
             </View>
         )}
-        <Text style={styles.title} numberOfLines={1}>{title}</Text>
+        <Text
+            style={styles.title}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+        >
+            {title}
+        </Text>
     </TouchableOpacity>
 );
 
@@ -58,7 +64,7 @@ const PopularReviewList = ({ activeCard, onToggleCard }) => {
 
                     // 먼저 title별로 개수 세기
                     for (const review of data) {
-                        console.log("review:", review)
+                        // console.log("review:", review)
                         const title = review.selectMovie.title;
                         // console.log("title:", title)
                         const count = countMap.get(title) || { count: 0, review };
@@ -122,7 +128,10 @@ const PopularReviewList = ({ activeCard, onToggleCard }) => {
         <FlatList
             horizontal
             data={data}
-            keyExtractor={(item) => item.id.toString()}
+            // keyExtractor={(item) => item.id.toString()}
+            keyExtractor={(item, index) =>
+                `${item.type}_${item.provider || 'unknown'}_${item.id}_${index}`
+            }
             contentContainerStyle={{ paddingHorizontal: 12 }}
             showsHorizontalScrollIndicator={false}
             extraData={activeCard}
@@ -149,7 +158,7 @@ const PopularReviewList = ({ activeCard, onToggleCard }) => {
 };
 
 const styles = StyleSheet.create({
-    centeredContainer:{
+    centeredContainer: {
         marginLeft: 18,
         marginTop: 10,
     },

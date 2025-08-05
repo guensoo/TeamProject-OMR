@@ -16,6 +16,12 @@ import FindPassword from './Heo/pages/FindPassword';
 import MyPage from './Heo/pages/MyPage';
 import linking from './Heo/utils/Linking';
 import ResetPassword from './Heo/pages/ResetPassword';
+import AccountSettings from './Heo/pages/AccountSettings';
+import Notifications from './Heo/pages/Notifications';
+import EditProfile from './Heo/pages/EditProfile';
+import ChangeEmail from './Heo/pages/ChangeEmail';
+import ChangePassword from './Heo/pages/ChangePassword';
+import DeleteAccount from './Heo/pages/DeleteAccount';
 
 //
 
@@ -64,10 +70,10 @@ export default function App() {
                         <Stack.Screen name="MovieListScreen" component={MovieListScreen} options={{ headerShown: false }} />
                         <Stack.Screen name="FindTheater" component={FindTheater} options={{ headerShown: false }} />
                         <Stack.Screen name="MapScreen" component={MapScreen} options={{ headerShown: false }} />
-                        <Stack.Screen name="AIRecommend" component={AIRecommend} options={{ headerShown: false }} />
+                        <Stack.Screen name="AIRecommend" component={AIRecommend} options={{ title: "AI추천" }} />
                         <Stack.Screen name="SearchList" component={SearchList} options={{ headerShown: false }} />
 
-                        <Stack.Screen name="ReviewDetail" component={ReviewDetail} />
+                        <Stack.Screen name="ReviewDetail" component={ReviewDetail} options={{ headerShown: false }} />
                         <Stack.Screen name="ReviewWrite" component={ReviewWrite} options={{ headerShown: false }} />
                         <Stack.Screen name="ReviewEdit" component={ReviewEdit} options={{ headerShown: false }} />
                         <Stack.Screen
@@ -106,6 +112,12 @@ export default function App() {
                                 ),
 
                             })} />
+                        <Stack.Screen name="AccountSettings" component={AccountSettings} options={{ title: "계정 설정" }} />
+                        <Stack.Screen name="EditProfile" component={EditProfile} options={{ title: "프로필 수정" }} />
+                        <Stack.Screen name="ChangeEmail" component={ChangeEmail} options={{ title: "이메일 변경" }} />
+                        <Stack.Screen name="ChangePassword" component={ChangePassword} options={{ title: "비밀번호 변경" }} />
+                        <Stack.Screen name="DeleteAccount" component={DeleteAccount} options={{ title: "회원 탈퇴" }} />
+                        <Stack.Screen name="Notifications" component={Notifications} options={{ title: "알림 설정" }} />
 
                     </Stack.Navigator>
                 </NavigationContainer>

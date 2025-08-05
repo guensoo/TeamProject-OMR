@@ -3,7 +3,7 @@ import { View, Text, StyleSheet } from "react-native";
 const AIRecommend = () => {
     return(
         <View style={styles.container}>
-            <Text style={styles.content}>만들수있으면 만들어봐</Text>
+            <Text style={styles.content}>개발 예정...</Text>
         </View>
     )
 }

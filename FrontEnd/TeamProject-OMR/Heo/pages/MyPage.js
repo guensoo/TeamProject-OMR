@@ -11,10 +11,10 @@ const MyPage = () => {
     const navigation = useNavigation();
 
     const menuItems = [
-        { icon: "settings-outline", title: "계정 설정", color: "#6C63FF" },
-        { icon: "notifications-outline", title: "알림 설정", color: "#FF6B6B" },
-        { icon: "help-circle-outline", title: "고객 지원", color: "#4ECDC4" },
-        { icon: "document-text-outline", title: "이용약관", color: "#45B7D1" },
+        { icon: "settings-outline", title: "계정 설정", color: "#6C63FF", screen: "AccountSettings" },
+        { icon: "notifications-outline", title: "알림 설정", color: "#FF6B6B", screen: "Notifications" },
+        { icon: "help-circle-outline", title: "고객 지원", color: "#4ECDC4", screen: "Support" },
+        // { icon: "document-text-outline", title: "이용약관", color: "#45B7D1" },
     ];
 
     if (!user) return null;
@@ -88,7 +88,11 @@ const MyPage = () => {
                 <View style={styles.menuCard}>
                     <Text style={styles.cardTitle}>설정</Text>
                     {menuItems.map((item, index) => (
-                        <TouchableOpacity key={index} style={styles.menuItem}>
+                        <TouchableOpacity 
+                            key={index} 
+                            style={styles.menuItem}
+                            onPress={() => navigation.navigate(item.screen)}
+                        >
                             <View style={[styles.menuIconContainer, { backgroundColor: `${item.color}20` }]}>
                                 <Ionicons name={item.icon} size={22} color={item.color} />
                             </View>
@@ -300,6 +304,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.2,
         shadowRadius: 8,
         elevation: 5,
+        marginBottom: 20,
     },
     logoutGradient: {
         flexDirection: "row",

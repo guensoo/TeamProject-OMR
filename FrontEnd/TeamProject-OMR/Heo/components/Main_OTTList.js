@@ -30,7 +30,7 @@ const PosterCard = ({ image, title, isActive, onToggle, onReviewPress, onDetailP
         )}
         <Text
             style={styles.title}
-            numberOfLines={2}
+            numberOfLines={1}
             ellipsizeMode="tail"
         >
             {title}
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
     },
     overlay: {
         ...StyleSheet.absoluteFillObject,
-        height: '75%',
+        height: '80%',
         backgroundColor: 'rgba(0, 0, 0, 0.4)',
         borderRadius: 8,
     },
