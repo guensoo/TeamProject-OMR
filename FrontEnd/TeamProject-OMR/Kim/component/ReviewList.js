@@ -10,10 +10,9 @@ import { PlatformFilter } from "./PlatformFilter";
 import ReviewComponent from "./ReviewComponent";
 import styles from './ReviewListStyle';
 import { SafeAreaView } from "react-native-safe-area-context";
-import { fetchReviews } from "../../All/api/ReviewApi"; // ★ 이 부분만 경로 맞춰주세요!
+import { fetchReviews } from "../../All/api/ReviewApi";
 
 const ReviewList = ({ navigation, route }) => {
-    // 상태 선언
     const [sort, setSort] = useState('latest');
     const [reviews, setReviews] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -22,14 +21,12 @@ const ReviewList = ({ navigation, route }) => {
     const [show, setShow] = useState(true);
     const [searchText, setSearchText] = useState('');
 
-    // 작품명 자동입력 (검색어 세팅)
     useEffect(() => {
         if (route?.params?.initialKeyword) {
             setSearchText(route.params.initialKeyword);
         }
     }, [route?.params?.initialKeyword]);
 
-    // 필터 애니메이션
     const Anim = useRef(new Animated.Value(1)).current;
     const isAnimatingRef = useRef(false);
 
@@ -38,7 +35,6 @@ const ReviewList = ({ navigation, route }) => {
         outputRange: [0, 170]
     });
 
-    // 필터 show/hide
     const shown = () => {
         Animated.timing(Anim, {
             toValue: 1,
@@ -56,7 +52,6 @@ const ReviewList = ({ navigation, route }) => {
         }).start();
     };
 
-    // 장르/플랫폼 필터 토글
     const toggleGenre = (genre) => {
         const newSelected = new Set(selectedGenres);
         newSelected.has(genre) ? newSelected.delete(genre) : newSelected.add(genre);
@@ -68,16 +63,18 @@ const ReviewList = ({ navigation, route }) => {
         setSelectedPlatforms(newSelected);
     };
 
-    // 1) 검색 + 2) 정렬을 useMemo로 최적화
+    // ** 검색어가 영화(타이틀)·TV(이름) 모두 적용되도록 수정 **
     const filteredReviews = useMemo(() => {
         let searched = reviews;
         if (searchText.trim()) {
             const searchLower = searchText.toLowerCase();
             searched = reviews.filter(review =>
-                (review.title?.toLowerCase().includes(searchLower)) ||
+                (review.title?.toLowerCase().includes(searchLower)) ||            // 영화 title
+                (review.name?.toLowerCase().includes(searchLower)) ||             // TV name
                 (review.content?.toLowerCase().includes(searchLower)) ||
-                (review.selectMovie?.title?.toLowerCase().includes(searchLower)) ||
-                (review.userData?.nickname?.toLowerCase().includes(searchLower))      // ★ 이 부분!
+                (review.selectMovie?.title?.toLowerCase().includes(searchLower)) || // 영화 title(선택)
+                (review.selectMovie?.name?.toLowerCase().includes(searchLower)) ||  // TV name(선택)
+                (review.userData?.nickname?.toLowerCase().includes(searchLower))
             );
         }
         if (searched.length <= 1) return searched;
@@ -91,13 +88,12 @@ const ReviewList = ({ navigation, route }) => {
         return searched;
     }, [reviews, searchText, sort]);
 
-    // 리뷰 데이터 fetch (페이지 접근시 or focus시마다)
     useFocusEffect(
         useCallback(() => {
             setLoading(true);
             (async () => {
                 try {
-                    const data = await fetchReviews(); // 🔥 API 함수 사용
+                    const data = await fetchReviews();
                     setReviews(data);
                 } catch (error) {
                     console.log('리뷰 불러오기 실패:', error);
