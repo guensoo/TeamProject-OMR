@@ -5,13 +5,8 @@ function OTTCardComponent({ rank, image, title, isActive, onToggle, onReviewPres
     return (
         <TouchableOpacity style={styles.card} onPress={onToggle} activeOpacity={0.9}>
             <Image source={{ uri: image }} style={styles.image} />
-
             {isActive && <View style={styles.overlay} />}
-
-            <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
-                {title}
-            </Text>
-
+            <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">{title}</Text>
             {isActive && (
                 <View style={styles.buttonContainer}>
                     <TouchableOpacity style={styles.reviewButton} onPress={onReviewPress}>

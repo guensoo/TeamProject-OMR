@@ -135,7 +135,9 @@ function OTTTabContent({ providerKey, sortBy }) {
                                     isActive={activeCard === item.id}
                                     onToggle={() => handleToggleCard(item.id)}
                                     onReviewPress={() => {
-                                        navigation.navigate("ReviewDetail", { reviewId: item.id })
+                                        navigation.navigate("ReviewList", {
+                                            initialKeyword: item.title || item.name
+                                        });
                                     }}
                                     onDetailPress={() => handleDetailPress(item)} // ⭐ 여기!
                                 />

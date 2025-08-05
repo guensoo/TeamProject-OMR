@@ -40,6 +40,7 @@ import SearchList from './Choi/SearchList';
 import AIRecommend from './Park/AIRecommend';
 import { ReviewWrite } from './Kim/component/ReviewWrite';
 import { SupportWrapper } from './Kim/supportCenter/SupportWrapper';
+import ReviewList from './Kim/component/ReviewList';
 
 const Stack = createNativeStackNavigator();
 
@@ -72,7 +73,7 @@ export default function App() {
                         <Stack.Screen name="MapScreen" component={MapScreen} options={{ headerShown: false }} />
                         <Stack.Screen name="AIRecommend" component={AIRecommend} options={{ title: "AI추천" }} />
                         <Stack.Screen name="SearchList" component={SearchList} options={{ headerShown: false }} />
-
+                        <Stack.Screen name="ReviewList" component={ReviewList} options={{ headerShown: false }} />
                         <Stack.Screen name="ReviewDetail" component={ReviewDetail} options={{ headerShown: false }} />
                         <Stack.Screen name="ReviewWrite" component={ReviewWrite} options={{ headerShown: false }} />
                         <Stack.Screen name="ReviewEdit" component={ReviewEdit} options={{ headerShown: false }} />

@@ -112,46 +112,48 @@ export default function MovieListScreen({ route, navigation }) {
     return (
         <View style={styles.container}>
             <SafeAreaView style={{ flex: 1 }}>
-            <View style={styles.sortContainer}>
-                <TouchableOpacity onPress={() => setSortBy('rank')}>
-                    <Text style={[styles.sortButton, sortBy === 'rank' && styles.active]}>
-                        {CATEGORY_LABELS[categoryKey] || '박스오피스 순위'}
-                    </Text>
-                </TouchableOpacity>
-                {/* 필요하면 최신순 등 다른 정렬 버튼도 추가 */}
-            </View>
+                <View style={styles.sortContainer}>
+                    <TouchableOpacity onPress={() => setSortBy('rank')}>
+                        <Text style={[styles.sortButton, sortBy === 'rank' && styles.active]}>
+                            {CATEGORY_LABELS[categoryKey] || '박스오피스 순위'}
+                        </Text>
+                    </TouchableOpacity>
+                    {/* 필요하면 최신순 등 다른 정렬 버튼도 추가 */}
+                </View>
 
-            {loading || fetchingDetail ? (
-                <ActivityIndicator size="large" />
-            ) : (
-                <FlatList
-                    data={data}
-                    numColumns={2}
-                    keyExtractor={(item) => item.id.toString()}
-                    renderItem={({ item, index }) => (
-                        <View style={{ position: 'relative', flex: 1 }}>
-                            {renderRankBadge(index + 1)}
-                            <TouchableOpacity
-                                activeOpacity={0.8}
-                                onPress={() => handleToggleCard(item.id)}
-                                style={{ flex: 1 }}
-                            >
-                                <MovieListCard
-                                    rank={index + 1}
-                                    image={item.poster_path}
-                                    title={item.title}
-                                    isActive={activeCard === item.id}
-                                    onToggle={() => handleToggleCard(item.id)}
-                                    onReviewPress={() => {
-                                        navigation.navigate("ReviewDetail", { reviewId: item.id });
-                                    }}
-                                    onDetailPress={() => handleDetailPress(item)}
-                                />
-                            </TouchableOpacity>
-                        </View>
-                    )}
-                />
-            )}
+                {loading || fetchingDetail ? (
+                    <ActivityIndicator size="large" />
+                ) : (
+                    <FlatList
+                        data={data}
+                        numColumns={2}
+                        keyExtractor={(item) => item.id.toString()}
+                        renderItem={({ item, index }) => (
+                            <View style={{ position: 'relative', flex: 1 }}>
+                                {renderRankBadge(index + 1)}
+                                <TouchableOpacity
+                                    activeOpacity={0.8}
+                                    onPress={() => handleToggleCard(item.id)}
+                                    style={{ flex: 1 }}
+                                >
+                                    <MovieListCard
+                                        rank={index + 1}
+                                        image={item.poster_path}
+                                        title={item.title}
+                                        isActive={activeCard === item.id}
+                                        onToggle={() => handleToggleCard(item.id)}
+                                        onReviewPress={() => {
+                                            navigation.navigate("ReviewList", {
+                                                initialKeyword: item.title || item.name
+                                            });
+                                        }}
+                                        onDetailPress={() => handleDetailPress(item)}
+                                    />
+                                </TouchableOpacity>
+                            </View>
+                        )}
+                    />
+                )}
             </SafeAreaView>
         </View>
     );

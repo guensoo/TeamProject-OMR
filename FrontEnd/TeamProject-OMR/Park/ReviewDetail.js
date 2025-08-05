@@ -18,6 +18,20 @@ import { getMovieDetail, getTVDetail } from "../All/api/tmdb";
 const ReviewDetail = ({ route, navigation }) => {
     const { user } = useContext(UserContext);
     const review = route.params?.review;
+
+    useEffect(() => {
+        if (!review) {
+            navigation.replace("BottomTabMenu", {
+                screen: 'ReviewList',
+                params: {
+                    initialKeyword: route?.params?.initialKeyword
+                    // 혹은 review?.selectMovie?.title || review?.title || ""
+                }
+            });
+        }
+    }, [review, navigation, route?.params?.initialKeyword]);
+
+    if (!review) return null;  // 이 줄 추가해주면 화면 깜빡임 없이 처리
     const currentUserId = user?.userId ?? null;
 
     // 상태 선언

@@ -4,7 +4,7 @@ import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native
 import OTTCard from './card/OTTCard';
 import { getMovieDetail, getTVDetail } from '../../All/api/tmdb'; // ← 실제 경로로!
 
-function OTTSection({ title, data, activeCard, onToggle, providerKey }) {
+function OTTSection({ title, data, activeCardKey, onToggle, providerKey }) {
     const navigation = useNavigation();
 
     // 상세 fetch → navigation
@@ -44,23 +44,26 @@ function OTTSection({ title, data, activeCard, onToggle, providerKey }) {
             <FlatList
                 horizontal
                 data={data}
-                keyExtractor={(item) => item.id.toString()}
-                extraData={activeCard}
-                renderItem={({ item, index }) => (
-                    <OTTCard
-                        rank={index + 1}
-                        image={`https://image.tmdb.org/t/p/w500${item.poster_path}`}
-                        title={item.title || item.name}
-                        isActive={activeCard === item.id}
-                        onToggle={() => onToggle(item.id)}
-                        onReviewPress={() => {
-                            navigation.navigate("ReviewList", {
-                                initialKeyword: item.title || item.name
-                            });
-                        }}
-                        onDetailPress={() => handleDetailPress(item)}
-                    />
-                )}
+                keyExtractor={(item) => providerKey + '-' + item.id}
+                extraData={activeCardKey}
+                renderItem={({ item, index }) => {
+                    const cardKey = providerKey + '-' + item.id;
+                    return (
+                        <OTTCard
+                            rank={index + 1}
+                            image={`https://image.tmdb.org/t/p/w500${item.poster_path}`}
+                            title={item.title || item.name}
+                            isActive={activeCardKey === cardKey}
+                            onToggle={() => onToggle(providerKey, item.id)}
+                            onReviewPress={() => {
+                                navigation.navigate("ReviewList", {
+                                    initialKeyword: item.title || item.name
+                                });
+                            }}
+                            onDetailPress={() => handleDetailPress(item)}
+                        />
+                    );
+                }}
             />
         </View>
     );

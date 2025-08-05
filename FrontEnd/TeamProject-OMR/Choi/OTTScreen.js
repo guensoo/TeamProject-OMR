@@ -15,7 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 export default function OTTScreen() {
     const [loading, setLoading] = useState(true);
     const [ottData, setOttData] = useState({});
-    const [activeCard, setActiveCard] = useState(null);
+    const [activeCardKey, setActiveCardKey] = useState(null);
 
     const fadeAnim = useState(new Animated.Value(0))[0];
     const slideAnim = useState(new Animated.Value(30))[0];
@@ -48,8 +48,9 @@ export default function OTTScreen() {
     }, []);
 
     // ✅ useCallback으로 메모이제이션
-    const handleToggle = useCallback((itemId) => {
-        setActiveCard((prev) => (prev === itemId ? null : itemId));
+    const handleToggle = useCallback((providerKey, itemId) => {
+        const key = providerKey + '-' + itemId;
+        setActiveCardKey(prev => (prev === key ? null : key));
     }, []);
 
     if (loading) {
@@ -93,7 +94,7 @@ export default function OTTScreen() {
                             <OTTSection
                                 title=""
                                 data={ottData[service.key] || []}
-                                activeCard={activeCard}
+                                activeCardKey={activeCardKey}
                                 onToggle={handleToggle}
                                 providerKey={service.key}
                             />
