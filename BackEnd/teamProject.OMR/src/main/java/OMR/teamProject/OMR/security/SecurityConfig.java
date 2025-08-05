@@ -1,0 +1,86 @@
+package OMR.teamProject.OMR.security;
+
+import static org.springframework.security.config.Customizer.withDefaults;
+
+import java.util.List;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+
+    // JWT 토큰을 검증할 필터 빈 등록
+    @Bean
+    public JwtFilter jwtFilter() {
+        return new JwtFilter();
+    }
+    
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    // Security 필터 체인 설정
+    @Bean
+    public SecurityFilterChain filterChain(org.springframework.security.config.annotation.web.builders.HttpSecurity http) throws Exception {
+        http
+        	// CORS 활성화
+        	.cors(Customizer.withDefaults())
+            // CSRF 비활성화
+            .csrf(AbstractHttpConfigurer::disable)
+            // 세션을 사용하지 않도록 stateless 설정
+            .sessionManagement(session ->
+                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
+            // URL별 권한 설정
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers(
+                		"/",
+                		"/**",
+                		"/api/reviews/**"
+                ).permitAll()
+                .anyRequest().authenticated()
+            )
+            // JWT 필터를 UsernamePasswordAuthenticationFilter 앞에 등록
+            .addFilterBefore(jwtFilter(), UsernamePasswordAuthenticationFilter.class)
+            // 기본 HTTP Basic 로그인 폼 비활성화(필요 시 제거)
+            .httpBasic(withDefaults());
+
+        return http.build();
+    }
+    
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(List.of(
+                "http://localhost:3000",
+                "http://localhost:8888",
+                "http://10.0.2.2:8888",
+                "http://10.0.2.2:3000",
+                "http://192.168.3.24:8888",
+                "http://192.168.3.24:3000",
+                "http://192.168.3.23:8888",
+                "http://192.168.3.23:3000"
+        ));
+        config.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS", "PATCH"));
+        config.setAllowCredentials(true);
+        config.setAllowedHeaders(List.of("*"));
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
+    }
+}

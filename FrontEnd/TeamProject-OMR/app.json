@@ -4,11 +4,12 @@
     "slug": "TeamProject-OMR",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/OMR_MainLogo.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
+    "scheme": "myapp",
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/OMR_MainLogo.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -20,7 +21,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.anonymous.TeamProjectOMR"
     },
     "web": {
       "favicon": "./assets/favicon.png"

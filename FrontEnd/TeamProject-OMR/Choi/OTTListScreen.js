@@ -1,0 +1,211 @@
+import React, { useState, useEffect } from 'react';
+import { View, FlatList, ActivityIndicator, TouchableOpacity, Text, StyleSheet, Dimensions } from 'react-native';
+import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
+import { getOTTPopularMovie, getOTTPopularTV, OTT_PROVIDERS, getMovieDetail, getTVDetail } from '../All/api/tmdb'; // ⭐ 상세 fetch import!
+import OTTListCard from './components/card/OTTListCard';
+import { useNavigation } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+const initialLayout = { width: Dimensions.get('window').width };
+
+function OTTTabContent({ providerKey, sortBy }) {
+    const [data, setData] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [page, setPage] = useState(1);
+    const [isEnd, setIsEnd] = useState(false);
+    const [activeCard, setActiveCard] = useState(null);
+    const [fetchingDetail, setFetchingDetail] = useState(false); // ⭐ 상세로딩 상태
+
+    const navigation = useNavigation();
+
+    useEffect(() => {
+        fetchData(1, sortBy);
+        setActiveCard(null);
+    }, [sortBy, providerKey]);
+
+    const fetchData = async (pageNum, sortOption) => {
+        try {
+            setLoading(true);
+            const providerId = OTT_PROVIDERS[providerKey];
+            // 영화+TV 모두 병렬 호출!
+            const [movies, tvs] = await Promise.all([
+                getOTTPopularMovie(providerId, pageNum, sortOption),
+                getOTTPopularTV(providerId, pageNum, sortOption),
+            ]);
+            // 타입 추가!
+            const moviesWithType = (movies || []).map(item => ({ ...item, media_type: 'movie' }));
+            const tvsWithType = (tvs || []).map(item => ({ ...item, media_type: 'tv' }));
+
+            // 정렬 기준에 따라 섞어서 반환
+            const combined = [...moviesWithType, ...tvsWithType].sort((a, b) => {
+                if (sortOption === 'release_date.desc') {
+                    return new Date(b.release_date || b.first_air_date || 0) - new Date(a.release_date || a.first_air_date || 0);
+                }
+                return (b.popularity || 0) - (a.popularity || 0);
+            });
+
+            if (pageNum === 1) setData(combined);
+            else setData(prev => [...prev, ...combined]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // 👑 1~3등만 뱃지로 표시
+    function renderRankBadge(rank) {
+        if (sortBy !== 'popularity.desc') return null;
+        if (rank > 3) return null;
+        let badgeStyle = {
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            zIndex: 10,
+            borderRadius: 16,
+            width: 32,
+            height: 32,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: '#444',
+            borderWidth: 2,
+            borderColor: '#fff'
+        };
+        let badgeEmoji = null;
+
+        if (rank === 1) badgeEmoji = "👑";
+        else if (rank === 2) badgeEmoji = "🥈";
+        else if (rank === 3) badgeEmoji = "🥉";
+
+        return (
+            <View style={badgeStyle}>
+                <Text style={{ fontSize: 20 }}>{badgeEmoji}</Text>
+            </View>
+        );
+    }
+
+    // 카드 토글 핸들러 (한번 더 누르면 닫힘)
+    const handleToggleCard = (id) => {
+        setActiveCard((prev) => (prev === id ? null : id));
+    };
+
+    // ⭐⭐ 상세 fetch 후 InfoDetail로 넘기는 로직!
+    const handleDetailPress = async (item) => {
+        setFetchingDetail(true);
+        try {
+            let detail = null;
+            if (item.media_type === 'movie' || item.title) {
+                detail = await getMovieDetail(item.id);
+            } else {
+                detail = await getTVDetail(item.id);
+            }
+            setFetchingDetail(false);
+            if (detail) {
+                navigation.navigate("InfoDetail", { ott: detail });
+            } else {
+                alert('상세 정보를 불러올 수 없습니다.');
+            }
+        } catch (e) {
+            setFetchingDetail(false);
+            alert('상세 정보를 불러오는 중 오류가 발생했습니다.');
+        }
+    };
+
+    return (
+
+
+        <View style={styles.tabContainer}>
+            {(loading && page === 1) || fetchingDetail ? (
+                <ActivityIndicator size="large" />
+            ) : (
+                <FlatList
+                    data={data}
+                    numColumns={2}
+                    keyExtractor={(item) => item.id.toString()}
+                    renderItem={({ item, index }) => (
+                        <View style={{ position: 'relative', flex: 1 }}>
+                            {renderRankBadge(index + 1)}
+                            <TouchableOpacity
+                                activeOpacity={0.8}
+                                onPress={() => handleToggleCard(item.id)}
+                                style={{ flex: 1 }}
+                            >
+                                <OTTListCard
+                                    rank={index + 1}
+                                    image={`https://image.tmdb.org/t/p/w500${item.poster_path}`}
+                                    title={item.title || item.name}
+                                    isActive={activeCard === item.id}
+                                    onToggle={() => handleToggleCard(item.id)}
+                                    onReviewPress={() => {
+                                        navigation.navigate("ReviewList", {
+                                            initialKeyword: item.title || item.name
+                                        });
+                                    }}
+                                    onDetailPress={() => handleDetailPress(item)} // ⭐ 여기!
+                                />
+                            </TouchableOpacity>
+                        </View>
+                    )}
+                />
+            )}
+
+        </View>
+    );
+}
+
+export default function OTTListScreen({ route }) {
+    const { providerKey } = route.params;
+    const [index, setIndex] = useState(0);
+    const [routes] = useState([
+        { key: 'popular', title: '인기순' },
+        { key: 'recent', title: '최신순' }
+    ]);
+
+    const renderScene = ({ route }) => {
+        switch (route.key) {
+            case 'popular':
+                return <OTTTabContent providerKey={providerKey} sortBy="popularity.desc" />;
+            case 'recent':
+                return <OTTTabContent providerKey={providerKey} sortBy="release_date.desc" />;
+            default:
+                return null;
+        }
+    };
+
+    return (
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#0f0f23' }} edges={['top', 'left', 'right']}>
+            <TabView
+                navigationState={{ index, routes }}
+                renderScene={renderScene}
+                onIndexChange={setIndex}
+                initialLayout={initialLayout}
+                renderTabBar={props =>
+                    <TabBar
+                        {...props}
+                        style={{ backgroundColor: '#181830' }}
+                        indicatorStyle={{ backgroundColor: '#fff' }}
+                        labelStyle={{ color: '#fff', fontWeight: 'bold' }}
+                        inactiveColor="#aaa"
+                        activeColor="#fff"
+                    />
+                }
+                style={{ backgroundColor: '#0f0f23' }}
+            />
+        </SafeAreaView>
+    );
+}
+
+const styles = StyleSheet.create({
+    tabContainer: { flex: 1, backgroundColor: '#0f0f23', padding: 10 },
+    detailBox: {
+        backgroundColor: '#232336',
+        borderRadius: 12,
+        margin: 8,
+        padding: 16,
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#393969'
+    },
+    detailText: {
+        color: '#fff',
+        fontSize: 14
+    }
+});
