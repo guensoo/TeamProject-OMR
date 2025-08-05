@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import { View, Text, Image, TouchableOpacity, ActivityIndicator, StyleSheet, Dimensions, FlatList } from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { getMovieDetail, getTVDetail } from "../../All/api/tmdb";
+import { fetchReviews } from "../../All/api/ReviewApi";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
@@ -51,13 +52,8 @@ const PopularReviewList = ({ activeCard, onToggleCard }) => {
             setLoading(true);
             (async () => {
                 try {
-                    const response = await fetch('http://10.0.2.2:8888/api/review', {
-                        method: 'GET',
-                        headers: { 'Content-Type': 'application/json' },
-                    });
-                    if (!response.ok) throw new Error('네트워크 오류 또는 서버 오류');
-                    const data = await response.json();
-                    // console.log("data", data)
+                    const data = await fetchReviews();
+
                     const countMap = new Map();
 
                     // 먼저 title별로 개수 세기
