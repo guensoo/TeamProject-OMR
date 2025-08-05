@@ -151,6 +151,10 @@ const PopularReviewList = ({ activeCard, onToggleCard }) => {
 };
 
 const styles = StyleSheet.create({
+    centeredContainer:{
+        marginLeft: 18,
+        marginTop: 10,
+    },
     card: {
         alignItems: 'center',
         marginRight: 12,

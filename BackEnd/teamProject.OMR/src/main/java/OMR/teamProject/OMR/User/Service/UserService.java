@@ -24,7 +24,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     //회원가입
-    public UserResponseDto register(UserRequestDto dto) {
+    public UserResponseDto register(UserRequestDto dto) {	
         UserEntity user = UserEntity.builder()
             .userId(dto.getUserId())
             .password(passwordEncoder.encode(dto.getPassword())) // 보통 암호화 필요!

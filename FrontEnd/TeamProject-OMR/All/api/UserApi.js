@@ -5,7 +5,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 //회원가입 api
 export async function registerUser(userData) {
     try {
+        console.log("userData::", userData)
         const res = await axios.post(`${API}/api/users/register`, userData);
+        console.log("res.data::",res.data)
         return res.data;
     } catch (error) {
         const message = error.response?.data?.message || error.message || '회원가입 실패';

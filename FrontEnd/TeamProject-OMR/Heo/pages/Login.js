@@ -52,8 +52,8 @@ const Login = () => {
                         <TouchableOpacity
                             style={styles.roleButton}
                             onPress={() => {
-                                setId('test');
-                                setPassword('11111111');
+                                setId('testuser');
+                                setPassword('a123456!');
                             }}
                         >
                             <Text style={styles.roleButtonText}>유저</Text>
@@ -62,8 +62,8 @@ const Login = () => {
                         <TouchableOpacity
                             style={styles.roleButton}
                             onPress={() => {
-                                setId('aaaa');
-                                setPassword('11111111');
+                                setId('hms1218');
+                                setPassword('a123456!');
                             }}
                         >
                             <Text style={styles.roleButtonText}>관리자</Text>
